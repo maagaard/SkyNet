@@ -28,7 +28,9 @@
 
 
 ## Tasks
-- stdin/stdout reader/writer 
+- [x] Create project
+- [ ] Make stdin/stdout reader/writer 
+- [ ] 
 
 
 ## Classes
