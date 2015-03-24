@@ -3,6 +3,11 @@ PLANNER.md
 
 # Planner
 
+## Server defined agent actions 
+- Move(agent-direction)
+- Push(agent-move-direction, box-push-direction)
+- Pull(agent-move-direction, current-direction)
+- NoOp
 
 ## Approach
 - Start with goals
