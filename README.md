@@ -29,7 +29,10 @@
 
 ## Tasks
 - [x] Create project
-- [ ] Make stdin/stdout reader/writer 
+- [ ] Make stdin/stdout reader/writer (Bjarke)
+- [ ] Create domain model/framework for planners (Bjarke)
+- [ ] Wire everything together in main (Bjarke)
+- [ ] 
 - [ ] 
 
 
