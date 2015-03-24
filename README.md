@@ -15,7 +15,22 @@
 - Set partial goals, benchmark (nodes, memory, explored etc)
 - Fullfill benchmarking levels
 
-### Code:
+## Planner:
+- Goals
+- Priorities
+- Plan
+- Map(.lvl) input --> plan output (sequence of action)
+- Fully observable and deterministic environment
+- Types of planners: POP
+
+
+### 1st iteration:
+- Single agent handling
+
+### 2nd iteration:
+- Multi agent handling
+
+## Code:
 - stdin/stdout reader/writer
 - Use names from lecture in codes as classifiers
 
