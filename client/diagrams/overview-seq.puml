@@ -1,0 +1,33 @@
+@startuml
+box "Server side" #white
+    actor server as s
+end box
+
+box "Client side" #white
+    actor client as c
+    participant "level reader" as reader
+    participant planner as p
+end box
+
+group Init
+    s -> c: messages: [String]
+activate s
+activate c
+    c -> reader: ReadLevel(messages)
+    activate reader
+    c <-- reader: level: Level
+    deactivate reader
+    c -> p: makePlan(level)
+    activate p
+
+    /'
+    Planning goes here!
+    '/
+
+    c <-- p: plan: Plan
+    deactivate p
+    s <-- c: plan: [Action]
+deactivate c
+deactivate s
+end
+@enduml
