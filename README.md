@@ -39,3 +39,15 @@
 - Agent
 - Heuristic
 - Command
+
+
+## Stuff
+- Level:
+    - Walls - rigid
+    - Goals - rigid
+    - Agents (co-ordinate based?)
+    - Boxes (co-ordinate based?)
+
+- Plan:
+    - State change steps (boxes and agents)
+
