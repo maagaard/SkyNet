@@ -27,6 +27,8 @@ PLANNER.md
 - Loop
     - Choose open precondition to goal state
     - Find actions that achieve condition
+- Check if actions break established conditions or is blocked by conditions
+    - Add ordering constraint ordering B to come before A 
 - Add preconditions to set of conditions (in a sub-plan) 
 - 
 
