@@ -4,7 +4,7 @@
 # AI - Assignment 3
 
 ## Language: 
-- Java
+- Java 8
 
 ## TODO:
 - Start thinking about how to do this...
@@ -15,20 +15,6 @@
 - Set partial goals, benchmark (nodes, memory, explored etc)
 - Fullfill benchmarking levels
 
-## Planner:
-- Goals
-- Priorities
-- Plan
-- Map(.lvl) input --> plan output (sequence of action)
-- Fully observable and deterministic environment
-- Types of planners: POP
-
-
-### 1st iteration:
-- Single agent handling
-
-### 2nd iteration:
-- Multi agent handling
 
 ## Code:
 - stdin/stdout reader/writer
@@ -39,3 +25,8 @@
 - Communication between agents 
 - Plan sharing
 - Conflict handling
+
+
+## Tasks:
+- stdin/stdout reader/writer 
+- 
