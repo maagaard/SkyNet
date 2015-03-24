@@ -32,8 +32,7 @@
 - [ ] Make stdin/stdout reader/writer (Bjarke)
 - [ ] Create domain model/framework for planners (Bjarke)
 - [ ] Wire everything together in main (Bjarke)
-- [ ] 
-- [ ] 
+- [ ] Create initial heuristics (Emil)
 
 
 ## Classes
