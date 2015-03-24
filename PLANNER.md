@@ -13,9 +13,10 @@ PLANNER.md
 
 ### POP approach
 - Prioritizing goals
-- Cost of solution
+- Cost of solution estimate / heuristics
 
-- Define goals, actions, literals
+- Define goals, actions, commands, literals
+
 
 
 ## Planner knowledge
@@ -30,4 +31,4 @@ PLANNER.md
 - Single agent handling
 
 ### 2nd iteration:
-- Multi agent handling
+- Multi agent handling 

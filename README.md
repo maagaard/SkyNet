@@ -30,3 +30,11 @@
 ## Tasks:
 - stdin/stdout reader/writer 
 - 
+
+
+## Classes:
+- Level
+- Agent
+- Strategy?
+- Heuristic
+- Command
