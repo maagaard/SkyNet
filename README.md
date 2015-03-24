@@ -7,6 +7,7 @@
 - [x] Create project
 - [ ] Make stdin/stdout reader/writer (Bjarke)
 - [ ] Create domain model/framework for planners (Bjarke)
+- [ ] Create benchmark framework for testing (Bjarke)
 - [ ] Wire everything together in main (Bjarke)
 - [ ] Create initial heuristics (Emil)
 - [ ] Create initial POP-algorithm (Dennis)
