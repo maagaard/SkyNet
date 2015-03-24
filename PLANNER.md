@@ -21,11 +21,24 @@ PLANNER.md
 
 
 ### POP approach
-- Prioritizing goals
-- Cost of solution estimate / heuristics
-
+- Heuristics
 - Define goals, actions, commands, literals
 
+- Loop
+    - Choose open precondition to goal state
+    - Find actions that achieve condition
+- Add preconditions to set of conditions (in a sub-plan) 
+- 
+
+
+<!-- #### Goal prioritizing
+- Choose goal
+- Loop
+    - Find open precondition
+    - Find action that achieves condition
+    - return "plan" for achieving goal
+- Check if other goals conflict with plan
+- Prioritize goals with regards to conflicts -->
 
 
 ## Planner knowledge
