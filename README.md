@@ -3,30 +3,6 @@
 
 # AI - Assignment 3
 
-## Language
-- Java 8
-
-## TODO
-- Start thinking about how to do this...
-- Simple Single Agent
-- Decenteralized vs centralized
-- Handling different color of boxes and agents
-- Heuristics (with multiple boxes and goals of same kind)
-- Set partial goals, benchmark (nodes, memory, explored etc)
-- Fullfill benchmarking levels
-
-
-## Code
-- stdin/stdout reader/writer
-- Use names from lecture in codes as classifiers
-
-## Project structure outline
-- Single agent structure
-- Communication between agents 
-- Plan sharing
-- Conflict handling
-
-
 ## Tasks
 - [x] Create project
 - [ ] Make stdin/stdout reader/writer (Bjarke)
@@ -36,8 +12,34 @@
 - [ ] Create initial POP-algorithm (Dennis)
 
 
+## Project info
 
-## Classes
+### Language
+- Java 8
+
+### Project work outline
+- Start thinking about how to do this...
+- Simple Single Agent
+- Decenteralized vs centralized
+- Handling different color of boxes and agents
+- Heuristics (with multiple boxes and goals of same kind)
+- Set partial goals, benchmark (nodes, memory, explored etc)
+- Fullfill benchmarking levels
+
+
+### Code
+- stdin/stdout reader/writer
+- Use names from lecture in codes as classifiers
+
+### Project structure outline
+- Single agent structure
+- Communication between agents 
+- Plan sharing
+- Conflict handling
+
+
+
+### Class proposals
 - Level
 - Planner
 - Plan (strategy?)
@@ -46,7 +48,7 @@
 - Command
 
 
-## Stuff
+### Other stuff
 - Level
     - Walls - rigid
     - Goals - rigid
