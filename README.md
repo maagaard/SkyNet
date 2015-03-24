@@ -10,6 +10,7 @@
 - [ ] Wire everything together in main (Bjarke)
 - [ ] Create initial heuristics (Emil)
 - [ ] Create initial POP-algorithm (Dennis)
+- [ ] Look into HTN-algorithm (Martin/Michel)
 
 
 ## Project info
