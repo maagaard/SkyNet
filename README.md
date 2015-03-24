@@ -34,7 +34,8 @@
 
 ## Classes:
 - Level
+- Planner
+- Plan (strategy?)
 - Agent
-- Strategy?
 - Heuristic
 - Command
