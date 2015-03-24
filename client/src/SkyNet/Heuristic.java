@@ -17,6 +17,20 @@ class Node {
     public int g() {
         return g;
     }
+
+    public boolean isGoalState() {
+//        for ( int row = 1; row < MAX_ROW - 1; row++ ) {
+//            for ( int col = 1; col < MAX_COLUMN - 1; col++ ) {
+//                char g = goals[row][col];
+//                char b = Character.toLowerCase( boxes[row][col] );
+//                if ( g > 0 && b != g) {
+//                    return false;
+//                }
+//            }
+//        }
+        return true;
+    }
+
 }
 
 public abstract class Heuristic implements Comparator< Node > {
