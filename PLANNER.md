@@ -7,7 +7,11 @@ PLANNER.md
 - Move(agent-direction)
 - Push(agent-move-direction, box-push-direction)
 - Pull(agent-move-direction, current-direction)
-- NoOp
+- NoOp 
+
+### Directions
+- N, W, E, S
+
 
 ## Approach
 - Start with goals
