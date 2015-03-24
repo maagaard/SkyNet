@@ -27,8 +27,8 @@ PLANNER.md
 - Fully observable and deterministic environment
 
 
-### 1st iteration:
+### 1st iteration
 - Single agent handling
 
-### 2nd iteration:
+### 2nd iteration
 - Multi agent handling 

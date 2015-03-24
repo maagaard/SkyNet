@@ -3,10 +3,10 @@
 
 # AI - Assignment 3
 
-## Language: 
+## Language
 - Java 8
 
-## TODO:
+## TODO
 - Start thinking about how to do this...
 - Simple Single Agent
 - Decenteralized vs centralized
@@ -16,23 +16,22 @@
 - Fullfill benchmarking levels
 
 
-## Code:
+## Code
 - stdin/stdout reader/writer
 - Use names from lecture in codes as classifiers
 
-## Project structure outline:
+## Project structure outline
 - Single agent structure
 - Communication between agents 
 - Plan sharing
 - Conflict handling
 
 
-## Tasks:
+## Tasks
 - stdin/stdout reader/writer 
-- 
 
 
-## Classes:
+## Classes
 - Level
 - Planner
 - Plan (strategy?)
@@ -42,12 +41,12 @@
 
 
 ## Stuff
-- Level:
+- Level
     - Walls - rigid
     - Goals - rigid
     - Agents (co-ordinate based?)
     - Boxes (co-ordinate based?)
 
-- Plan:
+- Plan
     - State change steps (boxes and agents)
 
