@@ -4,8 +4,7 @@
 # AI - Assignment 3
 
 ## Language: 
-- Python?
-- Java?
+- Java
 
 ## TODO:
 - Start thinking about how to do this...
