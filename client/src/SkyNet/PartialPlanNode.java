@@ -1,11 +1,8 @@
 package SkyNet;
 
-import SkyNet.model.Box;
-import SkyNet.model.Level;
-import SkyNet.model.PathFragment;
+import SkyNet.model.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -13,11 +10,15 @@ import java.util.Random;
  * Created by maagaard on 31/03/15.
  * Copyright (c) maagaard 2015.
  */
-public class Node {
+public class PartialPlanNode {
 
     public Level level;
+
+    public Box box;
+    public Goal goal;
+    public Agent agent;
+
     public ArrayList<PathFragment> path;
-    public ArrayList<Box> boxes;
 
     private static Random rnd = new Random( 1 );
     public static int MAX_ROW = 50;     //Default setting
@@ -32,12 +33,25 @@ public class Node {
     }
 
 
+    public PartialPlanNode(Level level, Agent agent, Goal goal, Box box) {
+        this.level = level;
+
+        this.agent = agent;
+        this.goal = goal;
+        this.box =  box;
+
+    }
+
     public boolean isInitialState() {
         return this.path.size() == 0;
     }
 
 
     public boolean isGoalState() {
+        if (box.equals(goal)) {
+            return true;
+        }
+        return false;
 //        for ( int row = 1; row < MAX_ROW - 1; row++ ) {
 //            for ( int col = 1; col < MAX_COLUMN - 1; col++ ) {
 //                char g = goals[row][col];
@@ -47,7 +61,7 @@ public class Node {
 //                }
 //            }
 //        }
-        return true;
+//        return true;
     }
 
 
@@ -62,35 +76,33 @@ public class Node {
     public int hashCode() {
         final int prime = 37;
         int result = 1;
-//        result = prime * result + agentCol;
-//        result = prime * result + agentRow;
-//        result = prime * result + Arrays.deepHashCode(boxes);
-//        result = prime * result + Arrays.deepHashCode( goals );
-//        result = prime * result + Arrays.deepHashCode( walls );
+        result = prime * result + box.hashCode();
+        result = prime * result + agent.hashCode();
+        result = prime * result + goal.hashCode();
+        result = prime * result + level.hashCode();
         return result;
     }
 
     @Override
     public boolean equals( Object obj ) {
-//        if ( this == obj )
-//            return true;
-//        if ( obj == null )
-//            return false;
-//        if ( getClass() != obj.getClass() )
-//            return false;
-//        Node other = (Node) obj;
-//        if ( agentCol != other.agentCol )
-//            return false;
-//        if ( agentRow != other.agentRow )
-//            return false;
-//        if ( !Arrays.deepEquals( boxes, other.boxes ) ) {
-//            return false;
-//        }
-//        if ( !Arrays.deepEquals( goals, other.goals ) )
-//            return false;
-//        if ( !Arrays.deepEquals( walls, other.walls ) )
-//            return false;
-//        return true;
+        if ( this == obj )
+            return true;
+        if ( obj == null )
+            return false;
+        if ( getClass() != obj.getClass() )
+            return false;
+
+        PartialPlanNode other = (PartialPlanNode) obj;
+        if (agent != other.agent)
+            return false;
+        if (box != other.box)
+            return false;
+        if (goal != other.goal)
+            return false;
+        if (level != other.level)
+            return false;
+
+        return true;
     }
 
     public String toString() {
@@ -117,6 +129,5 @@ public class Node {
 //        }
         return s.toString();
     }
-
 
 }

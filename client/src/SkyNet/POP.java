@@ -105,6 +105,13 @@ public class POP {
 
         Strategy strategy = new StrategyBestFirst(new AStar(initialState));
 
+        LinkedList<Node> partialPlan;
+        try {
+             partialPlan = Search(strategy);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
 
 
@@ -114,9 +121,9 @@ public class POP {
 
 
 
-    public LinkedList< Node > Search( Strategy strategy ) throws IOException {
+    public LinkedList<Node> Search( Strategy strategy ) throws IOException {
         System.err.format( "Search starting with strategy %s\n", strategy );
-        strategy.addToFrontier( this.initialState );
+        strategy.addToFrontier(this.initialState);
 
         int iterations = 0;
         while ( true ) {
@@ -139,8 +146,8 @@ public class POP {
             Node leafNode = strategy.getAndRemoveLeaf();
 
             if ( leafNode.isGoalState() ) {
-                return null;
-//                return leafNode.extractPlan();
+//                return null;
+                return leafNode.extractPlan();
             }
 
             strategy.addToExplored( leafNode );
