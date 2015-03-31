@@ -2,13 +2,12 @@ package SkyNet;
 
 import SkyNet.model.*;
 import SkyNet.Strategy.*;
-import SkyNet.Heuristic.*;
+import SkyNet.PartialPlanNode;
+import SkyNet.PartialPlanHeuristic.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 
 
 //class Strategy {
@@ -93,35 +92,34 @@ public class POP {
     public Node initialState = null;
 
 
-
     public void pickGoal() {
-        Goal g = new Goal(5, 6);
-        Box b = new Box(1, 3);
-        extractPartialOrderPlan(g, b);
+        Goal g = new Goal('a', 5, 6);
+        Box b = new Box('A', 1, 3);
+        Agent agent = new Agent(0, 1, 4);
+
+        extractPartialOrderPlan(agent, g, b);
     }
 
-    private ArrayList<Action> extractPartialOrderPlan(Goal goal, Box box) {
+    private ArrayList<Action> extractPartialOrderPlan(Agent agent, Goal goal, Box box) {
+
+        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
+
         ArrayList<Action> goalSteps = new ArrayList<Action>();
 
-        Strategy strategy = new StrategyBestFirst(new AStar(initialState));
+        Strategy strategy = new StrategyBestFirst(new AStar(partialInitialState));
 
-        LinkedList<Node> partialPlan;
+        LinkedList<PartialPlanNode> partialPlan;
         try {
              partialPlan = Search(strategy);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-
-
         return goalSteps;
     }
 
 
-
-
-    public LinkedList<Node> Search( Strategy strategy ) throws IOException {
+    public LinkedList<PartialPlanNode> Search( Strategy strategy ) throws IOException {
         System.err.format( "Search starting with strategy %s\n", strategy );
         strategy.addToFrontier(this.initialState);
 
@@ -143,19 +141,24 @@ public class POP {
                 return null;
             }
 
-            Node leafNode = strategy.getAndRemoveLeaf();
+            PartialPlanNode leafNode = (PartialPlanNode)strategy.getAndRemoveLeaf();
 
             if ( leafNode.isGoalState() ) {
-                return leafNode.extractPlan();
+                return leafNode.extractPartialPlan();
             }
 
             strategy.addToExplored( leafNode );
 
-            for ( Node n : leafNode.getExpandedNodes() ) {
-                if ( !strategy.isExplored( n ) && !strategy.inFrontier( n ) ) {
-                    strategy.addToFrontier( n );
+            for (PathFragment p : leafNode.getExpandedNodes()) {
+                if (!strategy.isExplored(leafNode) && !strategy.inFrontier(leafNode)) {
+                    strategy.addToFrontier(leafNode);
                 }
             }
+//            for ( Node n : leafNode.getExpandedNodes() ) {
+//                if ( !strategy.isExplored( n ) && !strategy.inFrontier( n ) ) {
+//                    strategy.addToFrontier( n );
+//                }
+//            }
             iterations++;
         }
     }

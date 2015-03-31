@@ -114,7 +114,8 @@ public class Node {
 //            return false;
 //        if ( !Arrays.deepEquals( walls, other.walls ) )
 //            return false;
-//        return true;
+
+        return true;
     }
 
     public String toString() {

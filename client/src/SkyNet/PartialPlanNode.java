@@ -5,6 +5,7 @@ import SkyNet.Command.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Random;
  * Created by maagaard on 31/03/15.
  * Copyright (c) maagaard 2015.
  */
-public class PartialPlanNode {
+public class PartialPlanNode extends Node {
 
     public Level level;
 
@@ -55,13 +56,10 @@ public class PartialPlanNode {
             if (c.actType == type.Move) {
                 // Check if there's a wall or box on the cell to which the agent is moving
                 if (this.level.cellIsFree(newAgentRow, newAgentCol)) {
-
                     this.agent.y = newAgentRow;
                     this.agent.x = newAgentCol;
-
                     expandedNodes.add(new PathFragment(this.agent, this.box));
                 }
-
             } else if (c.actType == type.Push) {
                 // Make sure that there's actually a box to move
                 if (box.y == newAgentRow && box.x == newAgentCol) {
@@ -69,38 +67,30 @@ public class PartialPlanNode {
                     int newBoxCol = newAgentCol + dirToColChange(c.dir2);
                     // .. and that new cell of box is free
                     if (this.level.cellIsFree(newBoxRow, newBoxCol)) {
-
                         this.agent.y = newAgentRow;
                         this.agent.x = newAgentCol;
                         this.box.y = newBoxRow;
                         this.box.x = newBoxCol;
-
                         expandedNodes.add(new PathFragment(this.agent, this.box));
                     }
                 }
-
             } else if (c.actType == type.Pull) {
                 // Cell is free where agent is going
                 if (this.level.cellIsFree(newAgentRow, newAgentCol)) {
-
                     int boxRow = this.agent.y + dirToRowChange(c.dir2);
                     int boxCol = this.agent.x + dirToColChange(c.dir2);
                     // .. and there's a box in "dir2" of the agent
                     if (box.y == boxRow && box.x == boxCol) {
-
                         this.box.y = this.agent.y;
                         this.box.x = this.agent.x;
-
                         this.agent.y = newAgentRow;
                         this.agent.x = newAgentCol;
-
                         expandedNodes.add(new PathFragment(this.agent, this.box));
                     }
                 }
             }
         }
 //        Collections.shuffle(expandedNodes, rnd);
-
         return expandedNodes;
     }
 
@@ -112,6 +102,18 @@ public class PartialPlanNode {
         return ( d == dir.E ? 1 : ( d == dir.W ? -1 : 0 ) ); // East is left one column (1), west is right one column (-1)
     }
 
+
+    //TODO: FIX
+//    @Override
+    public LinkedList<PartialPlanNode> extractPartialPlan() {
+        LinkedList<PartialPlanNode> plan = new LinkedList<PartialPlanNode>();
+        Node n = this;
+        while( !n.isInitialState() ) {
+//            plan.addFirst(n);
+//            n = n.parent;
+        }
+        return plan;
+    }
 
 
 
