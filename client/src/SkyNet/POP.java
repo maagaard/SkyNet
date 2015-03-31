@@ -1,44 +1,12 @@
 package SkyNet;
 
-import SkyNet.model.Action;
+import SkyNet.model.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-
-/**
- * client
- * Created by maagaard on 24/03/15.
- * Copyright (c) maagaard 2015.
- */
-
-class Goal {
-    public Goal(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-    public int x;
-    public int y;
-}
-
-class Box {
-    public Box(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-    public int x;
-    public int y;
-}
-
-class Level {
-    public int walls[][];
-    public int goals[][];
-
-//    public int boxes[][];
-//    public int agents[][];
-}
 
 
 class Strategy {
