@@ -1,8 +1,10 @@
 package SkyNet;
 
 import SkyNet.model.*;
+import SkyNet.Command.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -42,7 +44,73 @@ public class PartialPlanNode {
     }
 
 
+    public ArrayList<PathFragment> getExpandedNodes() {
+        ArrayList<PathFragment> expandedNodes = new ArrayList<PathFragment>(Command.every.length);
 
+        for (Command c : Command.every) {
+            // Determine applicability of action
+            int newAgentRow = this.agent.y + dirToRowChange(c.dir1);
+            int newAgentCol = this.agent.x + dirToColChange(c.dir1);
+
+            if (c.actType == type.Move) {
+                // Check if there's a wall or box on the cell to which the agent is moving
+                if (this.level.cellIsFree(newAgentRow, newAgentCol)) {
+
+                    this.agent.y = newAgentRow;
+                    this.agent.x = newAgentCol;
+
+                    expandedNodes.add(new PathFragment(this.agent, this.box));
+                }
+
+            } else if (c.actType == type.Push) {
+                // Make sure that there's actually a box to move
+                if (box.y == newAgentRow && box.x == newAgentCol) {
+                    int newBoxRow = newAgentRow + dirToRowChange(c.dir2);
+                    int newBoxCol = newAgentCol + dirToColChange(c.dir2);
+                    // .. and that new cell of box is free
+                    if (this.level.cellIsFree(newBoxRow, newBoxCol)) {
+
+                        this.agent.y = newAgentRow;
+                        this.agent.x = newAgentCol;
+                        this.box.y = newBoxRow;
+                        this.box.x = newBoxCol;
+
+                        expandedNodes.add(new PathFragment(this.agent, this.box));
+                    }
+                }
+
+            } else if (c.actType == type.Pull) {
+                // Cell is free where agent is going
+                if (this.level.cellIsFree(newAgentRow, newAgentCol)) {
+
+                    int boxRow = this.agent.y + dirToRowChange(c.dir2);
+                    int boxCol = this.agent.x + dirToColChange(c.dir2);
+                    // .. and there's a box in "dir2" of the agent
+                    if (box.y == boxRow && box.x == boxCol) {
+
+                        this.box.y = this.agent.y;
+                        this.box.x = this.agent.x;
+
+                        this.agent.y = newAgentRow;
+                        this.agent.x = newAgentCol;
+
+                        expandedNodes.add(new PathFragment(this.agent, this.box));
+                    }
+                }
+            }
+        }
+//        Collections.shuffle(expandedNodes, rnd);
+
+        return expandedNodes;
+    }
+
+    private int dirToRowChange( dir d ) {
+        return ( d == dir.S ? 1 : ( d == dir.N ? -1 : 0 ) ); // South is down one row (1), north is up one row (-1)
+    }
+
+    private int dirToColChange( dir d ) {
+        return ( d == dir.E ? 1 : ( d == dir.W ? -1 : 0 ) ); // East is left one column (1), west is right one column (-1)
+    }
 
 
 

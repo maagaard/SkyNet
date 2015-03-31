@@ -21,4 +21,8 @@ public class Level {
 
     }
 
+    public boolean cellIsFree(int row, int col) {
+        return !(this.walls[row][col] == 0);
+    }
+
 }
