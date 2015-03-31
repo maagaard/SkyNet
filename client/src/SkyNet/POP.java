@@ -1,6 +1,8 @@
 package SkyNet;
 
 import SkyNet.model.*;
+import SkyNet.Strategy.*;
+import SkyNet.Heuristic.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,49 +11,49 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 
-class Strategy {
-    public String searchStatus() {
-//        return String.format( "#Explored: %4d, #Frontier: %3d, Time: %3.2f s \t%s", countExplored(), countFrontier(), timeSpent(), Memory.stringRep() );
-        return "dummy";
-    }
-
-    public float timeSpent() {
-//        return ( System.currentTimeMillis() - startTime ) / 1000f;
-        return 0.0f;
-    }
-
-    public HashSet< Node > explored;
-    public void addToExplored( Node n ) {
-        explored.add( n );
-    }
-
-    private PriorityQueue<Node> frontier;
-
-    public Node getAndRemoveLeaf() {
-        Node node = frontier.poll();
-        return node;
-    }
-
-    public void addToFrontier( Node n ) {
-        frontier.add(n);
-    }
-
-    public int countFrontier() {
-        return frontier.size();
-    }
-
-    public boolean frontierIsEmpty() {
-        return frontier.isEmpty();
-    }
-
-    public boolean inFrontier( Node n ) {
-        return frontier.contains(n);
-    }
-
-    public String toString() {
-        return "Best-first Search (PriorityQueue) using ";
-    }
-}
+//class Strategy {
+//    public String searchStatus() {
+////        return String.format( "#Explored: %4d, #Frontier: %3d, Time: %3.2f s \t%s", countExplored(), countFrontier(), timeSpent(), Memory.stringRep() );
+//        return "dummy";
+//    }
+//
+//    public float timeSpent() {
+////        return ( System.currentTimeMillis() - startTime ) / 1000f;
+//        return 0.0f;
+//    }
+//
+//    public HashSet< Node > explored;
+//    public void addToExplored( Node n ) {
+//        explored.add( n );
+//    }
+//
+//    private PriorityQueue<Node> frontier;
+//
+//    public Node getAndRemoveLeaf() {
+//        Node node = frontier.poll();
+//        return node;
+//    }
+//
+//    public void addToFrontier( Node n ) {
+//        frontier.add(n);
+//    }
+//
+//    public int countFrontier() {
+//        return frontier.size();
+//    }
+//
+//    public boolean frontierIsEmpty() {
+//        return frontier.isEmpty();
+//    }
+//
+//    public boolean inFrontier( Node n ) {
+//        return frontier.contains(n);
+//    }
+//
+//    public String toString() {
+//        return "Best-first Search (PriorityQueue) using ";
+//    }
+//}
 
 public class POP {
 
@@ -101,6 +103,7 @@ public class POP {
     private ArrayList<Action> extractPartialOrderPlan(Goal goal, Box box) {
         ArrayList<Action> goalSteps = new ArrayList<Action>();
 
+        Strategy strategy = new StrategyBestFirst(new AStar(initialState));
 
 
 
