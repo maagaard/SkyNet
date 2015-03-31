@@ -63,7 +63,7 @@ public class POP {
         public static final int timeLimit = 180;
 
         public static float used() {
-            return ( runtime.totalMemory() - runtime.freeMemory() ) / mb;
+            return (runtime.totalMemory() - runtime.freeMemory()) / mb;
         }
 
         public static float free() {
@@ -79,11 +79,11 @@ public class POP {
         }
 
         public static boolean shouldEnd() {
-            return ( used() / max() > limitRatio );
+            return (used() / max() > limitRatio);
         }
 
         public static String stringRep() {
-            return String.format( "[Used: %.2f MB, Free: %.2f MB, Alloc: %.2f MB, MaxAlloc: %.2f MB]", used(), free(), total(), max() );
+            return String.format("[Used: %.2f MB, Free: %.2f MB, Alloc: %.2f MB, MaxAlloc: %.2f MB]", used(), free(), total(), max());
         }
     }
 
@@ -110,7 +110,8 @@ public class POP {
 
         LinkedList<PartialPlanNode> partialPlan;
         try {
-             partialPlan = Search(strategy);
+            partialPlan = PartialSearch(strategy);
+            System.err.format("Search starting with strategy %d\n", partialPlan.get(0).path.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -119,37 +120,36 @@ public class POP {
     }
 
 
-    public LinkedList<PartialPlanNode> Search( Strategy strategy ) throws IOException {
-        System.err.format( "Search starting with strategy %s\n", strategy );
+    public LinkedList<PartialPlanNode> PartialSearch(Strategy strategy) throws IOException {
+        System.err.format("Search starting with strategy %s\n", strategy);
         strategy.addToFrontier(this.initialState);
 
         int iterations = 0;
-        while ( true ) {
+        while (true) {
 //            if ( iterations % 200 == 0 ) {
 //                System.err.println( strategy.searchStatus() );
 //            }
-            if ( Memory.shouldEnd() ) {
-                System.err.format( "Memory limit almost reached, terminating search %s\n", Memory.stringRep() );
+            if (Memory.shouldEnd()) {
+                System.err.format("Memory limit almost reached, terminating search %s\n", Memory.stringRep());
                 return null;
             }
-            if ( strategy.timeSpent() > 300 ) { // Minutes timeout
-                System.err.format( "Time limit reached, terminating search %s\n", Memory.stringRep() );
+            if (strategy.timeSpent() > 300) { // Minutes timeout
+                System.err.format("Time limit reached, terminating search %s\n", Memory.stringRep());
+                return null;
+            }
+            if (strategy.frontierIsEmpty()) {
                 return null;
             }
 
-            if ( strategy.frontierIsEmpty() ) {
-                return null;
-            }
+            PartialPlanNode leafNode = (PartialPlanNode) strategy.getAndRemoveLeaf();
 
-            PartialPlanNode leafNode = (PartialPlanNode)strategy.getAndRemoveLeaf();
-
-            if ( leafNode.isGoalState() ) {
+            if (leafNode.isGoalState()) {
                 return leafNode.extractPartialPlan();
             }
 
-            strategy.addToExplored( leafNode );
+            strategy.addToExplored(leafNode);
 
-            for (PathFragment p : leafNode.getExpandedNodes()) {
+            for (PathFragment p : leafNode.getExpandedPaths()) {
                 if (!strategy.isExplored(leafNode) && !strategy.inFrontier(leafNode)) {
                     strategy.addToFrontier(leafNode);
                 }

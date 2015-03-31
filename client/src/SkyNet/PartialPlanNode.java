@@ -45,8 +45,8 @@ public class PartialPlanNode extends Node {
     }
 
 
-    public ArrayList<PathFragment> getExpandedNodes() {
-        ArrayList<PathFragment> expandedNodes = new ArrayList<PathFragment>(Command.every.length);
+    public ArrayList<PathFragment> getExpandedPaths() {
+        ArrayList<PathFragment> expandedPaths = new ArrayList<PathFragment>(Command.every.length);
 
         for (Command c : Command.every) {
             // Determine applicability of action
@@ -58,7 +58,7 @@ public class PartialPlanNode extends Node {
                 if (this.level.cellIsFree(newAgentRow, newAgentCol)) {
                     this.agent.y = newAgentRow;
                     this.agent.x = newAgentCol;
-                    expandedNodes.add(new PathFragment(this.agent, this.box));
+                    expandedPaths.add(new PathFragment(this.agent, this.box));
                 }
             } else if (c.actType == type.Push) {
                 // Make sure that there's actually a box to move
@@ -71,7 +71,7 @@ public class PartialPlanNode extends Node {
                         this.agent.x = newAgentCol;
                         this.box.y = newBoxRow;
                         this.box.x = newBoxCol;
-                        expandedNodes.add(new PathFragment(this.agent, this.box));
+                        expandedPaths.add(new PathFragment(this.agent, this.box));
                     }
                 }
             } else if (c.actType == type.Pull) {
@@ -85,13 +85,13 @@ public class PartialPlanNode extends Node {
                         this.box.x = this.agent.x;
                         this.agent.y = newAgentRow;
                         this.agent.x = newAgentCol;
-                        expandedNodes.add(new PathFragment(this.agent, this.box));
+                        expandedPaths.add(new PathFragment(this.agent, this.box));
                     }
                 }
             }
         }
 //        Collections.shuffle(expandedNodes, rnd);
-        return expandedNodes;
+        return expandedPaths;
     }
 
     private int dirToRowChange( dir d ) {
