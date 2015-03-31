@@ -1,11 +1,13 @@
 package SkyNet;
 
 import SkyNet.model.Box;
+import SkyNet.model.Goal;
 import SkyNet.model.Level;
 import SkyNet.model.PathFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -18,6 +20,7 @@ public class Node {
     public Level level;
     public ArrayList<PathFragment> path;
     public ArrayList<Box> boxes;
+    public ArrayList<Goal> goals;
 
     private static Random rnd = new Random( 1 );
     public static int MAX_ROW = 50;     //Default setting
@@ -37,6 +40,7 @@ public class Node {
     }
 
 
+    //TODO: FIX
     public boolean isGoalState() {
 //        for ( int row = 1; row < MAX_ROW - 1; row++ ) {
 //            for ( int col = 1; col < MAX_COLUMN - 1; col++ ) {
@@ -47,13 +51,33 @@ public class Node {
 //                }
 //            }
 //        }
-        return true;
+
+        int goalCount = 0;
+
+        for (Goal goal : goals) {
+            for (Box box : boxes) {
+                if (goal.equals(box)) {
+                    ++goalCount;
+                    break;
+                }
+            }
+        }
+        return goalCount == goals.size();
     }
 
 
 
 
-
+    //TODO: FIX
+    public LinkedList< Node > extractPlan() {
+        LinkedList< Node > plan = new LinkedList< Node >();
+        Node n = this;
+        while( !n.isInitialState() ) {
+            plan.addFirst( n );
+//            n = n.parent;
+        }
+        return plan;
+    }
 
 
 

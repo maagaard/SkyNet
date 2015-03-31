@@ -21,25 +21,12 @@ public class PartialPlanNode {
     public ArrayList<PathFragment> path;
 
     private static Random rnd = new Random( 1 );
-    public static int MAX_ROW = 50;     //Default setting
-    public static int MAX_COLUMN = 50;  //Default setting
-
-    public int agentRow;
-    public int agentCol;
-
-    private int g;
-    public int g() {
-        return g;
-    }
-
 
     public PartialPlanNode(Level level, Agent agent, Goal goal, Box box) {
         this.level = level;
-
         this.agent = agent;
         this.goal = goal;
         this.box =  box;
-
     }
 
     public boolean isInitialState() {
@@ -52,16 +39,6 @@ public class PartialPlanNode {
             return true;
         }
         return false;
-//        for ( int row = 1; row < MAX_ROW - 1; row++ ) {
-//            for ( int col = 1; col < MAX_COLUMN - 1; col++ ) {
-//                char g = goals[row][col];
-//                char b = Character.toLowerCase( boxes[row][col] );
-//                if ( g > 0 && b != g) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
     }
 
 

@@ -146,17 +146,16 @@ public class POP {
             Node leafNode = strategy.getAndRemoveLeaf();
 
             if ( leafNode.isGoalState() ) {
-//                return null;
                 return leafNode.extractPlan();
             }
 
             strategy.addToExplored( leafNode );
 
-//            for ( Node n : leafNode.getExpandedNodes() ) {
-//                if ( !strategy.isExplored( n ) && !strategy.inFrontier( n ) ) {
-//                    strategy.addToFrontier( n );
-//                }
-//            }
+            for ( Node n : leafNode.getExpandedNodes() ) {
+                if ( !strategy.isExplored( n ) && !strategy.inFrontier( n ) ) {
+                    strategy.addToFrontier( n );
+                }
+            }
             iterations++;
         }
     }
