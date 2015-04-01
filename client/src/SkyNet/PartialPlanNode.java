@@ -21,7 +21,7 @@ public class PartialPlanNode extends Node {
     public Goal goal;
     public Agent agent;
 
-    public ArrayList<PathFragment> path;
+    public ArrayList<PathFragment> path = new ArrayList<PathFragment>();
 
     private static Random rnd = new Random( 1 );
 
@@ -44,6 +44,13 @@ public class PartialPlanNode extends Node {
         return false;
     }
 
+    public boolean isGoalState(PathFragment pathFragment) {
+        if (pathFragment.boxLocation.x == pathFragment.goalLocation.x && pathFragment.boxLocation.y == pathFragment.goalLocation.y) {
+            return true;
+        }
+        return false;
+    }
+
 
     public ArrayList<PathFragment> getExpandedPaths() {
         ArrayList<PathFragment> expandedPaths = new ArrayList<PathFragment>(Command.every.length);
@@ -58,7 +65,7 @@ public class PartialPlanNode extends Node {
                 if (this.level.cellIsFree(newAgentRow, newAgentCol)) {
                     this.agent.y = newAgentRow;
                     this.agent.x = newAgentCol;
-                    expandedPaths.add(new PathFragment(this.agent, this.box));
+                    expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, this.path.size()+1));
                 }
             } else if (c.actType == type.Push) {
                 // Make sure that there's actually a box to move
@@ -71,7 +78,7 @@ public class PartialPlanNode extends Node {
                         this.agent.x = newAgentCol;
                         this.box.y = newBoxRow;
                         this.box.x = newBoxCol;
-                        expandedPaths.add(new PathFragment(this.agent, this.box));
+                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, this.path.size()+1));
                     }
                 }
             } else if (c.actType == type.Pull) {
@@ -85,12 +92,12 @@ public class PartialPlanNode extends Node {
                         this.box.x = this.agent.x;
                         this.agent.y = newAgentRow;
                         this.agent.x = newAgentCol;
-                        expandedPaths.add(new PathFragment(this.agent, this.box));
+                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, this.path.size()+1));
                     }
                 }
             }
         }
-//        Collections.shuffle(expandedNodes, rnd);
+        Collections.shuffle(expandedPaths, rnd);
         return expandedPaths;
     }
 
@@ -115,7 +122,15 @@ public class PartialPlanNode extends Node {
         return plan;
     }
 
-
+    public LinkedList<PartialPlanNode> extractPartialPlan(PathFragment pathFragment) {
+        LinkedList<PartialPlanNode> plan = new LinkedList<PartialPlanNode>();
+        Node n = this;
+        while( !n.isInitialState() ) {
+//            plan.addFirst(n);
+//            n = n.parent;
+        }
+        return plan;
+    }
 
 
     //TODO: Must implement methods below

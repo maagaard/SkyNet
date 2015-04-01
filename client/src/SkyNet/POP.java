@@ -1,7 +1,8 @@
 package SkyNet;
 
 import SkyNet.model.*;
-import SkyNet.Strategy.*;
+//import SkyNet.Strategy.*;
+import SkyNet.PartialStrategy.*;
 import SkyNet.PartialPlanNode;
 import SkyNet.PartialPlanHeuristic.*;
 
@@ -106,11 +107,11 @@ public class POP {
 
         ArrayList<Action> goalSteps = new ArrayList<Action>();
 
-        Strategy strategy = new StrategyBestFirst(new AStar(partialInitialState));
+        PartialStrategy strategy = new StrategyBestFirst(new AStar(partialInitialState.path.get(0)), level);
 
         LinkedList<PartialPlanNode> partialPlan;
         try {
-            partialPlan = PartialSearch(strategy);
+            partialPlan = PartialSearch(strategy, partialInitialState);
             System.err.format("Search starting with strategy %d\n", partialPlan.get(0).path.size());
         } catch (IOException e) {
             e.printStackTrace();
@@ -120,9 +121,9 @@ public class POP {
     }
 
 
-    public LinkedList<PartialPlanNode> PartialSearch(Strategy strategy) throws IOException {
+    public LinkedList<PartialPlanNode> PartialSearch(PartialStrategy strategy, PartialPlanNode partialNode) throws IOException {
         System.err.format("Search starting with strategy %s\n", strategy);
-        strategy.addToFrontier(this.initialState);
+        strategy.addToFrontier(this.initialState.path.get(0));
 
         int iterations = 0;
         while (true) {
@@ -141,17 +142,18 @@ public class POP {
                 return null;
             }
 
-            PartialPlanNode leafNode = (PartialPlanNode) strategy.getAndRemoveLeaf();
+            PathFragment leafPath = strategy.getAndRemoveLeaf();
+//            PartialPlanNode leafNode = (PartialPlanNode) strategy.getAndRemoveLeaf();
 
-            if (leafNode.isGoalState()) {
-                return leafNode.extractPartialPlan();
+            if (partialNode.isGoalState(leafPath)) {
+                return partialNode.extractPartialPlan(leafPath);
             }
 
-            strategy.addToExplored(leafNode);
+            strategy.addToExplored(leafPath);
 
-            for (PathFragment p : leafNode.getExpandedPaths()) {
-                if (!strategy.isExplored(leafNode) && !strategy.inFrontier(leafNode)) {
-                    strategy.addToFrontier(leafNode);
+            for (PathFragment p : partialNode.getExpandedPaths()) {
+                if (!strategy.isExplored(p) && !strategy.inFrontier(p)) {
+                    strategy.addToFrontier(p);
                 }
             }
 //            for ( Node n : leafNode.getExpandedNodes() ) {

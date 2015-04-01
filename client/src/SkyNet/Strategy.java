@@ -117,12 +117,12 @@ public abstract class Strategy {
 
 
 	public static class StrategyBestFirst extends Strategy {
-		private PartialPlanHeuristic heuristic;
+		private Heuristic heuristic;
 
         private PriorityQueue<Node> frontier;
         private PriorityQueue<Node> oldFrontier;
 
-		public StrategyBestFirst( PartialPlanHeuristic h ) {
+		public StrategyBestFirst(Heuristic h ) {
 			super();
 			heuristic = h;
             frontier = new PriorityQueue<Node>(11, heuristic); //11 is default initial capacity

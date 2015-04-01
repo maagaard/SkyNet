@@ -19,11 +19,15 @@ public class PathFragment {
         }
     }
 
+    public Position goalLocation;
     public Position boxLocation;
     public Position agentLocation;
+    public int pathLength;
 
-    public PathFragment(Agent agent, Box box) {
+    public PathFragment(Agent agent, Box box, Goal goal, int length) {
+        this.goalLocation = new Position(goal.x, goal.y);
         this.agentLocation = new Position(agent.x, agent.y);
         this.boxLocation = new Position(box.x, box.y);
+        this.pathLength = length;
     }
 }

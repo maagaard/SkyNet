@@ -9,16 +9,16 @@ public class Level {
     public int walls[][];
     public ArrayList<Goal> goals;
 
-
-    public ArrayList<Box> boxes;
-    public int agents[][];
+//    public ArrayList<Box> boxes;
+//    public int agents[][];
 
     public Level() {
 
-//        this.boxes = boxes;
 //        this.goals = goals;
 //        this.walls = walls;
 
+
+//        this.boxes = boxes;
     }
 
     public boolean cellIsFree(int row, int col) {
