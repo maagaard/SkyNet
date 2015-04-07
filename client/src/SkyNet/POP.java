@@ -6,54 +6,13 @@ import SkyNet.PartialStrategy.*;
 import SkyNet.PartialPlanNode;
 import SkyNet.PartialPlanHeuristic.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
-
-//class Strategy {
-//    public String searchStatus() {
-////        return String.format( "#Explored: %4d, #Frontier: %3d, Time: %3.2f s \t%s", countExplored(), countFrontier(), timeSpent(), Memory.stringRep() );
-//        return "dummy";
-//    }
-//
-//    public float timeSpent() {
-////        return ( System.currentTimeMillis() - startTime ) / 1000f;
-//        return 0.0f;
-//    }
-//
-//    public HashSet< Node > explored;
-//    public void addToExplored( Node n ) {
-//        explored.add( n );
-//    }
-//
-//    private PriorityQueue<Node> frontier;
-//
-//    public Node getAndRemoveLeaf() {
-//        Node node = frontier.poll();
-//        return node;
-//    }
-//
-//    public void addToFrontier( Node n ) {
-//        frontier.add(n);
-//    }
-//
-//    public int countFrontier() {
-//        return frontier.size();
-//    }
-//
-//    public boolean frontierIsEmpty() {
-//        return frontier.isEmpty();
-//    }
-//
-//    public boolean inFrontier( Node n ) {
-//        return frontier.contains(n);
-//    }
-//
-//    public String toString() {
-//        return "Best-first Search (PriorityQueue) using ";
-//    }
-//}
 
 public class POP {
 
@@ -88,17 +47,98 @@ public class POP {
         }
     }
 
-
     public Level level;
+    public ArrayList<Box> boxes = new ArrayList<Box>();
+    public ArrayList<Agent> agents = new ArrayList<Agent>();
     public Node initialState = null;
+    public PathFragment initialPath = null;
 
+    public static void error(String msg) throws Exception {
+        throw new Exception("GSCError: " + msg);
+    }
+
+    public POP(BufferedReader serverMessages) throws Exception {
+
+        Map<Character, String> colors = new HashMap<Character, String>();
+        String line, color = "";
+
+        int agentCol = -1, agentRow = -1;
+        int colorLines = 0, levelLines = 0;
+
+        // Read lines specifying colors
+        while ((line = serverMessages.readLine()).matches("^[a-z]+:\\s*[0-9A-Z](,\\s*[0-9A-Z])*\\s*$")) {
+            line = line.replaceAll("\\s", "");
+            String[] colonSplit = line.split(":");
+            color = colonSplit[0].trim();
+
+            for (String id : colonSplit[1].split(",")) {
+                colors.put(id.trim().charAt(0), color);
+            }
+            colorLines++;
+        }
+
+        if (colorLines > 0) {
+            error("Box colors not supported");
+        }
+
+
+        int MAX_SIZE = 100;
+
+        boolean[][] walls = new boolean[MAX_SIZE][MAX_SIZE];
+//        char[][] boxes = new char[MAX_SIZE][MAX_SIZE];
+//        char[][] goals = new char[MAX_SIZE][MAX_SIZE];
+        int longestLine = 0;
+
+        ArrayList<Goal> goals = new ArrayList<Goal>();
+
+        while (!line.equals("")) {
+            int length = line.length();
+            if (length > longestLine) longestLine = length;
+
+            for (int i = 0; i < length; i++) {
+                char chr = line.charAt(i);
+                if ('+' == chr) { // Walls
+                    walls[levelLines][i] = true;
+                } else if ('0' <= chr && chr <= '9') { // Agents
+                    if (agentCol != -1 || agentRow != -1) {
+                        error("Not a single agent level");
+                    }
+                    agents.add(new Agent(chr, i, levelLines));
+
+                } else if ('A' <= chr && chr <= 'Z') { // Boxes
+//                    boxes[levelLines][i] = chr;
+                    boxes.add(new Box(chr, i, levelLines));
+                } else if ('a' <= chr && chr <= 'z') { // Goal cells
+//                    goals[levelLines][i] = chr;
+                    goals.add(new Goal(chr, i, levelLines));
+
+                }
+            }
+            line = serverMessages.readLine();
+            levelLines++;
+        }
+
+
+        level = new Level();
+        level.walls = walls;
+        level.goals = goals;
+
+    }
 
     public void pickGoal() {
-        Goal g = new Goal('a', 5, 6);
-        Box b = new Box('A', 1, 3);
-        Agent agent = new Agent(0, 1, 4);
 
-        extractPartialOrderPlan(agent, g, b);
+        Goal g = level.goals.get(0);
+
+        Box box = null;
+        for (Box b : boxes) {
+            if (Character.toLowerCase(g.name) == Character.toLowerCase(b.name)) {
+                box = b;
+                break;
+            }
+        }
+
+        Agent agent = agents.get(0);
+        extractPartialOrderPlan(agent, g, box);
     }
 
     private ArrayList<Action> extractPartialOrderPlan(Agent agent, Goal goal, Box box) {
@@ -107,6 +147,7 @@ public class POP {
 
         ArrayList<Action> goalSteps = new ArrayList<Action>();
 
+        partialInitialState.path.add(new PathFragment(agent, box, goal, 1));
         PartialStrategy strategy = new StrategyBestFirst(new AStar(partialInitialState.path.get(0)), level);
 
         LinkedList<PartialPlanNode> partialPlan;
@@ -123,7 +164,7 @@ public class POP {
 
     public LinkedList<PartialPlanNode> PartialSearch(PartialStrategy strategy, PartialPlanNode partialNode) throws IOException {
         System.err.format("Search starting with strategy %s\n", strategy);
-        strategy.addToFrontier(this.initialState.path.get(0));
+        strategy.addToFrontier(partialNode.path.get(0));
 
         int iterations = 0;
         while (true) {

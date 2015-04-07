@@ -1,9 +1,5 @@
 package SkyNet.model;
 
-import jdk.internal.util.xml.impl.Pair;
-
-import javax.swing.text.Position;
-
 /**
  * client
  * Created by maagaard on 31/03/15.

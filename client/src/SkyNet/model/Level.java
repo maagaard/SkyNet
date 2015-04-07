@@ -6,7 +6,7 @@ import java.util.List;
 public class Level {
 
 
-    public int walls[][];
+    public boolean walls[][];
     public ArrayList<Goal> goals;
 
 //    public ArrayList<Box> boxes;
@@ -22,7 +22,7 @@ public class Level {
     }
 
     public boolean cellIsFree(int row, int col) {
-        return !(this.walls[row][col] == 0);
+        return !(this.walls[row][col]);
     }
 
 }

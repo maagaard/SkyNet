@@ -7,13 +7,13 @@ package SkyNet.model;
  */
 public class Agent {
 
-    public Agent(int number, int x, int y) {
-        this.number= number;
+    public Agent(char number, int x, int y) {
+        this.number = number;
         this.x = x;
         this.y = y;
     }
 
-    public int number;
+    public char number;
     public int x;
     public int y;
 
