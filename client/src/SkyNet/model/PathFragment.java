@@ -1,5 +1,7 @@
 package SkyNet.model;
 
+import SkyNet.Command;
+
 /**
  * client
  * Created by maagaard on 31/03/15.
@@ -15,15 +17,17 @@ public class PathFragment {
         }
     }
 
+    public Command action;
     public Position goalLocation;
     public Position boxLocation;
     public Position agentLocation;
     public int pathLength;
 
-    public PathFragment(Agent agent, Box box, Goal goal, int length) {
+    public PathFragment(Agent agent, Box box, Goal goal, Command action, int length) {
         this.goalLocation = new Position(goal.x, goal.y);
         this.agentLocation = new Position(agent.x, agent.y);
         this.boxLocation = new Position(box.x, box.y);
+        this.action = action;
         this.pathLength = length;
     }
 }

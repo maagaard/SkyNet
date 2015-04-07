@@ -2,6 +2,7 @@ package SkyNet;
 
 import SkyNet.model.*;
 import SkyNet.Command.*;
+import org.omg.PortableInterceptor.ACTIVE;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +66,7 @@ public class PartialPlanNode extends Node {
                 if (this.level.cellIsFree(newAgentRow, newAgentCol)) {
                     this.agent.y = newAgentRow;
                     this.agent.x = newAgentCol;
-                    expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, this.path.size()+1));
+                    expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, c, this.path.size()+1));
                 }
             } else if (c.actType == type.Push) {
                 // Make sure that there's actually a box to move
@@ -78,7 +79,7 @@ public class PartialPlanNode extends Node {
                         this.agent.x = newAgentCol;
                         this.box.y = newBoxRow;
                         this.box.x = newBoxCol;
-                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, this.path.size()+1));
+                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, c, this.path.size()+1));
                     }
                 }
             } else if (c.actType == type.Pull) {
@@ -92,7 +93,7 @@ public class PartialPlanNode extends Node {
                         this.box.x = this.agent.x;
                         this.agent.y = newAgentRow;
                         this.agent.x = newAgentCol;
-                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, this.path.size()+1));
+                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, c, this.path.size()+1));
                     }
                 }
             }
@@ -112,24 +113,30 @@ public class PartialPlanNode extends Node {
 
     //TODO: FIX
 //    @Override
-    public LinkedList<PartialPlanNode> extractPartialPlan() {
-        LinkedList<PartialPlanNode> plan = new LinkedList<PartialPlanNode>();
-        Node n = this;
-        while( !n.isInitialState() ) {
-//            plan.addFirst(n);
-//            n = n.parent;
-        }
-        return plan;
-    }
+//    public LinkedList<PartialPlanNode> extractPartialPlan() {
+//        LinkedList<PartialPlanNode> plan = new LinkedList<PartialPlanNode>();
+//        Node n = this;
+//        while( !n.isInitialState() ) {
+////            plan.addFirst(n);
+////            n = n.parent;
+//        }
+//        return plan;
+//    }
 
-    public LinkedList<PartialPlanNode> extractPartialPlan(PathFragment pathFragment) {
-        LinkedList<PartialPlanNode> plan = new LinkedList<PartialPlanNode>();
-        Node n = this;
-        while( !n.isInitialState() ) {
+    public LinkedList<Command> extractPartialPlan() {
+        LinkedList<Command> actions = new LinkedList<Command>();
+//        Node n = this;
+
+        for (PathFragment p : this.path) {
+            actions.add(p.action);
+        }
+
+//        while( !n.isInitialState() ) {
 //            plan.addFirst(n);
 //            n = n.parent;
-        }
-        return plan;
+//        }
+
+        return actions;
     }
 
 

@@ -47,17 +47,20 @@ public class POP {
         }
     }
 
+    public BufferedReader serverMessages;
     public Level level;
     public ArrayList<Box> boxes = new ArrayList<Box>();
     public ArrayList<Agent> agents = new ArrayList<Agent>();
     public Node initialState = null;
     public PathFragment initialPath = null;
+    public PartialStrategy strategy = null;
 
     public static void error(String msg) throws Exception {
         throw new Exception("GSCError: " + msg);
     }
 
     public POP(BufferedReader serverMessages) throws Exception {
+        this.serverMessages = serverMessages;
 
         Map<Character, String> colors = new HashMap<Character, String>();
         String line, color = "";
@@ -125,7 +128,7 @@ public class POP {
 
     }
 
-    public void pickGoal() {
+    public void pickGoal() throws IOException {
 
         Goal g = level.goals.get(0);
 
@@ -138,31 +141,67 @@ public class POP {
         }
 
         Agent agent = agents.get(0);
-        extractPartialOrderPlan(agent, g, box);
+
+        LinkedList<Command> solution = extractPartialOrderPlan(agent, g, box);
+
+        if (solution == null) {
+            System.err.println("Unable to solve level");
+            System.exit(0);
+        } else {
+//            System.err.println("\nSummary for " + strategy);
+            System.err.println("Found solution of length " + solution.size());
+            System.err.println(strategy.searchStatus());
+
+            for (Command c : solution) {
+                String act = c.toActionString();
+                System.out.println(act);
+                String response = this.serverMessages.readLine();
+                if (response.contains("false")) {
+                    System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
+                    System.err.format("%s was attempted in \n%s\n", act, c);
+                    break;
+                }
+            }
+
+//            for (PartialPlanNode n : solution) {
+//                String act = n.toActionString();
+//                System.out.println(act);
+//                String response = serverMessages.readLine();
+//                if (response.contains("false")) {
+//                    System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
+//                    System.err.format("%s was attempted in \n%s\n", act, n);
+//                    break;
+//                }
+//            }
+        }
     }
 
-    private ArrayList<Action> extractPartialOrderPlan(Agent agent, Goal goal, Box box) {
+    private LinkedList<Command> extractPartialOrderPlan(Agent agent, Goal goal, Box box) {
 
         PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
 
         ArrayList<Action> goalSteps = new ArrayList<Action>();
 
-        partialInitialState.path.add(new PathFragment(agent, box, goal, 1));
+        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 1));
         PartialStrategy strategy = new StrategyBestFirst(new AStar(partialInitialState.path.get(0)), level);
+        this.strategy =  strategy;
 
-        LinkedList<PartialPlanNode> partialPlan;
+//        LinkedList<PartialPlanNode> partialPlan = null;
+        LinkedList<Command> partialPlan = null;
+
         try {
             partialPlan = PartialSearch(strategy, partialInitialState);
-            System.err.format("Search starting with strategy %d\n", partialPlan.get(0).path.size());
+            System.err.format("Search starting with strategy %d\n", partialPlan.size());
         } catch (IOException e) {
             e.printStackTrace();
+            System.err.format("Error");
         }
 
-        return goalSteps;
+        return partialPlan;
     }
 
 
-    public LinkedList<PartialPlanNode> PartialSearch(PartialStrategy strategy, PartialPlanNode partialNode) throws IOException {
+    public LinkedList<Command> PartialSearch(PartialStrategy strategy, PartialPlanNode partialNode) throws IOException {
         System.err.format("Search starting with strategy %s\n", strategy);
         strategy.addToFrontier(partialNode.path.get(0));
 
@@ -187,7 +226,7 @@ public class POP {
 //            PartialPlanNode leafNode = (PartialPlanNode) strategy.getAndRemoveLeaf();
 
             if (partialNode.isGoalState(leafPath)) {
-                return partialNode.extractPartialPlan(leafPath);
+                return partialNode.extractPartialPlan();
             }
 
             strategy.addToExplored(leafPath);
@@ -204,6 +243,7 @@ public class POP {
 //            }
             iterations++;
         }
+
     }
 
 }
