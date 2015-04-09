@@ -108,7 +108,11 @@ public class PartialPlanNode extends Node {
             }
         }
         Collections.shuffle(expandedPaths, rnd);
+
+        //TODO: THIS can't happen
+        //TODO: Instead, the chosen path should be added to this.path
         this.path = expandedPaths;
+
         return expandedPaths;
     }
 
