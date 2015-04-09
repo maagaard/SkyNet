@@ -229,13 +229,14 @@ public class POP {
             PathFragment leafPath = strategy.getAndRemoveLeaf();
 //            PartialPlanNode leafNode = (PartialPlanNode) strategy.getAndRemoveLeaf();
 
-            System.err.format("Path: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y + ", " + leafPath.pathLength + "\n");
-
             if (partialNode.isGoalState(leafPath)) {
                 return partialNode.extractPartialPlan();
             }
 
+            System.err.format("Explore: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y + ", " + leafPath.pathLength + "\n");
             strategy.addToExplored(leafPath);
+
+            partialNode.update(leafPath);
 
             for (PathFragment p : partialNode.getExpandedPaths()) {
                 if (!strategy.isExplored(p) && !strategy.inFrontier(p)) {
@@ -254,19 +255,34 @@ public class POP {
                     }
 
                     strategy.addToFrontier(p);
-                } else {
+
+                } else if (strategy.inFrontier(p) && !strategy.isExplored(p)) {
+                    if (p.action.dir2 != null) {
+                        System.err.format("In frontier. a: " + p.agentLocation.x + "," + p.agentLocation.y +
+                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
+                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() + ", dir2: " + p.action.dir2.toString() +
+                                "\n");
+                    } else {
+                        System.err.format("In frontier. a: " + p.agentLocation.x + "," + p.agentLocation.y +
+                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
+                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() +
+                                "\n");
+                    }
+                }
+                else {
                     if (p.action.dir2 != null) {
                         System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
                                 ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
                                 ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() + ", dir2: " + p.action.dir2.toString() +
                                 "\n");
-                    }
-                    else {
+                    } else {
                         System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
                                 ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
                                 ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() +
                                 "\n");
                     }
+                }
+
 
 //                    if (leafPath.action.dir2 != null) {
 //                        System.err.format("Is explored. a: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y +
@@ -283,7 +299,6 @@ public class POP {
 
 
 //                    System.err.format("Is explored\n");
-                }
             }
 //            for ( Node n : leafNode.getExpandedNodes() ) {
 //                if ( !strategy.isExplored( n ) && !strategy.inFrontier( n ) ) {

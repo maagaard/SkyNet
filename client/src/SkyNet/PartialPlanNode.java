@@ -64,9 +64,10 @@ public class PartialPlanNode extends Node {
             if (c.actType == type.Move) {
                 // Check if there's a wall or box on the cell to which the agent is moving
                 if (this.level.cellIsFree(newAgentRow, newAgentCol)) {
-                    this.agent.y = newAgentRow;
-                    this.agent.x = newAgentCol;
-                    expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, c, this.path.size()+1));
+//                    this.agent.y = newAgentRow;
+//                    this.agent.x = newAgentCol;
+                    Agent agent = new Agent(this.agent.number, newAgentCol, newAgentRow);
+                    expandedPaths.add(new PathFragment(agent, this.box, this.goal, c, this.path.size()+1));
                 }
             } else if (c.actType == type.Push) {
                 // Make sure that there's actually a box to move
@@ -74,12 +75,15 @@ public class PartialPlanNode extends Node {
                     int newBoxRow = newAgentRow + dirToRowChange(c.dir2);
                     int newBoxCol = newAgentCol + dirToColChange(c.dir2);
                     // .. and that new cell of box is free
+//                    System.err.format("" + box.x + "," + box.y +"\n");
                     if (this.level.cellIsFree(newBoxRow, newBoxCol)) {
-                        this.agent.y = newAgentRow;
-                        this.agent.x = newAgentCol;
-                        this.box.y = newBoxRow;
-                        this.box.x = newBoxCol;
-                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, c, this.path.size()+1));
+//                        this.agent.y = newAgentRow;
+//                        this.agent.x = newAgentCol;
+//                        this.box.y = newBoxRow;
+//                        this.box.x = newBoxCol;
+                        Agent agent = new Agent(this.agent.number, newAgentCol, newAgentRow);
+                        Box box = new Box(this.box.name, newBoxCol, newBoxRow);
+                        expandedPaths.add(new PathFragment(agent, box, this.goal, c, this.path.size()+1));
                     }
                 }
             } else if (c.actType == type.Pull) {
@@ -89,11 +93,16 @@ public class PartialPlanNode extends Node {
                     int boxCol = this.agent.x + dirToColChange(c.dir2);
                     // .. and there's a box in "dir2" of the agent
                     if (box.y == boxRow && box.x == boxCol) {
-                        this.box.y = this.agent.y;
-                        this.box.x = this.agent.x;
-                        this.agent.y = newAgentRow;
-                        this.agent.x = newAgentCol;
-                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, c, this.path.size()+1));
+//                        this.box.y = this.agent.y;
+//                        this.box.x = this.agent.x;
+//                        this.agent.y = newAgentRow;
+//                        this.agent.x = newAgentCol;
+//                        expandedPaths.add(new PathFragment(this.agent, this.box, this.goal, c, this.path.size() + 1));
+
+                        Agent agent = new Agent(this.agent.number, newAgentCol, newAgentRow);
+                        Box box = new Box(this.box.name, this.agent.x, this.agent.y);
+                        expandedPaths.add(new PathFragment(agent, box, this.goal, c, this.path.size()+1));
+
                     }
                 }
             }
@@ -200,4 +209,10 @@ public class PartialPlanNode extends Node {
         return s.toString();
     }
 
+    public void update(PathFragment leafPath) {
+        this.agent.x = leafPath.agentLocation.x;
+        this.agent.y = leafPath.agentLocation.y;
+        this.box.x = leafPath.boxLocation.x;
+        this.box.y = leafPath.boxLocation.y;
+    }
 }

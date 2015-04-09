@@ -48,8 +48,10 @@ public class PathFragment {
         }
 
         result = prime * result + action.actType.ordinal();
-        result = prime * result + agentLocation.x + agentLocation.y;
-        result = prime * result + boxLocation.x + boxLocation.y;
+        result = prime * result + agentLocation.x;
+        result = prime * result + agentLocation.y;
+        result = prime * result + boxLocation.x;
+        result = prime * result + boxLocation.y;
         result = prime * result + goalLocation.x + goalLocation.y;
         return result;
     }
