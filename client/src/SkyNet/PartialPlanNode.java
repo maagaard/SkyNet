@@ -99,6 +99,7 @@ public class PartialPlanNode extends Node {
             }
         }
         Collections.shuffle(expandedPaths, rnd);
+        this.path = expandedPaths;
         return expandedPaths;
     }
 

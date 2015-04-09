@@ -142,6 +142,8 @@ public class POP {
 
         Agent agent = agents.get(0);
 
+        System.err.println("Agent: " + agent.number + ", goal: " + g.name + ", box: " + box.name);
+
         LinkedList<Command> solution = extractPartialOrderPlan(agent, g, box);
 
         if (solution == null) {
@@ -191,6 +193,7 @@ public class POP {
 
         try {
             partialPlan = PartialSearch(strategy, partialInitialState);
+            if (partialPlan == null) return null;
             System.err.format("Search starting with strategy %d\n", partialPlan.size());
         } catch (IOException e) {
             e.printStackTrace();
@@ -207,9 +210,9 @@ public class POP {
 
         int iterations = 0;
         while (true) {
-//            if ( iterations % 200 == 0 ) {
-//                System.err.println( strategy.searchStatus() );
-//            }
+            if ( iterations % 1000 == 0 ) {
+                System.err.println(strategy.searchStatus());
+            }
             if (Memory.shouldEnd()) {
                 System.err.format("Memory limit almost reached, terminating search %s\n", Memory.stringRep());
                 return null;
@@ -219,11 +222,14 @@ public class POP {
                 return null;
             }
             if (strategy.frontierIsEmpty()) {
+                System.err.format("Frontier is empty");
                 return null;
             }
 
             PathFragment leafPath = strategy.getAndRemoveLeaf();
 //            PartialPlanNode leafNode = (PartialPlanNode) strategy.getAndRemoveLeaf();
+
+            System.err.format("Path: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y + ", " + leafPath.pathLength + "\n");
 
             if (partialNode.isGoalState(leafPath)) {
                 return partialNode.extractPartialPlan();
@@ -233,7 +239,50 @@ public class POP {
 
             for (PathFragment p : partialNode.getExpandedPaths()) {
                 if (!strategy.isExplored(p) && !strategy.inFrontier(p)) {
+
+                    if (p.action.dir2 != null) {
+                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
+                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
+                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() + ", dir2: " + p.action.dir2.toString() +
+                                "\n");
+                    }
+                    else {
+                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
+                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
+                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() +
+                                "\n");
+                    }
+
                     strategy.addToFrontier(p);
+                } else {
+                    if (p.action.dir2 != null) {
+                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
+                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
+                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() + ", dir2: " + p.action.dir2.toString() +
+                                "\n");
+                    }
+                    else {
+                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
+                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
+                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() +
+                                "\n");
+                    }
+
+//                    if (leafPath.action.dir2 != null) {
+//                        System.err.format("Is explored. a: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y +
+//                                ", b: " + leafPath.boxLocation.x + "," + leafPath.boxLocation.y +
+//                                ", move: " + leafPath.action.actType.toString() + ", dir1: " + leafPath.action.dir1.toString() + ", dir2: " + leafPath.action.dir2.toString() +
+//                                "\n");
+//                    }
+//                    else {
+//                        System.err.format("Is explored. a: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y +
+//                                ", b: " + leafPath.boxLocation.x + "," + leafPath.boxLocation.y +
+//                                ", move: " + leafPath.action.actType.toString() + ", dir1: " + leafPath.action.dir1.toString() +
+//                                "\n");
+//                    }
+
+
+//                    System.err.format("Is explored\n");
                 }
             }
 //            for ( Node n : leafNode.getExpandedNodes() ) {

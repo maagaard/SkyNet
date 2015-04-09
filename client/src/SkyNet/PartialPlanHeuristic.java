@@ -13,6 +13,7 @@ public abstract class PartialPlanHeuristic implements Comparator<PathFragment> {
 
     public PartialPlanHeuristic(PathFragment initialState) {
         this.initialState = initialState;
+        System.err.println("Initialize heuristics");
 
 //        for (int i = 0; i < partialInitialState.goals.length; i++) {
 //            for (int j = 0; j < partialInitialState.goals[i].length; j++) {
@@ -38,7 +39,8 @@ public abstract class PartialPlanHeuristic implements Comparator<PathFragment> {
     public int h(PathFragment n) {
         int agentBoxDist = (Math.abs(n.boxLocation.y - n.agentLocation.y) + (Math.abs(n.boxLocation.x - n.agentLocation.x)));
         int boxGoalDist = (Math.abs(n.goalLocation.y - n.boxLocation.y) + (Math.abs(n.goalLocation.x - n.boxLocation.x)));
-
+//        int dist = agentBoxDist + boxGoalDist;
+//        System.err.println("Dist: " + dist);
         return agentBoxDist + boxGoalDist;
 
 //        if (n.getClass() == PartialPlanPathFragment.class) {
