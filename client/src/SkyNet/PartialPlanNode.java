@@ -111,7 +111,7 @@ public class PartialPlanNode extends Node {
 
         //TODO: THIS can't happen
         //TODO: Instead, the chosen path should be added to this.path
-        this.path = expandedPaths;
+//        this.path = expandedPaths;
 
         return expandedPaths;
     }
@@ -140,7 +140,6 @@ public class PartialPlanNode extends Node {
     public LinkedList<Command> extractPartialPlan() {
         LinkedList<Command> actions = new LinkedList<Command>();
 //        Node n = this;
-
         for (PathFragment p : this.path) {
             actions.add(p.action);
         }
@@ -214,6 +213,7 @@ public class PartialPlanNode extends Node {
     }
 
     public void update(PathFragment leafPath) {
+        this.path.add(leafPath);
         this.agent.x = leafPath.agentLocation.x;
         this.agent.y = leafPath.agentLocation.y;
         this.box.x = leafPath.boxLocation.x;
