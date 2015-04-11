@@ -52,6 +52,10 @@ public abstract class PartialPlanHeuristic implements Comparator<PathFragment> {
 //        }
     }
 
+
+    //TODO: HEURISTICS should get the distance to the cell where the agent can push/pull box
+
+
     public abstract int f(PathFragment n);
 
     public static class AStar extends PartialPlanHeuristic {

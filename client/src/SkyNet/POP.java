@@ -197,8 +197,8 @@ public class POP {
 
         ArrayList<Action> goalSteps = new ArrayList<Action>();
 
-        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 1));
-        PartialStrategy strategy = new StrategyBestFirst(new Greedy(partialInitialState.path.get(0)), level);
+        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
+        PartialStrategy strategy = new StrategyBestFirst(new AStar(partialInitialState.path.get(0)), level);
         this.strategy =  strategy;
 
 //        LinkedList<PartialPlanNode> partialPlan = null;
@@ -239,10 +239,10 @@ public class POP {
                 return null;
             }
 
+//            PathFragment previous = partialNode.path.get(partialNode.path.size()-1);
             PathFragment leafPath = strategy.getAndRemoveLeaf();
 
-//            PartialPlanNode leafNode = (PartialPlanNode) strategy.getAndRemoveLeaf();
-
+//            System.err.format("Previous: " + previous.pathLength + "    - This: " + leafPath.pathLength + "\n");
 
             System.err.format("Explore: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y + ", " + leafPath.action + ", " + leafPath.pathLength + "\n");
             strategy.addToExplored(leafPath);
@@ -256,7 +256,7 @@ public class POP {
 
             for (PathFragment p : partialNode.getExpandedPaths()) {
                 if (!strategy.isExplored(p) && !strategy.inFrontier(p)) {
-
+                    strategy.addToFrontier(p);
 //                    if (p.action.dir2 != null) {
 //                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
 //                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
@@ -269,9 +269,6 @@ public class POP {
 //                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() +
 //                                "\n");
 //                    }
-
-                    strategy.addToFrontier(p);
-
                 } else if (strategy.inFrontier(p) && !strategy.isExplored(p)) {
 //                    if (p.action.dir2 != null) {
 //                        System.err.format("In frontier. a: " + p.agentLocation.x + "," + p.agentLocation.y +
@@ -298,7 +295,6 @@ public class POP {
 //                                "\n");
 //                    }
                 }
-
 
 //                    if (leafPath.action.dir2 != null) {
 //                        System.err.format("Is explored. a: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y +
