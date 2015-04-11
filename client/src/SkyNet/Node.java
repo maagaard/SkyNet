@@ -5,10 +5,7 @@ import SkyNet.model.Goal;
 import SkyNet.model.Level;
 import SkyNet.model.PathFragment;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 
 /**
  * client
@@ -18,11 +15,13 @@ import java.util.Random;
 public class Node {
 
     public Level level;
-    public ArrayList<PathFragment> path;
     public ArrayList<Box> boxes;
     public ArrayList<Goal> goals;
 
-    private static Random rnd = new Random( 1 );
+    public Node parent;
+    public Command action;
+
+    private static Random rnd = new Random(1);
     public static int MAX_ROW = 50;     //Default setting
     public static int MAX_COLUMN = 50;  //Default setting
 
@@ -30,55 +29,164 @@ public class Node {
     public int agentCol;
 
     private int g;
+
+    public Node(Node parent, int rows, int columns) {
+
+        MAX_ROW = rows;
+        MAX_COLUMN = columns;
+
+        boxes = new char[rows][columns];
+
+        this.parent = parent;
+        if (parent == null) {
+            g = 0;
+            goals = new char[rows][columns];
+            walls = new boolean[rows][columns];
+        } else {
+            g = parent.g() + 1;
+            walls = parent.walls;
+            goals = parent.goals;
+        }
+    }
+
     public int g() {
         return g;
     }
 
-
     public boolean isInitialState() {
-        return this.path.size() == 0;
+        return this.parent == null;
     }
 
-
-    //TODO: FIX
     public boolean isGoalState() {
-//        for ( int row = 1; row < MAX_ROW - 1; row++ ) {
-//            for ( int col = 1; col < MAX_COLUMN - 1; col++ ) {
-//                char g = goals[row][col];
-//                char b = Character.toLowerCase( boxes[row][col] );
-//                if ( g > 0 && b != g) {
-//                    return false;
-//                }
-//            }
-//        }
-
-        int goalCount = 0;
-
-        for (Goal goal : goals) {
-            for (Box box : boxes) {
-                if (goal.equals(box)) {
-                    ++goalCount;
-                    break;
+        for (int row = 1; row < MAX_ROW - 1; row++) {
+            for (int col = 1; col < MAX_COLUMN - 1; col++) {
+                char g = goals[row][col];
+                char b = Character.toLowerCase(boxes[row][col]);
+                if (g > 0 && b != g) {
+                    return false;
                 }
             }
         }
-        return goalCount == goals.size();
+        return true;
     }
 
 
+    //TODO: FIX
+//    public boolean isGoalState() {
+////        for ( int row = 1; row < MAX_ROW - 1; row++ ) {
+////            for ( int col = 1; col < MAX_COLUMN - 1; col++ ) {
+////                char g = goals[row][col];
+////                char b = Character.toLowerCase( boxes[row][col] );
+////                if ( g > 0 && b != g) {
+////                    return false;
+////                }
+////            }
+////        }
+//
+//        int goalCount = 0;
+//
+//        for (Goal goal : goals) {
+//            for (Box box : boxes) {
+//                if (goal.equals(box)) {
+//                    ++goalCount;
+//                    break;
+//                }
+//            }
+//        }
+//        return goalCount == goals.size();
+//    }
 
 
     //TODO: FIX
-    public LinkedList< Node > extractPlan() {
-        LinkedList< Node > plan = new LinkedList< Node >();
+    public LinkedList<Node> extractPlan() {
+        LinkedList<Node> plan = new LinkedList<Node>();
         Node n = this;
-        while( !n.isInitialState() ) {
-            plan.addFirst( n );
-//            n = n.parent;
+        while (!n.isInitialState()) {
+            plan.addFirst(n);
+            n = n.parent;
         }
         return plan;
     }
 
+
+    public ArrayList<Node> getExpandedNodes() {
+        ArrayList<Node> expandedNodes = new ArrayList<Node>(Command.every.length);
+        for (Command c : Command.every) {
+            // Determine applicability of action
+            int newAgentRow = this.agentRow + dirToRowChange(c.dir1);
+            int newAgentCol = this.agentCol + dirToColChange(c.dir1);
+
+            if (c.actType == type.Move) {
+                // Check if there's a wall or box on the cell to which the agent is moving
+                if (cellIsFree(newAgentRow, newAgentCol)) {
+                    Node n = this.ChildNode();
+                    n.action = c;
+                    n.agentRow = newAgentRow;
+                    n.agentCol = newAgentCol;
+                    expandedNodes.add(n);
+                }
+            } else if (c.actType == type.Push) {
+                // Make sure that there's actually a box to move
+                if (boxAt(newAgentRow, newAgentCol)) {
+                    int newBoxRow = newAgentRow + dirToRowChange(c.dir2);
+                    int newBoxCol = newAgentCol + dirToColChange(c.dir2);
+                    // .. and that new cell of box is free
+                    if (cellIsFree(newBoxRow, newBoxCol)) {
+                        Node n = this.ChildNode();
+                        n.action = c;
+                        n.agentRow = newAgentRow;
+                        n.agentCol = newAgentCol;
+                        n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
+                        n.boxes[newAgentRow][newAgentCol] = 0;
+                        expandedNodes.add(n);
+                    }
+                }
+            } else if (c.actType == type.Pull) {
+                // Cell is free where agent is going
+                if (cellIsFree(newAgentRow, newAgentCol)) {
+                    int boxRow = this.agentRow + dirToRowChange(c.dir2);
+                    int boxCol = this.agentCol + dirToColChange(c.dir2);
+                    // .. and there's a box in "dir2" of the agent
+                    if (boxAt(boxRow, boxCol)) {
+                        Node n = this.ChildNode();
+                        n.action = c;
+                        n.agentRow = newAgentRow;
+                        n.agentCol = newAgentCol;
+                        n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
+                        n.boxes[boxRow][boxCol] = 0;
+                        expandedNodes.add(n);
+                    }
+                }
+            }
+        }
+        Collections.shuffle(expandedNodes, rnd);
+        return expandedNodes;
+    }
+
+    private boolean cellIsFree(int row, int col) {
+        return (!this.walls[row][col] && this.boxes[row][col] == 0);
+    }
+
+    private boolean boxAt(int row, int col) {
+        return this.boxes[row][col] > 0;
+    }
+
+
+    private int dirToRowChange(dir d) {
+        return (d == dir.S ? 1 : (d == dir.N ? -1 : 0)); // South is down one row (1), north is up one row (-1)
+    }
+
+    private int dirToColChange(dir d) {
+        return (d == dir.E ? 1 : (d == dir.W ? -1 : 0)); // East is left one column (1), west is right one column (-1)
+    }
+
+    private Node ChildNode() {
+        Node copy = new Node(this, MAX_ROW, MAX_COLUMN);
+        for (int row = 0; row < MAX_ROW; row++) {
+            System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, MAX_COLUMN);
+        }
+        return copy;
+    }
 
 
     //TODO: Must implement methods below
@@ -95,7 +203,7 @@ public class Node {
     }
 
     @Override
-    public boolean equals( Object obj ) {
+    public boolean equals(Object obj) {
 //        if ( this == obj )
 //            return true;
 //        if ( obj == null )

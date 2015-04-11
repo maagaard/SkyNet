@@ -85,6 +85,7 @@ public class POP {
         }
 
 
+
         int MAX_SIZE = 100;
 
         boolean[][] walls = new boolean[MAX_SIZE][MAX_SIZE];
@@ -93,6 +94,8 @@ public class POP {
         int longestLine = 0;
 
         ArrayList<Goal> goals = new ArrayList<Goal>();
+
+
 
         while (!line.equals("")) {
             int length = line.length();
@@ -125,6 +128,22 @@ public class POP {
         level = new Level();
         level.walls = walls;
         level.goals = goals;
+
+        //Initialize new agent
+        initialState = new Node(null, levelLines +1, longestLine+1);
+
+        System.err.format("Column size: %d, row size: %d\n", Node.MAX_COLUMN, Node.MAX_ROW);
+        //Copy walls, boxes and goals into smaller array
+        for(int i = 0; i < Node.MAX_ROW; ++i) {
+            for (int j = 0; j < Node.MAX_COLUMN ; j++) {
+                initialState.walls[i][j] = walls[i][j];
+                initialState.goals[i][j] = goals[i][j];
+                initialState.boxes[i][j] = boxes[i][j];
+            }
+        }
+
+        initialState.agentCol = initialAgentCol;
+        initialState.agentRow = initialAgentRow;
 
     }
 
