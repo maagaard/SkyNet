@@ -21,7 +21,7 @@ public class Level {
 //        this.boxes = boxes;
     }
 
-    public boolean cellIsFree(int row, int col) {
+    public boolean celIsFree(int row, int col) {
         return !(this.walls[row][col]);
     }
 

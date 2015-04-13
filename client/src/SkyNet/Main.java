@@ -19,9 +19,10 @@ public class Main {
         BufferedReader serverMessages = new BufferedReader(new InputStreamReader(System.in));
         Level level = LevelReader.ReadLevel(serverMessages);
 
-        // Plan plan = Planner.plan(level);
-        Plan plan = new Plan(new LinkedList<>());
-        LinkedList<Node> solution = popClient.solveLevel();
+        Planner planner = null; //TODO: Use POP or whatever
+
+        Plan plan = planner.createPlan(level);
+//        LinkedList<Node> solution = popClient.solveLevel();
 
         //Check and output plan
         if (plan.GetPlan().size() == 0) {

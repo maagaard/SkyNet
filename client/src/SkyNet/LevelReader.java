@@ -20,8 +20,8 @@ public class LevelReader {
         ArrayList<Box> boxes = new ArrayList<>();
         ArrayList<Agent> agents = new ArrayList<>();
 
-        Map<Character, String> colors = new HashMap<Character, String>();
-        String line, color = "";
+        Map<Character, String> colors = new HashMap<>();
+        String line, color;
 
         int agentCol = -1, agentRow = -1;
         int colorLines = 0, levelLines = 0;
