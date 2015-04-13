@@ -26,7 +26,17 @@ public class PartialPlanNode extends Node {
 
     private static Random rnd = new Random(1);
 
+    public PartialPlanNode(Node parent, int rows, int columns) {
+        super(parent, rows, columns);
+    }
+
+//    public PartialPlanNode(PartialPlanNode node) {
+//        super(node);
+//
+//    }
+
     public PartialPlanNode(Level level, Agent agent, Goal goal, Box box) {
+        super(null, 0, 0);
         this.level = level;
         this.agent = agent;
         this.goal = goal;

@@ -14,6 +14,26 @@ public abstract class Heuristic implements Comparator< Node > {
 	public Heuristic(Node initialState) {
 		this.initialState = initialState;
 
+		for (int i = 0; i < initialState.goals.length; i++) {
+			for (int j = 0; j < initialState.goals[i].length; j++) {
+				if (initialState.goals[i][j] != 0) {
+
+					//Simple
+					goalRow = i;
+					goalColumn = j;
+
+					//Advanced
+					goalMap.put(Character.toLowerCase(initialState.goals[i][j]), new int[]{i, j});
+				}
+			}
+		}
+		for (int i = 0; i < initialState.boxes.length; i++) {
+			for (int j = 0; j < initialState.boxes[i].length; j++) {
+				if (initialState.boxes[i][j] != 0) {
+					boxMap.put(Character.toLowerCase(initialState.boxes[i][j]), new int[]{i, j});
+				}
+			}
+		}
 	}
 
 	public int compare( Node n1, Node n2 ) {

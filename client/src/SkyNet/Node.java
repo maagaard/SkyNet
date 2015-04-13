@@ -1,9 +1,7 @@
 package SkyNet;
 
-import SkyNet.model.Box;
-import SkyNet.model.Goal;
 import SkyNet.model.Level;
-import SkyNet.model.PathFragment;
+import SkyNet.Command.*;
 
 import java.util.*;
 
@@ -15,8 +13,13 @@ import java.util.*;
 public class Node {
 
     public Level level;
-    public ArrayList<Box> boxes;
-    public ArrayList<Goal> goals;
+//    public ArrayList<Box> boxes;
+//    public ArrayList<Goal> goals;
+
+    public boolean[][] walls; // = new boolean[MAX_ROW][MAX_COLUMN];
+    public char[][] boxes;// = new char[MAX_ROW][MAX_COLUMN];
+    public char[][] goals;//; = new char[MAX_ROW][MAX_COLUMN];
+
 
     public Node parent;
     public Command action;
@@ -29,6 +32,23 @@ public class Node {
     public int agentCol;
 
     private int g;
+
+//    public Node(Node parent) {
+//        boxes = new char[MAX_ROW][MAX_COLUMN];
+//
+//        this.parent = parent;
+//        if (parent == null) {
+//            g = 0;
+//            goals = new char[MAX_ROW][MAX_COLUMN];
+//            ;
+//            walls = new boolean[MAX_ROW][MAX_COLUMN];
+//            ;
+//        } else {
+//            g = parent.g() + 1;
+//            walls = parent.walls;
+//            goals = parent.goals;
+//        }
+//    }
 
     public Node(Node parent, int rows, int columns) {
 
@@ -189,65 +209,63 @@ public class Node {
     }
 
 
-    //TODO: Must implement methods below
     @Override
     public int hashCode() {
-        final int prime = 37;
+        final int prime = 31;
         int result = 1;
-//        result = prime * result + agentCol;
-//        result = prime * result + agentRow;
-//        result = prime * result + Arrays.deepHashCode(boxes);
-//        result = prime * result + Arrays.deepHashCode( goals );
-//        result = prime * result + Arrays.deepHashCode( walls );
+        result = prime * result + agentCol;
+        result = prime * result + agentRow;
+        result = prime * result + Arrays.deepHashCode(boxes);
+        result = prime * result + Arrays.deepHashCode(goals);
+        result = prime * result + Arrays.deepHashCode(walls);
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-//        if ( this == obj )
-//            return true;
-//        if ( obj == null )
-//            return false;
-//        if ( getClass() != obj.getClass() )
-//            return false;
-//        Node other = (Node) obj;
-//        if ( agentCol != other.agentCol )
-//            return false;
-//        if ( agentRow != other.agentRow )
-//            return false;
-//        if ( !Arrays.deepEquals( boxes, other.boxes ) ) {
-//            return false;
-//        }
-//        if ( !Arrays.deepEquals( goals, other.goals ) )
-//            return false;
-//        if ( !Arrays.deepEquals( walls, other.walls ) )
-//            return false;
-
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Node other = (Node) obj;
+        if (agentCol != other.agentCol)
+            return false;
+        if (agentRow != other.agentRow)
+            return false;
+        if (!Arrays.deepEquals(boxes, other.boxes)) {
+            return false;
+        }
+        if (!Arrays.deepEquals(goals, other.goals))
+            return false;
+        if (!Arrays.deepEquals(walls, other.walls))
+            return false;
         return true;
     }
 
     public String toString() {
         StringBuilder s = new StringBuilder();
-//        for ( int row = 0; row < MAX_ROW; row++ ) {
-//            if ( !this.walls[row][0] ) {
-//                break;
-//            }
-//            for ( int col = 0; col < MAX_COLUMN; col++ ) {
-//                if ( this.boxes[row][col] > 0 ) {
-//                    s.append( this.boxes[row][col] );
-//                } else if ( this.goals[row][col] > 0 ) {
-//                    s.append( this.goals[row][col] );
-//                } else if ( this.walls[row][col] ) {
-//                    s.append( "+" );
-//                } else if ( row == this.agentRow && col == this.agentCol ) {
-//                    s.append( "0" );
-//                } else {
-//                    s.append( " " );
-//                }
-//            }
-//
-//            s.append( "\n" );
-//        }
+        for (int row = 0; row < MAX_ROW; row++) {
+            if (!this.walls[row][0]) {
+                break;
+            }
+            for (int col = 0; col < MAX_COLUMN; col++) {
+                if (this.boxes[row][col] > 0) {
+                    s.append(this.boxes[row][col]);
+                } else if (this.goals[row][col] > 0) {
+                    s.append(this.goals[row][col]);
+                } else if (this.walls[row][col]) {
+                    s.append("+");
+                } else if (row == this.agentRow && col == this.agentCol) {
+                    s.append("0");
+                } else {
+                    s.append(" ");
+                }
+            }
+
+            s.append("\n");
+        }
         return s.toString();
     }
 

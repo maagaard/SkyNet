@@ -1,10 +1,11 @@
 package SkyNet;
 
 import SkyNet.model.*;
-//import SkyNet.Strategy.*;
-import SkyNet.PartialStrategy.*;
-import SkyNet.PartialPlanNode;
-import SkyNet.PartialPlanHeuristic.*;
+import SkyNet.Strategy.*;
+//import SkyNet.PartialStrategy.*;
+//import SkyNet.PartialPlanNode;
+//import SkyNet.PartialPlanHeuristic.*;
+import SkyNet.Heuristic.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class POP {
     public ArrayList<Agent> agents = new ArrayList<Agent>();
     public Node initialState = null;
     public PathFragment initialPath = null;
-    public PartialStrategy strategy = null;
+    public Strategy strategy = null;
 
     public static void error(String msg) throws Exception {
         throw new Exception("GSCError: " + msg);
@@ -84,18 +85,17 @@ public class POP {
             error("Box colors not supported");
         }
 
-
-
         int MAX_SIZE = 100;
 
         boolean[][] walls = new boolean[MAX_SIZE][MAX_SIZE];
-//        char[][] boxes = new char[MAX_SIZE][MAX_SIZE];
-//        char[][] goals = new char[MAX_SIZE][MAX_SIZE];
+        char[][] nodeBoxes = new char[MAX_SIZE][MAX_SIZE];
+        char[][] nodeGoals = new char[MAX_SIZE][MAX_SIZE];
         int longestLine = 0;
 
         ArrayList<Goal> goals = new ArrayList<Goal>();
 
-
+        int initialAgentRow = 0;
+        int initialAgentCol = 0;
 
         while (!line.equals("")) {
             int length = line.length();
@@ -110,12 +110,13 @@ public class POP {
                         error("Not a single agent level");
                     }
                     agents.add(new Agent(chr, i, levelLines));
-
+                    initialAgentRow = levelLines;
+                    initialAgentCol = i;
                 } else if ('A' <= chr && chr <= 'Z') { // Boxes
-//                    boxes[levelLines][i] = chr;
+                    nodeBoxes[levelLines][i] = chr;
                     boxes.add(new Box(chr, i, levelLines));
                 } else if ('a' <= chr && chr <= 'z') { // Goal cells
-//                    goals[levelLines][i] = chr;
+                    nodeGoals[levelLines][i] = chr;
                     goals.add(new Goal(chr, i, levelLines));
 
                 }
@@ -128,23 +129,24 @@ public class POP {
         level = new Level();
         level.walls = walls;
         level.goals = goals;
+//        this.initialState.level = level;
+
 
         //Initialize new agent
-        initialState = new Node(null, levelLines +1, longestLine+1);
+        initialState = new Node(null, levelLines + 1, longestLine + 1);
 
         System.err.format("Column size: %d, row size: %d\n", Node.MAX_COLUMN, Node.MAX_ROW);
         //Copy walls, boxes and goals into smaller array
-        for(int i = 0; i < Node.MAX_ROW; ++i) {
-            for (int j = 0; j < Node.MAX_COLUMN ; j++) {
+        for (int i = 0; i < Node.MAX_ROW; ++i) {
+            for (int j = 0; j < Node.MAX_COLUMN; j++) {
                 initialState.walls[i][j] = walls[i][j];
-                initialState.goals[i][j] = goals[i][j];
-                initialState.boxes[i][j] = boxes[i][j];
+                initialState.goals[i][j] = nodeGoals[i][j];
+                initialState.boxes[i][j] = nodeBoxes[i][j];
             }
         }
 
         initialState.agentCol = initialAgentCol;
         initialState.agentRow = initialAgentRow;
-
     }
 
     public void pickGoal() throws IOException {
@@ -163,70 +165,79 @@ public class POP {
 
         System.err.println("Agent: " + agent.number + ", goal: " + g.name + ", box: " + box.name);
 
-        LinkedList<Command> solution = extractPartialOrderPlan(agent, g, box);
+        LinkedList<Node> solution = extractPartialOrderPlan(agent, g, box);
 
         if (solution == null) {
             System.err.println("Unable to solve level");
             System.exit(0);
         } else {
-//            System.err.println("\nSummary for " + strategy);
+            System.err.println("\nSummary for " + strategy);
             System.err.println("Found solution of length " + solution.size());
             System.err.println(strategy.searchStatus());
 
-            if (solution.get(0) == null) {
-                solution.removeFirst();
-            }
-//            for (int i = 0; i < 20; i++) {
-//                System.err.format("Action: %s\n", solution.get(i));
-//            }
-
-            System.err.format("Start\n");
-
-            for (Command c : solution) {
-                if (c == null) { continue; }
-                System.err.format("Action: %s\n", c);
-                String act = c.toActionString();
+            for (Node n : solution) {
+                String act = n.action.toActionString();
                 System.out.println(act);
-                String response = this.serverMessages.readLine();
+                String response = serverMessages.readLine();
                 if (response.contains("false")) {
                     System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
-                    System.err.format("%s was attempted in \n%s\n", act, c);
-                    continue;
-//                    break;
+                    System.err.format("%s was attempted in \n%s\n", act, n);
+                    break;
                 }
             }
-            System.err.format("Done\n");
 
-//            for (PartialPlanNode n : solution) {
-//                String act = n.toActionString();
+        }
+
+
+//        if (solution == null) {
+//            System.err.println("Unable to solve level");
+//            System.exit(0);
+//        } else {
+////            System.err.println("\nSummary for " + strategy);
+//            System.err.println("Found solution of length " + solution.size());
+//            System.err.println(strategy.searchStatus());
+//
+//            if (solution.get(0) == null) {
+//                solution.removeFirst();
+//            }
+////            for (int i = 0; i < 20; i++) {
+////                System.err.format("Action: %s\n", solution.get(i));
+////            }
+//
+//            System.err.format("Start\n");
+//
+//            for (Command c : solution) {
+//                if (c == null) { continue; }
+//                System.err.format("Action: %s\n", c);
+//                String act = c.toActionString();
 //                System.out.println(act);
-//                String response = serverMessages.readLine();
+//                String response = this.serverMessages.readLine();
 //                if (response.contains("false")) {
 //                    System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
-//                    System.err.format("%s was attempted in \n%s\n", act, n);
-//                    break;
+//                    System.err.format("%s was attempted in \n%s\n", act, c);
+//                    continue;
+////                    break;
 //                }
 //            }
-        }
+//            System.err.format("Done\n");
+//        }
+
+
     }
 
-    private LinkedList<Command> extractPartialOrderPlan(Agent agent, Goal goal, Box box) {
+    private LinkedList<Node> extractPartialOrderPlan(Agent agent, Goal goal, Box box) {
 
-        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
+//        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
+//        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
 
-        ArrayList<Action> goalSteps = new ArrayList<Action>();
+        strategy = new StrategyBestFirst(new AStar(this.initialState));
 
-        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
-        PartialStrategy strategy = new StrategyBestFirst(new AStar(partialInitialState.path.get(0)), level);
-        this.strategy =  strategy;
-
-//        LinkedList<PartialPlanNode> partialPlan = null;
-        LinkedList<Command> partialPlan = null;
+        LinkedList<Node> partialPlan = null;
 
         try {
-            partialPlan = PartialSearch(strategy, partialInitialState);
+            partialPlan = PartialSearch(strategy);
             if (partialPlan == null) return null;
-            System.err.format("Search starting with strategy %d\n", partialPlan.size());
+            System.err.format("Search starting with strategy %s\n", strategy);
         } catch (IOException e) {
             e.printStackTrace();
             System.err.format("Error");
@@ -236,9 +247,10 @@ public class POP {
     }
 
 
-    public LinkedList<Command> PartialSearch(PartialStrategy strategy, PartialPlanNode partialNode) throws IOException {
+    public LinkedList<Node> PartialSearch(Strategy strategy) throws IOException {
         System.err.format("Search starting with strategy %s\n", strategy);
-        strategy.addToFrontier(partialNode.path.get(0));
+//        strategy.addToFrontier(partialNode.path.get(0));
+        strategy.addToFrontier(this.initialState);
 
         int iterations = 0;
         while (true) {
@@ -258,84 +270,20 @@ public class POP {
                 return null;
             }
 
-//            PathFragment previous = partialNode.path.get(partialNode.path.size()-1);
-            PathFragment leafPath = strategy.getAndRemoveLeaf();
+            Node leafNode = strategy.getAndRemoveLeaf();
 
-//            System.err.format("Previous: " + previous.pathLength + "    - This: " + leafPath.pathLength + "\n");
-
-            System.err.format("Explore: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y + ", " + leafPath.action + ", " + leafPath.pathLength + "\n");
-            strategy.addToExplored(leafPath);
-
-            partialNode.update(leafPath);
-            System.err.format("Length: " + partialNode.path.size() + "\n");
-
-            if (partialNode.isGoalState(leafPath)) {
-                return partialNode.extractPartialPlan();
+            if (leafNode.isGoalState()) {
+                System.err.format("Goal state reached\n");
+                return leafNode.extractPlan();
             }
 
-            for (PathFragment p : partialNode.getExpandedPaths()) {
-                if (!strategy.isExplored(p) && !strategy.inFrontier(p)) {
-                    strategy.addToFrontier(p);
-//                    if (p.action.dir2 != null) {
-//                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
-//                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
-//                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() + ", dir2: " + p.action.dir2.toString() +
-//                                "\n");
-//                    }
-//                    else {
-//                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
-//                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
-//                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() +
-//                                "\n");
-//                    }
-                } else if (strategy.inFrontier(p) && !strategy.isExplored(p)) {
-//                    if (p.action.dir2 != null) {
-//                        System.err.format("In frontier. a: " + p.agentLocation.x + "," + p.agentLocation.y +
-//                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
-//                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() + ", dir2: " + p.action.dir2.toString() +
-//                                "\n");
-//                    } else {
-//                        System.err.format("In frontier. a: " + p.agentLocation.x + "," + p.agentLocation.y +
-//                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
-//                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() +
-//                                "\n");
-//                    }
+            strategy.addToExplored(leafNode);
+            for (Node n : leafNode.getExpandedNodes()) {
+                if (!strategy.isExplored(n) && !strategy.inFrontier(n)) {
+                    strategy.addToFrontier(n);
                 }
-                else {
-//                    if (p.action.dir2 != null) {
-//                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
-//                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
-//                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() + ", dir2: " + p.action.dir2.toString() +
-//                                "\n");
-//                    } else {
-//                        System.err.format("Is explored. a: " + p.agentLocation.x + "," + p.agentLocation.y +
-//                                ", b: " + p.boxLocation.x + "," + p.boxLocation.y +
-//                                ", move: " + p.action.actType.toString() + ", dir1: " + p.action.dir1.toString() +
-//                                "\n");
-//                    }
-                }
-
-//                    if (leafPath.action.dir2 != null) {
-//                        System.err.format("Is explored. a: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y +
-//                                ", b: " + leafPath.boxLocation.x + "," + leafPath.boxLocation.y +
-//                                ", move: " + leafPath.action.actType.toString() + ", dir1: " + leafPath.action.dir1.toString() + ", dir2: " + leafPath.action.dir2.toString() +
-//                                "\n");
-//                    }
-//                    else {
-//                        System.err.format("Is explored. a: " + leafPath.agentLocation.x + "," + leafPath.agentLocation.y +
-//                                ", b: " + leafPath.boxLocation.x + "," + leafPath.boxLocation.y +
-//                                ", move: " + leafPath.action.actType.toString() + ", dir1: " + leafPath.action.dir1.toString() +
-//                                "\n");
-//                    }
-
-
-//                    System.err.format("Is explored\n");
             }
-//            for ( Node n : leafNode.getExpandedNodes() ) {
-//                if ( !strategy.isExplored( n ) && !strategy.inFrontier( n ) ) {
-//                    strategy.addToFrontier( n );
-//                }
-//            }
+
             iterations++;
         }
 
