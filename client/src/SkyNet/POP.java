@@ -173,6 +173,13 @@ public class POP {
             }
 
             fullSolution.addAll(shortest);
+//            return fullSolution;
+
+            Node endNode = shortest.getLast();
+
+            agent.x = endNode.agentCol;
+            agent.y = endNode.agentRow;
+
         }
 
         return fullSolution;
@@ -180,7 +187,6 @@ public class POP {
 
 
     public LinkedList<Node> pickGoal() throws IOException {
-
 
         Goal g = level.goals.get(0);
 
@@ -263,12 +269,22 @@ public class POP {
 //        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
 //        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
 
-        strategy = new StrategyBestFirst(new AStar(this.initialState));
+//        System.err.format("Initial state length: " + this.initialState.boxes);
+
+
+        Node state = new Node(null, initialState.boxes.length, initialState.boxes[0].length);
+        state.goals[goal.y][goal.x] = goal.name;
+        state.boxes[box.y][box.x] = box.name;
+        state.walls = initialState.walls;
+        state.agentCol = agent.x;
+        state.agentRow = agent.y;
+
+        strategy = new StrategyBestFirst(new AStar(state));
 
         LinkedList<Node> partialPlan = null;
 
         try {
-            partialPlan = PartialSearch(strategy);
+            partialPlan = PartialSearch(strategy, state);
             if (partialPlan == null) return null;
             System.err.format("Search starting with strategy %s\n", strategy);
         } catch (IOException e) {
@@ -280,10 +296,11 @@ public class POP {
     }
 
 
-    public LinkedList<Node> PartialSearch(Strategy strategy) throws IOException {
+    public LinkedList<Node> PartialSearch(Strategy strategy, Node state) throws IOException {
         System.err.format("Search starting with strategy %s\n", strategy);
 //        strategy.addToFrontier(partialNode.path.get(0));
-        strategy.addToFrontier(this.initialState);
+
+        strategy.addToFrontier(state);
 
         int iterations = 0;
         while (true) {

@@ -30,6 +30,7 @@ public class Node {
 
     public int agentRow;
     public int agentCol;
+    public char agentNumber;
 
     private int g;
 
