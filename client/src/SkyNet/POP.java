@@ -9,10 +9,7 @@ import SkyNet.Heuristic.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 
 public class POP {
@@ -149,7 +146,41 @@ public class POP {
         initialState.agentRow = initialAgentRow;
     }
 
-    public void pickGoal() throws IOException {
+    public LinkedList<Node> solveLevel() throws IOException {
+
+        Agent agent = agents.get(0);
+
+        LinkedList<Node> fullSolution = new LinkedList<Node>();
+
+        for (Goal goal : level.goals) {
+
+            LinkedList<LinkedList<Node>> solutionList = new LinkedList<LinkedList<Node>>();
+//            Box box = null;
+            for (Box box : boxes) {
+                if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
+//                    box = b;
+                    System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
+                    LinkedList<Node> solution = extractPartialOrderPlan(agent, goal, box);
+                    solutionList.add(solution);
+                }
+            }
+
+            LinkedList<Node> shortest = solutionList.pop();
+            for (LinkedList<Node> solution : solutionList) {
+                if (solution.size() < shortest.size()) {
+                    shortest = solution;
+                }
+            }
+
+            fullSolution.addAll(shortest);
+        }
+
+        return fullSolution;
+    }
+
+
+    public LinkedList<Node> pickGoal() throws IOException {
+
 
         Goal g = level.goals.get(0);
 
@@ -187,6 +218,8 @@ public class POP {
             }
 
         }
+
+        return solution;
 
 
 //        if (solution == null) {
