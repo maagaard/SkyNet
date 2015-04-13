@@ -1,15 +1,15 @@
 package SkyNet.model;
 
-import SkyNet.Command;
+import SkyNet.Node;
 
 import java.util.LinkedList;
 
 public class Plan {
-    private LinkedList<Command> plan;
+    private LinkedList<Node> plan;
 
-    public LinkedList<Command> GetPlan() { return plan; }
+    public LinkedList<Node> GetPlan() { return plan; }
 
-    public Plan(LinkedList<Command> _plan) {
+    public Plan(LinkedList<Node> _plan) {
         plan = _plan;
     }
 }

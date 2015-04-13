@@ -16,8 +16,8 @@ public class Main {
 
         // Use stderr to print to console
         System.err.println("SearchClient initializing.");
-
-        Level level = LevelReader.ReadLevel(new BufferedReader(new InputStreamReader(System.in)));
+        BufferedReader serverMessages = new BufferedReader(new InputStreamReader(System.in));
+        Level level = LevelReader.ReadLevel(serverMessages);
 
         // Plan plan = Planner.plan(level);
         Plan plan = new Plan(new LinkedList<>());
@@ -27,7 +27,8 @@ public class Main {
         if (plan.GetPlan().size() == 0) {
             System.err.println("Unable to solve level");
         } else {
-            LevelWriter.ExecutePlan(plan);
+            System.err.println("Found solution of length " + plan.GetPlan().size());
+            LevelWriter.ExecutePlan(plan, serverMessages);
         }
 
         System.exit(0);
