@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         // Use stderr to print to console
-        System.err.println("SearchClient initializing. I am sending this using the error output stream.");
+        System.err.println("SearchClient initializing.");
 
         Level level = LevelReader.ReadLevel(new BufferedReader(new InputStreamReader(System.in)));
 
