@@ -7,7 +7,6 @@ import SkyNet.Strategy.*;
 //import SkyNet.PartialPlanHeuristic.*;
 import SkyNet.Heuristic.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 
@@ -27,12 +26,11 @@ public class POP implements Planner {
 
         LinkedList<Node> fullSolution = new LinkedList<>();
 
-        LinkedList<LinkedList<Node>> partialPlans = new LinkedList<LinkedList<Node>>();
+        LinkedList<Plan> partialPlans = new LinkedList<>();
 
         for (Goal goal : level.goals) {
 
             LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
-//            Box box = null;
             for (Box box : level.boxes) {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
 //                    box = b;
@@ -49,11 +47,10 @@ public class POP implements Planner {
                 }
             }
 
-
             fullSolution.addAll(shortest);
 //            return fullSolution;
 
-            partialPlans.add(shortest);
+            partialPlans.add(new Plan(shortest));
             Node endNode = shortest.getLast();
 
             agent.x = endNode.agentCol;
@@ -61,24 +58,24 @@ public class POP implements Planner {
 
         }
 
-        return new Plan(fullSolution);
-        discoverConflicts(partialPlans);
+        return resolveConflicts(level, partialPlans);
 
+//        return new Plan(fullSolution);
     }
 
-    private void discoverConflicts(LinkedList<LinkedList<Node>> partialPlans) {
+    private Plan resolveConflicts(Level level, LinkedList<Plan> partialPlans) {
 
         // Ordering constraints --> Check if any goals interfere with other plans
 
-        for (LinkedList<Node> partialPlan : partialPlans) {
+        for (Plan partialPlan : partialPlans) {
             //TODO: Find partial plan goal - do not check if this goal is in the way for the actions
             //TODO: Or find goals to check for
 
-            ArrayList<Goal> goals = new ArrayList<Goal>(this.level.goals);
+            ArrayList<Goal> goals = new ArrayList<>(level.goals);
 
-            goals.remove(partialPlan.get(0).pursuedGoal);
+            goals.remove(partialPlan.GetPlan().get(0).pursuedGoal);
 
-            for (Node node : partialPlan) {
+            for (Node node : partialPlan.GetPlan()) {
                 //TODO: Check if agent passes other partial plan goals
                 for (Goal goal : goals) {
                     if (goal.x == node.agentCol || goal.y == node.agentRow) {
@@ -92,7 +89,8 @@ public class POP implements Planner {
 //        this.level.goals
         }
 
-
+        //TODO: Return a merged plan
+        return new Plan(new LinkedList<>());
     }
 
 
