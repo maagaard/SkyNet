@@ -35,7 +35,7 @@ public abstract class PartialStrategy {
     }
 
     public String searchStatus() {
-        return String.format("#Explored: %4d, #Frontier: %3d, Time: %3.2f s \t%s", countExplored(), countFrontier(), timeSpent(), POP.Memory.stringRep());
+        return String.format("#Explored: %4d, #Frontier: %3d, Time: %3.2f s \t%s", countExplored(), countFrontier(), timeSpent(), Memory.stringRep());
     }
 
     public float timeSpent() {

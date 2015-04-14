@@ -2,7 +2,7 @@ package SkyNet;
 
 import java.util.*;
 
-import SkyNet.POP.Memory;
+import SkyNet.Memory;
 
 public abstract class Strategy {
 

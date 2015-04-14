@@ -14,7 +14,10 @@ import java.util.*;
 
 public class POP implements Planner {
 
-    public POP() throws Exception {
+    private Strategy strategy;
+
+    public POP(Strategy strategy) throws Exception {
+        this.strategy = strategy;
     }
 
     @Override
@@ -22,7 +25,7 @@ public class POP implements Planner {
 
         Agent agent = level.agents.get(0);
 
-        LinkedList<Node> fullSolution = new LinkedList<Node>();
+        LinkedList<Node> fullSolution = new LinkedList<>();
 
         for (Goal goal : level.goals) {
 
@@ -32,7 +35,7 @@ public class POP implements Planner {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
 //                    box = b;
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-                    LinkedList<Node> solution = extractPartialOrderPlan(agent, goal, box);
+                    LinkedList<Node> solution = extractPartialOrderPlan(level, agent, goal, box);
                     solutionList.add(solution);
                 }
             }
@@ -136,7 +139,7 @@ public class POP implements Planner {
 
 //    }
 
-    private LinkedList<Node> extractPartialOrderPlan(Agent agent, Goal goal, Box box) {
+    private LinkedList<Node> extractPartialOrderPlan(Level level, Agent agent, Goal goal, Box box) {
 
 //        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
 //        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
@@ -144,10 +147,11 @@ public class POP implements Planner {
 //        System.err.format("Initial state length: " + this.initialState.boxes);
 
 
-        Node state = new Node(null, initialState.boxes.length, initialState.boxes[0].length);
+//        Node state = new Node(null, level.boxes.size(), level.boxes[0].length);
+        Node state = new Node(null, level.boxes.size(), -1);
         state.goals[goal.y][goal.x] = goal.name;
         state.boxes[box.y][box.x] = box.name;
-        state.walls = initialState.walls;
+        state.walls = level.walls;
         state.agentCol = agent.x;
         state.agentRow = agent.y;
 
