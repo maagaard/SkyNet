@@ -1,5 +1,6 @@
 package SkyNet;
 
+import SkyNet.model.Goal;
 import SkyNet.model.Level;
 import SkyNet.Command.*;
 
@@ -20,7 +21,7 @@ public class Node {
     public char[][] boxes;// = new char[MAX_ROW][MAX_COLUMN];
     public char[][] goals;//; = new char[MAX_ROW][MAX_COLUMN];
 
-
+    public Goal pursuedGoal = null;
     public Node parent;
     public Command action;
 

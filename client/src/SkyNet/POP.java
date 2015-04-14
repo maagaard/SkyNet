@@ -197,19 +197,20 @@ public class POP {
             //TODO: Find partial plan goal - do not check if this goal is in the way for the actions
             //TODO: Or find goals to check for
             ArrayList<Goal> goals = (ArrayList<Goal>) this.level.goals.clone();
-//            goals.
+            goals.remove(partialPlan.get(0).pursuedGoal);
 
             for (Node node : partialPlan) {
                 //TODO: Check if agent passes other partial plan goals
-
-//                for ()
-
-//                if (node.agentCol ==
+                for (Goal goal : goals) {
+                    if (goal.x == node.agentCol || goal.y == node.agentRow) {
+                        //TODO: indicate conflict and given cell
+                        //TODO: find plan that solves goal in conflict - order to happen after iterated plan
+                    }
+                }
             }
-        }
 
 //        this.level.goals
-
+        }
 
 
     }
