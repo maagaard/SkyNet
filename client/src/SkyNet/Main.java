@@ -21,8 +21,8 @@ public class Main {
         BufferedReader serverMessages = new BufferedReader(new InputStreamReader(System.in));
         Level level = LevelReader.ReadLevel(serverMessages);
 
-        Node state = new Node(null, level.height, level.width);
-        Strategy strategy = new StrategyBestFirst(new AStar(state));
+//        Node state = new Node(null, level.height, level.width);
+        Strategy strategy = null;//new StrategyBestFirst(new AStar(state));
 
         Planner planner = new POP(strategy);    //null; //TODO: Use POP or whatever
 
