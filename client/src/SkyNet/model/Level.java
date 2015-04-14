@@ -10,6 +10,8 @@ public class Level {
     public ArrayList<Goal> goals;
     public ArrayList<Box> boxes;
     public ArrayList<Agent> agents;
+    public int width;
+    public int height;
 
     public Level() {
     }

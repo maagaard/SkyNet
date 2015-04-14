@@ -85,6 +85,9 @@ public class LevelReader {
         level.goals = goals;
         level.agents = agents;
         level.boxes = boxes;
+        level.width = longestLine;
+        level.height = levelLines;
+
         return level;
     }
 }

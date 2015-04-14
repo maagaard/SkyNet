@@ -18,6 +18,8 @@ public class Plan implements Comparator<PartialPlan> {
     }
 
 
+    //TODO: Also prioritize with regards to initial heuristics as to know which plan is best to solve first
+
 
     @Override
     public int compare(PartialPlan p1, PartialPlan p2) {

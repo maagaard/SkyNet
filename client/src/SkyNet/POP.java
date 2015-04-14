@@ -146,9 +146,8 @@ public class POP implements Planner {
 
 //        System.err.format("Initial state length: " + this.initialState.boxes);
 
-
 //        Node state = new Node(null, level.boxes.size(), level.boxes[0].length);
-        Node state = new Node(null, level.boxes.size(), -1);
+        Node state = new Node(null, level.height, level.width);
         state.goals[goal.y][goal.x] = goal.name;
         state.boxes[box.y][box.x] = box.name;
         state.walls = level.walls;
