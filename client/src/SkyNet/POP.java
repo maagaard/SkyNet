@@ -15,6 +15,8 @@ import java.util.*;
 public class POP implements Planner {
 
     private Strategy strategy;
+    private Level level;
+    private Node initialState;
 
     public POP(Strategy strategy) throws Exception {
         this.strategy = strategy;
@@ -22,6 +24,14 @@ public class POP implements Planner {
 
     @Override
     public Plan createPlan(Level level) {
+        this.level = level;
+
+        this.initialState = new Node(null, level.height, level.width);
+        initialState.goals[goal.y][goal.x] = goal.name;
+        initialState.boxes[box.y][box.x] = box.name;
+        initialState.walls = level.walls;
+        initialState.agentCol = agent.x;
+        initialState.agentRow = agent.y;
 
         Agent agent = level.agents.get(0);
 
@@ -32,10 +42,10 @@ public class POP implements Planner {
         for (Goal goal : level.goals) {
 
             LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
-//            Box box = null;
+
             for (Box box : level.boxes) {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
-//                    box = b;
+
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
                     LinkedList<Node> solution = extractPartialOrderPlan(level, agent, goal, box);
                     solutionList.add(solution);
@@ -61,10 +71,14 @@ public class POP implements Planner {
 
         }
 
-        return new Plan(fullSolution);
         discoverConflicts(partialPlans);
 
+
+        return new Plan(fullSolution);
+
     }
+
+
 
     private void discoverConflicts(LinkedList<LinkedList<Node>> partialPlans) {
 
@@ -74,7 +88,7 @@ public class POP implements Planner {
             //TODO: Find partial plan goal - do not check if this goal is in the way for the actions
             //TODO: Or find goals to check for
 
-            ArrayList<Goal> goals = new ArrayList<Goal>(this.level.goals);
+            ArrayList<Goal> goals = new ArrayList<>(this.level.goals);
 
             goals.remove(partialPlan.get(0).pursuedGoal);
 
@@ -180,21 +194,21 @@ public class POP implements Planner {
 //        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
 
 //        System.err.format("Initial state length: " + this.initialState.boxes);
-
 //        Node state = new Node(null, level.boxes.size(), level.boxes[0].length);
-        Node state = new Node(null, level.height, level.width);
-        state.goals[goal.y][goal.x] = goal.name;
-        state.boxes[box.y][box.x] = box.name;
-        state.walls = level.walls;
-        state.agentCol = agent.x;
-        state.agentRow = agent.y;
 
-        strategy = new StrategyBestFirst(new AStar(state));
+//        Node state = new Node(null, level.height, level.width);
+//        state.goals[goal.y][goal.x] = goal.name;
+//        state.boxes[box.y][box.x] = box.name;
+//        state.walls = level.walls;
+//        state.agentCol = agent.x;
+//        state.agentRow = agent.y;
+
+//        strategy = new StrategyBestFirst(new AStar(state));
 
         LinkedList<Node> partialPlan = null;
 
         try {
-            partialPlan = PartialSearch(strategy, state);
+            partialPlan = PartialSearch(strategy, initialState);
             if (partialPlan == null) return null;
             System.err.format("Search starting with strategy %s\n", strategy);
         } catch (IOException e) {
