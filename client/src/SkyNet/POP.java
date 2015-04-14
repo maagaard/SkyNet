@@ -207,6 +207,7 @@ public class POP {
                     if (goal.x == node.agentCol || goal.y == node.agentRow) {
                         //TODO: indicate conflict and given cell
                         //TODO: find plan that solves goal in conflict - order to happen after iterated plan
+
                     }
                 }
             }
