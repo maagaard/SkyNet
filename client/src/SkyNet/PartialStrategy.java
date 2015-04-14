@@ -130,27 +130,27 @@ public abstract class PartialStrategy {
         private PartialPlanHeuristic heuristic;
         private Level level;
         private PriorityQueue<PathFragment> frontier;
-//        private PriorityQueue<PathFragment> oldFrontier;
+        private PriorityQueue<PathFragment> oldFrontier;
 
         public StrategyBestFirst(PartialPlanHeuristic h, Level l) {
             super();
             heuristic = h;
             level = l;
             frontier = new PriorityQueue<PathFragment>(11, heuristic); //11 is default initial capacity
-//            oldFrontier = new PriorityQueue<PathFragment>(11, heuristic); //11 is default initial capacity
+            oldFrontier = new PriorityQueue<PathFragment>(11, heuristic); //11 is default initial capacity
         }
 
         public PathFragment getAndRemoveLeaf() {
 
             PathFragment node;
-//            if (frontier.size() == 0) {
-//                node = oldFrontier.poll();
-//            } else {
+            if (frontier.size() == 0) {
+                node = oldFrontier.poll();
+            } else {
                 node = frontier.poll();
 
-//                oldFrontier.addAll(frontier);
-//                frontier.clear();
-//            }
+                oldFrontier.addAll(frontier);
+                frontier.clear();
+            }
             System.err.format("Heuristics: " + heuristic.f(node) + "\n");
             return node;
         }
@@ -160,11 +160,11 @@ public abstract class PartialStrategy {
         }
 
         public int countFrontier() {
-            return frontier.size();// + oldFrontier.size();
+            return frontier.size() + oldFrontier.size();
         }
 
         public boolean frontierIsEmpty() {
-            return frontier.isEmpty();// && oldFrontier.isEmpty();
+            return frontier.isEmpty() && oldFrontier.isEmpty();
         }
 
         public boolean inFrontier(PathFragment n) {
