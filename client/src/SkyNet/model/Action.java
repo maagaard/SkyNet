@@ -1,10 +1,10 @@
 package SkyNet.model;
 
-import java.util.List;
+import java.util.Set;
 
 public class Action extends Method {
 
-    public Action(List<Atom> preconditions) {
+    public Action(Set<Atom> preconditions) {
         super(preconditions);
     }
 }

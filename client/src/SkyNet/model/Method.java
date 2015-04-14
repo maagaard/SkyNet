@@ -1,35 +1,35 @@
 package SkyNet.model;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * HTN Method
  * has: (name, precondition, reduction)
  */
 public abstract class Method {
-    private final List<Atom> preconditions;
-    private final List<Method> reduction;
+    private final Set<Atom> preconditions;
+    private final Set<Method> reduction;
 
-    public Method(List<Atom> preconditions, List<Method> reduction){
+    public Method(Set<Atom> preconditions, Set<Method> reduction){
         this.preconditions = preconditions;
         this.reduction = reduction;
     }
 
-    public Method(List<Atom> preconditions) {
+    public Method(Set<Atom> preconditions) {
         this.preconditions = preconditions;
-        this.reduction = new LinkedList<>(); //empty list
+        this.reduction = new HashSet<>(); //empty list
     }
 
-    public boolean PreconditionsHold(List<Atom> state){
-        return preconditions.stream().allMatch(); //TODO: lambda stuff
+    public boolean PreconditionsHold(Set<Atom> state){
+        return state.stream()
+                    .filter(preconditions::contains)
+                    .count() == preconditions.size();
     }
 
-    //reduction
-    public List<Method> Decompose(List<Atom> state){
-        //check if preconditions holds in state
-        //if they do then return reduction
-
+    public Set<Method> Decompose(Set<Atom> state){
+        if(this.PreconditionsHold(state))
+            return reduction;
         return null;
     }
 }
