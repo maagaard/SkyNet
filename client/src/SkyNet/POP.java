@@ -152,6 +152,8 @@ public class POP {
 
         LinkedList<Node> fullSolution = new LinkedList<Node>();
 
+        LinkedList<LinkedList<Node>> partialPlans = new LinkedList<LinkedList<Node>>();
+
         for (Goal goal : level.goals) {
 
             LinkedList<LinkedList<Node>> solutionList = new LinkedList<LinkedList<Node>>();
@@ -172,17 +174,44 @@ public class POP {
                 }
             }
 
+
             fullSolution.addAll(shortest);
 //            return fullSolution;
 
+            partialPlans.add(shortest);
             Node endNode = shortest.getLast();
-
             agent.x = endNode.agentCol;
             agent.y = endNode.agentRow;
-
         }
 
+        discoverConflicts(partialPlans);
+
         return fullSolution;
+    }
+
+    private void discoverConflicts(LinkedList<LinkedList<Node>> partialPlans) {
+
+        // Ordering constraints --> Check if any goals interfere with other plans
+
+        for (LinkedList<Node> partialPlan : partialPlans) {
+            //TODO: Find partial plan goal - do not check if this goal is in the way for the actions
+            //TODO: Or find goals to check for
+            ArrayList<Goal> goals = (ArrayList<Goal>) this.level.goals.clone();
+//            goals.
+
+            for (Node node : partialPlan) {
+                //TODO: Check if agent passes other partial plan goals
+
+//                for ()
+
+//                if (node.agentCol ==
+            }
+        }
+
+//        this.level.goals
+
+
+
     }
 
 
