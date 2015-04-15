@@ -118,7 +118,6 @@ public abstract class Heuristic implements Comparator<Node> {
 //        double b = Math.pow(n.agentRow - goalRow, 2);
 //        double distance = Math.sqrt(a + b);
 
-
         if (n.chosenGoal != null && n.chosenBox != null) {
             int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
             int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));

@@ -119,8 +119,11 @@ public class POP implements Planner {
 
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
                     LinkedList<Node> solution = extractSubgoalSolution(level, agent, goal, box);
-
                     solutionList.add(new PartialPlan(agent, goal, box, solution));
+
+                    if (solution == null) {
+                        System.err.format("No solution found\n");
+                    }
                 }
             }
 
@@ -278,9 +281,9 @@ public class POP implements Planner {
 
         Node state = new Node(null, level.height, level.width);
         state.walls = initialState.walls;
-        state.actingAgent = agent;
-        state.chosenGoal = goal;
-        state.chosenBox = box;
+//        state.actingAgent = agent;
+//        state.chosenGoal = goal;
+//        state.chosenBox = box;
         state.agentCol = agent.x;
         state.agentRow = agent.y;
 
@@ -377,7 +380,7 @@ public class POP implements Planner {
                 return null;
             }
             if (strategy.frontierIsEmpty()) {
-                System.err.format("Frontier is empty");
+                System.err.format("Frontier is empty\n");
                 return null;
             }
 
