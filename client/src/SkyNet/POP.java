@@ -56,7 +56,18 @@ public class POP implements Planner {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
 
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-                    LinkedList<Node> solution = extractPartialOrderPlan(level, agent, goal, box);
+//                    LinkedList<Node> solution = extractPartialOrderPlan(level, agent, goal, box);
+
+                    for (int i = 0; i < level.goals.size(); i++) {
+                        Goal g = level.goals.get(i);
+                        initialState.goals[g.y][g.x] = g.name;
+                    }
+                    for (int i = 0; i < level.boxes.size(); i++) {
+                        Box b = level.boxes.get(i);
+                        initialState.goals[b.y][b.x] = b.name;
+                    }
+
+                    LinkedList<Node> solution = extractPlan(level, agent, goal, box); //extractPartialOrderPlan(level, agent, goal, box);
                     solutionList.add(solution);
                 }
             }
@@ -72,11 +83,12 @@ public class POP implements Planner {
 //            return fullSolution;
 
             partialPlans.add(new Plan(shortest));
-            Node endNode = shortest.getLast();
 
-            agent.x = endNode.agentCol;
-            agent.y = endNode.agentRow;
-
+            //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
+            //TODO: OR change the
+//            Node endNode = shortest.getLast();
+//            agent.x = endNode.agentCol;
+//            agent.y = endNode.agentRow;
         }
 
 
@@ -293,6 +305,42 @@ public class POP implements Planner {
 
         return partialPlan;
     }
+
+
+    //TODO: Make extraction plan for whole level - based on goal sorting
+    private LinkedList<Node> extractPlan(Level level, Agent agent, Goal goal, Box box) {
+
+//        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
+//        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
+
+//        System.err.format("Initial state length: " + this.initialState.boxes);
+//        Node state = new Node(null, level.boxes.size(), level.boxes[0].length);
+
+
+//        Node state = new Node(null, level.height, level.width);   //new Node(null, level.height, level.width);
+//        state.walls = initialState.walls;
+//        state.agentCol = agent.x;
+//        state.agentRow = agent.y;
+//        state.goals[goal.y][goal.x] = goal.name;
+//        state.boxes[box.y][box.x] = box.name;
+
+
+        strategy = new StrategyBestFirst(new AStar(initialState));
+
+        LinkedList<Node> partialPlan = null;
+
+        try {
+            partialPlan = PartialSearch(strategy, initialState);
+            if (partialPlan == null) return null;
+            System.err.format("Search starting with strategy %s\n", strategy);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.format("Error");
+        }
+
+        return partialPlan;
+    }
+
 
 
     public LinkedList<Node> PartialSearch(Strategy strategy, Node state) throws IOException {
