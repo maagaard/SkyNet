@@ -7,7 +7,6 @@ import SkyNet.Strategy.*;
 //import SkyNet.PartialPlanHeuristic.*;
 import SkyNet.Heuristic.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 
@@ -56,7 +55,7 @@ public class POP implements Planner {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
 
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-//                    LinkedList<Node> solution = extractPartialOrderPlan(level, agent, goal, box);
+//                    LinkedList<Node> solution = extractSubgoalSolution(level, agent, goal, box);
 
                     for (int i = 0; i < level.goals.size(); i++) {
                         Goal g = level.goals.get(i);
@@ -67,7 +66,7 @@ public class POP implements Planner {
                         initialState.goals[b.y][b.x] = b.name;
                     }
 
-                    LinkedList<Node> solution = extractPlan(level, agent, goal, box); //extractPartialOrderPlan(level, agent, goal, box);
+                    LinkedList<Node> solution = extractPlan(level, agent, goal, box); //extractSubgoalSolution(level, agent, goal, box);
                     solutionList.add(solution);
                 }
             }
@@ -114,7 +113,7 @@ public class POP implements Planner {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
 
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-                    LinkedList<Node> solution = extractPartialOrderPlan(level, agent, goal, box);
+                    LinkedList<Node> solution = extractSubgoalSolution(level, agent, goal, box);
 
                     solutionList.add(new PartialPlan(agent, goal, box, solution));
                 }
@@ -170,7 +169,7 @@ public class POP implements Planner {
 
             ArrayList<Goal> goals = new ArrayList<>(level.goals);
 
-            goals.remove(partialPlan.GetPlan().get(0).pursuedGoal);
+            goals.remove(partialPlan.GetPlan().get(0).chosenGoal);
 
             for (Node node : partialPlan.GetPlan()) {
                 //TODO: Check if agent passes other partial plan goals
@@ -207,7 +206,7 @@ public class POP implements Planner {
 //
 //        System.err.println("Agent: " + agent.number + ", goal: " + g.name + ", box: " + box.name);
 //
-//        LinkedList<Node> solution = extractPartialOrderPlan(agent, g, box);
+//        LinkedList<Node> solution = extractSubgoalSolution(agent, g, box);
 //
 //        if (solution == null) {
 //            System.err.println("Unable to solve level");
@@ -269,26 +268,19 @@ public class POP implements Planner {
 
 //    }
 
-    private LinkedList<Node> extractPartialOrderPlan(Level level, Agent agent, Goal goal, Box box) {
-
-//        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
-//        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
-
-//        System.err.format("Initial state length: " + this.initialState.boxes);
-//        Node state = new Node(null, level.boxes.size(), level.boxes[0].length);
+    private LinkedList<Node> extractSubgoalSolution(Level level, Agent agent, Goal goal, Box box) {
 
 
-        Node state = new Node(null, level.height, level.width);   //new Node(null, level.height, level.width);
-
+        Node state = new Node(null, level.height, level.width);
         state.walls = initialState.walls;
-//        state.agentCol = initialState.agentCol;
-//        state.agentRow = initialState.agentRow;
+        state.actingAgent = agent;
+        state.chosenGoal = goal;
+        state.chosenBox = box;
         state.agentCol = agent.x;
         state.agentRow = agent.y;
 
-        state.goals[goal.y][goal.x] = goal.name;
-        state.boxes[box.y][box.x] = box.name;
-
+//        state.goals[goal.y][goal.x] = goal.name;
+//        state.boxes[box.y][box.x] = box.name;
 
         strategy = new StrategyBestFirst(new AStar(state));
 
@@ -307,14 +299,9 @@ public class POP implements Planner {
     }
 
 
+
     //TODO: Make extraction plan for whole level - based on goal sorting
     private LinkedList<Node> extractPlan(Level level, Agent agent, Goal goal, Box box) {
-
-//        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
-//        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
-
-//        System.err.format("Initial state length: " + this.initialState.boxes);
-//        Node state = new Node(null, level.boxes.size(), level.boxes[0].length);
 
 
 //        Node state = new Node(null, level.height, level.width);   //new Node(null, level.height, level.width);
@@ -324,6 +311,18 @@ public class POP implements Planner {
 //        state.goals[goal.y][goal.x] = goal.name;
 //        state.boxes[box.y][box.x] = box.name;
 
+
+//        Node state = new Node(null, level.height, level.width);
+//        state.walls = initialState.walls;
+//        state.agentCol = agent.x;
+//        state.agentRow = agent.y;
+//        state.goals[goal.y][goal.x] = goal.name;
+//        state.boxes[box.y][box.x] = box.name;
+//        strategy = new StrategyBestFirst(new AStar(state));
+
+
+        //TODO: State should contain all walls, boxes, goals and agents - however,
+        //TODO: chosen agent, goal and box should also be known
 
         strategy = new StrategyBestFirst(new AStar(initialState));
 
@@ -340,6 +339,7 @@ public class POP implements Planner {
 
         return partialPlan;
     }
+
 
 
 

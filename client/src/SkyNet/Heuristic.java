@@ -1,10 +1,19 @@
 package SkyNet;
 
+import SkyNet.model.Agent;
+import SkyNet.model.Box;
+import SkyNet.model.Goal;
+import SkyNet.model.Level;
+
 import java.util.*;
 
 public abstract class Heuristic implements Comparator<Node> {
 
     public Node initialState;
+    public Level level;
+    private Agent actingAgent;
+    private Goal chosenGoal;
+    private Box chosenBox;
 
     public int goalRow, goalColumn;
 
@@ -14,6 +23,7 @@ public abstract class Heuristic implements Comparator<Node> {
     public Heuristic(Node initialState) {
         this.initialState = initialState;
 
+//        this.chosenGoal = initialState.chosenGoal;
         for (int i = 0; i < initialState.goals.length; i++) {
             for (int j = 0; j < initialState.goals[i].length; j++) {
                 if (initialState.goals[i][j] != 0) {
@@ -104,11 +114,24 @@ public abstract class Heuristic implements Comparator<Node> {
 
     public int h(Node n) {
 
-        double a = Math.pow(n.agentCol - goalColumn, 2);
-        double b = Math.pow(n.agentRow - goalRow, 2);
-        double distance = Math.sqrt(a + b);
+//        double a = Math.pow(n.agentCol - goalColumn, 2);
+//        double b = Math.pow(n.agentRow - goalRow, 2);
+//        double distance = Math.sqrt(a + b);
 
-        return (int) distance;
+
+        if (chosenGoal != null && chosenBox != null && actingAgent != null) {
+            int agentBoxDist = (Math.abs(n.chosenBox.y - n.actingAgent.y) + (Math.abs(n.chosenBox.x - n.actingAgent.x)));
+            int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
+            return agentBoxDist + boxGoalDist;
+        } else {
+            int something = 100;
+            return something;
+        }
+
+//        int dist = agentBoxDist + boxGoalDist;
+//        System.err.println("Dist: " + dist);
+
+//        return (int) distance;
     }
 
     public abstract int f(Node n);
