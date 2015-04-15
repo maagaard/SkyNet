@@ -1,10 +1,11 @@
 package SkyNet;
 
+import SkyNet.Command.dir;
+import SkyNet.Command.type;
 import SkyNet.model.Agent;
 import SkyNet.model.Box;
 import SkyNet.model.Goal;
 import SkyNet.model.Level;
-import SkyNet.Command.*;
 
 import java.util.*;
 
@@ -13,26 +14,25 @@ import java.util.*;
  * Created by maagaard on 31/03/15.
  * Copyright (c) maagaard 2015.
  */
-public class Node {
+public class LowMemoryNode {
 
     public Level level;
-
-    public ArrayList<Box> boxes;
-    public ArrayList<Goal> goals;
+//    public ArrayList<Box> boxes;
+//    public ArrayList<Goal> goals;
 
     public boolean[][] walls; // = new boolean[MAX_ROW][MAX_COLUMN];
-//    public char[][] boxes;// = new char[MAX_ROW][MAX_COLUMN];
-//    public char[][] goals;//; = new char[MAX_ROW][MAX_COLUMN];
+    public char[][] boxes;// = new char[MAX_ROW][MAX_COLUMN];
+    public char[][] goals;//; = new char[MAX_ROW][MAX_COLUMN];
 
     public Goal chosenGoal = null;
     public Box chosenBox = null;
     public Agent actingAgent = null;
-    public Node parent;
+    public LowMemoryNode parent;
     public Command action;
 
     private static Random rnd = new Random(1);
-//    public static int MAX_ROW = 50;     //Default setting
-//    public static int MAX_COLUMN = 50;  //Default setting
+    public static int MAX_ROW = 50;     //Default setting
+    public static int MAX_COLUMN = 50;  //Default setting
 
     public int agentRow;
     public int agentCol;
@@ -57,34 +57,17 @@ public class Node {
 //        }
 //    }
 
-    public Node(Node parent, Level level) {
+    public LowMemoryNode(LowMemoryNode parent, int rows, int columns) {
 
-        this.parent = parent;
+        MAX_ROW = rows;
+        MAX_COLUMN = columns;
 
-        if (parent == null) {
-            g = 0;
-            this.level = level;
-//            goals = new char[rows][columns];
-//            walls = new boolean[rows][columns];
-        } else {
-            g = parent.g() + 1;
-            this.level = parent.level;
-//            walls = parent.walls;
-//            goals = parent.goals;
-        }
-    }
-
-    public Node(Node parent, int rows, int columns) {
-
-//        MAX_ROW = rows;
-//        MAX_COLUMN = columns;
-
-//        boxes = new char[rows][columns];
+        boxes = new char[rows][columns];
 
         this.parent = parent;
         if (parent == null) {
             g = 0;
-//            goals = new char[rows][columns];
+            goals = new char[rows][columns];
             walls = new boolean[rows][columns];
         } else {
             g = parent.g() + 1;
@@ -102,27 +85,16 @@ public class Node {
     }
 
     public boolean isGoalState() {
-        for (Goal g : goals) {
-            for (Box b: boxes) {
-                if (Character.toLowerCase(b.name) == g.name) {
-                    if (b.x == g.x && b.y == g.y) {
-                        return true;
-                    }
+        for (int row = 1; row < MAX_ROW - 1; row++) {
+            for (int col = 1; col < MAX_COLUMN - 1; col++) {
+                char g = goals[row][col];
+                char b = Character.toLowerCase(boxes[row][col]);
+                if (g > 0 && b != g) {
+                    return false;
                 }
             }
         }
-        return false;
-
-//        for (int row = 1; row < MAX_ROW - 1; row++) {
-//            for (int col = 1; col < MAX_COLUMN - 1; col++) {
-//                char g = goals[row][col];
-//                char b = Character.toLowerCase(boxes[row][col]);
-//                if (g > 0 && b != g) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
+        return true;
     }
 
 
@@ -153,9 +125,9 @@ public class Node {
 
 
     //TODO: FIX
-    public LinkedList<Node> extractPlan() {
-        LinkedList<Node> plan = new LinkedList<Node>();
-        Node n = this;
+    public LinkedList<LowMemoryNode> extractPlan() {
+        LinkedList<LowMemoryNode> plan = new LinkedList<LowMemoryNode>();
+        LowMemoryNode n = this;
         while (!n.isInitialState()) {
             plan.addFirst(n);
             n = n.parent;
@@ -164,8 +136,8 @@ public class Node {
     }
 
 
-    public ArrayList<Node> getExpandedNodes() {
-        ArrayList<Node> expandedNodes = new ArrayList<Node>(Command.every.length);
+    public ArrayList<LowMemoryNode> getExpandedNodes() {
+        ArrayList<LowMemoryNode> expandedNodes = new ArrayList<LowMemoryNode>(Command.every.length);
         for (Command c : Command.every) {
             // Determine applicability of action
             int newAgentRow = this.agentRow + dirToRowChange(c.dir1);
@@ -174,7 +146,7 @@ public class Node {
             if (c.actType == type.Move) {
                 // Check if there's a wall or box on the cell to which the agent is moving
                 if (cellIsFree(newAgentRow, newAgentCol)) {
-                    Node n = this.ChildNode();
+                    LowMemoryNode n = this.ChildNode();
                     n.action = c;
                     n.agentRow = newAgentRow;
                     n.agentCol = newAgentCol;
@@ -187,13 +159,12 @@ public class Node {
                     int newBoxCol = newAgentCol + dirToColChange(c.dir2);
                     // .. and that new cell of box is free
                     if (cellIsFree(newBoxRow, newBoxCol)) {
-                        Node n = this.ChildNode();
+                        LowMemoryNode n = this.ChildNode();
                         n.action = c;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
-//                        n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
-//                        n.boxes[newAgentRow][newAgentCol] = 0;
-
+                        n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
+                        n.boxes[newAgentRow][newAgentCol] = 0;
                         expandedNodes.add(n);
                     }
                 }
@@ -204,7 +175,7 @@ public class Node {
                     int boxCol = this.agentCol + dirToColChange(c.dir2);
                     // .. and there's a box in "dir2" of the agent
                     if (boxAt(boxRow, boxCol)) {
-                        Node n = this.ChildNode();
+                        LowMemoryNode n = this.ChildNode();
                         n.action = c;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
@@ -236,8 +207,8 @@ public class Node {
         return (d == dir.E ? 1 : (d == dir.W ? -1 : 0)); // East is left one column (1), west is right one column (-1)
     }
 
-    private Node ChildNode() {
-        Node copy = new Node(this, MAX_ROW, MAX_COLUMN);
+    private LowMemoryNode ChildNode() {
+        LowMemoryNode copy = new LowMemoryNode(this, MAX_ROW, MAX_COLUMN);
         for (int row = 0; row < MAX_ROW; row++) {
             System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, MAX_COLUMN);
         }
@@ -265,7 +236,7 @@ public class Node {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Node other = (Node) obj;
+        LowMemoryNode other = (LowMemoryNode) obj;
         if (agentCol != other.agentCol)
             return false;
         if (agentRow != other.agentRow)
