@@ -41,11 +41,28 @@ public class POP implements Planner {
         //TODO: determine ordering constraints for goals
         PriorityQueue<Goal> sortedGoals = sortGoals();
 
+        System.err.format("Goal order: \n");
+        for (Goal g : sortedGoals) {
+            System.err.format("" + g.name + ", ");
+        }
+        System.err.format("\n");
+
 
         //TODO: Create plan based on ordering constraints
 
         LinkedList<Node> fullSolution = new LinkedList<>();
         LinkedList<Plan> partialPlans = new LinkedList<>();
+
+
+        //Add all goals and boxes to initial state
+        for (int i = 0; i < level.goals.size(); i++) {
+            Goal g = level.goals.get(i);
+            initialState.goals[g.y][g.x] = g.name;
+        }
+        for (int i = 0; i < level.boxes.size(); i++) {
+            Box b = level.boxes.get(i);
+            initialState.boxes[b.y][b.x] = b.name;
+        }
 
         for (Goal goal : sortedGoals) {
 
@@ -53,20 +70,9 @@ public class POP implements Planner {
 
             for (Box box : level.boxes) {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
-
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-//                    LinkedList<Node> solution = extractSubgoalSolution(level, agent, goal, box);
 
-                    for (int i = 0; i < level.goals.size(); i++) {
-                        Goal g = level.goals.get(i);
-                        initialState.goals[g.y][g.x] = g.name;
-                    }
-                    for (int i = 0; i < level.boxes.size(); i++) {
-                        Box b = level.boxes.get(i);
-                        initialState.goals[b.y][b.x] = b.name;
-                    }
-
-                    LinkedList<Node> solution = extractPlan(level, agent, goal, box); //extractSubgoalSolution(level, agent, goal, box);
+                    LinkedList<Node> solution = extractPlan(level, agent, goal, box);
                     solutionList.add(solution);
                 }
             }
@@ -85,9 +91,9 @@ public class POP implements Planner {
 
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
             //TODO: OR change the
-//            Node endNode = shortest.getLast();
-//            agent.x = endNode.agentCol;
-//            agent.y = endNode.agentRow;
+            Node endNode = shortest.getLast();
+            agent.x = endNode.agentCol;
+            agent.y = endNode.agentRow;
         }
 
 
@@ -106,7 +112,6 @@ public class POP implements Planner {
         LinkedList<PartialPlan> partialPlans = new LinkedList<>();
 
         for (Goal goal : level.goals) {
-
             LinkedList<PartialPlan> solutionList = new LinkedList<>();
 
             for (Box box : level.boxes) {
@@ -279,8 +284,8 @@ public class POP implements Planner {
         state.agentCol = agent.x;
         state.agentRow = agent.y;
 
-//        state.goals[goal.y][goal.x] = goal.name;
-//        state.boxes[box.y][box.x] = box.name;
+        state.goals[goal.y][goal.x] = goal.name;
+        state.boxes[box.y][box.x] = box.name;
 
         strategy = new StrategyBestFirst(new AStar(state));
 
@@ -323,6 +328,15 @@ public class POP implements Planner {
 
         //TODO: State should contain all walls, boxes, goals and agents - however,
         //TODO: chosen agent, goal and box should also be known
+
+//        state.goals[goal.y][goal.x] = goal.name;
+//        state.boxes[box.y][box.x] = box.name;
+
+//        initialState.actingAgent = agent;
+        initialState.chosenGoal = goal;
+        initialState.chosenBox = box;
+        initialState.agentCol = agent.x;
+        initialState.agentRow = agent.y;
 
         strategy = new StrategyBestFirst(new AStar(initialState));
 

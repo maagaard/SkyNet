@@ -119,13 +119,12 @@ public abstract class Heuristic implements Comparator<Node> {
 //        double distance = Math.sqrt(a + b);
 
 
-        if (chosenGoal != null && chosenBox != null && actingAgent != null) {
-            int agentBoxDist = (Math.abs(n.chosenBox.y - n.actingAgent.y) + (Math.abs(n.chosenBox.x - n.actingAgent.x)));
+        if (n.chosenGoal != null && n.chosenBox != null) {
+            int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
             int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
             return agentBoxDist + boxGoalDist;
         } else {
-            int something = 100;
-            return something;
+            return h2(n);
         }
 
 //        int dist = agentBoxDist + boxGoalDist;
@@ -143,7 +142,7 @@ public abstract class Heuristic implements Comparator<Node> {
 
         public int f(Node n) {
 //            System.err.println("g: "+n.g()+ " h: "+h(n));
-            return n.g() + h2(n);
+            return n.g() + h(n);
         }
 
         public String toString() {

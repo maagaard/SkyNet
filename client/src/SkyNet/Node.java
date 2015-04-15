@@ -1,5 +1,7 @@
 package SkyNet;
 
+import SkyNet.model.Agent;
+import SkyNet.model.Box;
 import SkyNet.model.Goal;
 import SkyNet.model.Level;
 import SkyNet.Command.*;
@@ -21,7 +23,9 @@ public class Node {
     public char[][] boxes;// = new char[MAX_ROW][MAX_COLUMN];
     public char[][] goals;//; = new char[MAX_ROW][MAX_COLUMN];
 
-    public Goal pursuedGoal = null;
+    public Goal chosenGoal = null;
+    public Box chosenBox;
+    public Agent actingAgent;
     public Node parent;
     public Command action;
 
@@ -66,8 +70,11 @@ public class Node {
             walls = new boolean[rows][columns];
         } else {
             g = parent.g() + 1;
+            chosenBox = parent.chosenBox;
+            chosenGoal = parent.chosenGoal;
             walls = parent.walls;
             goals = parent.goals;
+//            boxes = parent.boxes;
         }
     }
 
