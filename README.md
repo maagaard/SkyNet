@@ -14,6 +14,12 @@
 - [ ] Look into HTN-algorithm (Martin/Michel)
 
 
+## Emil 
+- [ ] Create two different searches - one for priortising goals and one for solving
+- [ ] Fix Node with regards to dobbelt-arrays 
+- [ ] Fix heuristics for Node
+- [ ] Clean up 
+
 ## Project info
 
 ### Language

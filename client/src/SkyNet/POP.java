@@ -12,155 +12,51 @@ import java.io.IOException;
 import java.util.*;
 
 
-public class POP {
+public class POP implements Planner {
 
-    public static class Memory {
-        public static Runtime runtime = Runtime.getRuntime();
-        public static final float mb = 1024 * 1024;
-        public static final float limitRatio = .9f;
-        public static final int timeLimit = 180;
+    private Strategy strategy;
+    private Level level;
+    private Node initialState;
 
-        public static float used() {
-            return (runtime.totalMemory() - runtime.freeMemory()) / mb;
-        }
-
-        public static float free() {
-            return runtime.freeMemory() / mb;
-        }
-
-        public static float total() {
-            return runtime.totalMemory() / mb;
-        }
-
-        public static float max() {
-            return runtime.maxMemory() / mb;
-        }
-
-        public static boolean shouldEnd() {
-            return (used() / max() > limitRatio);
-        }
-
-        public static String stringRep() {
-            return String.format("[Used: %.2f MB, Free: %.2f MB, Alloc: %.2f MB, MaxAlloc: %.2f MB]", used(), free(), total(), max());
-        }
+    public POP(Strategy strategy) throws Exception {
+        this.strategy = strategy;
     }
 
-    public BufferedReader serverMessages;
-    public Level level;
-    public ArrayList<Box> boxes = new ArrayList<Box>();
-    public ArrayList<Agent> agents = new ArrayList<Agent>();
-    public Node initialState = null;
-    public PathFragment initialPath = null;
-    public Strategy strategy = null;
+    @Override
+    public Plan createPlan(Level level) {
+        this.level = level;
 
-    public static void error(String msg) throws Exception {
-        throw new Exception("GSCError: " + msg);
-    }
+//        initialState.goals[goal.y][goal.x] = goal.name;
+//        initialState.boxes[box.y][box.x] = box.name;
+//        initialState.walls = level.walls;
 
-    public POP(BufferedReader serverMessages) throws Exception {
-        this.serverMessages = serverMessages;
+        Agent agent = level.agents.get(0);
 
-        Map<Character, String> colors = new HashMap<Character, String>();
-        String line, color = "";
+        initialState = new Node(null, level.height, level.width);
+        initialState.walls = level.walls;
+        initialState.agentCol = agent.x;
+        initialState.agentRow = agent.y;
 
-        int agentCol = -1, agentRow = -1;
-        int colorLines = 0, levelLines = 0;
+//        this.strategy = new StrategyBestFirst(new AStar(initialState));
 
-        // Read lines specifying colors
-        while ((line = serverMessages.readLine()).matches("^[a-z]+:\\s*[0-9A-Z](,\\s*[0-9A-Z])*\\s*$")) {
-            line = line.replaceAll("\\s", "");
-            String[] colonSplit = line.split(":");
-            color = colonSplit[0].trim();
-
-            for (String id : colonSplit[1].split(",")) {
-                colors.put(id.trim().charAt(0), color);
-            }
-            colorLines++;
-        }
-
-        if (colorLines > 0) {
-            error("Box colors not supported");
-        }
-
-        int MAX_SIZE = 100;
-
-        boolean[][] walls = new boolean[MAX_SIZE][MAX_SIZE];
-        char[][] nodeBoxes = new char[MAX_SIZE][MAX_SIZE];
-        char[][] nodeGoals = new char[MAX_SIZE][MAX_SIZE];
-        int longestLine = 0;
-
-        ArrayList<Goal> goals = new ArrayList<Goal>();
-
-        int initialAgentRow = 0;
-        int initialAgentCol = 0;
-
-        while (!line.equals("")) {
-            int length = line.length();
-            if (length > longestLine) longestLine = length;
-
-            for (int i = 0; i < length; i++) {
-                char chr = line.charAt(i);
-                if ('+' == chr) { // Walls
-                    walls[levelLines][i] = true;
-                } else if ('0' <= chr && chr <= '9') { // Agents
-                    if (agentCol != -1 || agentRow != -1) {
-                        error("Not a single agent level");
-                    }
-                    agents.add(new Agent(chr, i, levelLines));
-                    initialAgentRow = levelLines;
-                    initialAgentCol = i;
-                } else if ('A' <= chr && chr <= 'Z') { // Boxes
-                    nodeBoxes[levelLines][i] = chr;
-                    boxes.add(new Box(chr, i, levelLines));
-                } else if ('a' <= chr && chr <= 'z') { // Goal cells
-                    nodeGoals[levelLines][i] = chr;
-                    goals.add(new Goal(chr, i, levelLines));
-
-                }
-            }
-            line = serverMessages.readLine();
-            levelLines++;
-        }
+        //TODO: determine ordering constraints for goals
+        PriorityQueue<Goal> sortedGoals = sortGoals();
 
 
-        level = new Level();
-        level.walls = walls;
-        level.goals = goals;
-//        this.initialState.level = level;
+        //TODO: Create plan based on ordering constraints
 
+        LinkedList<Node> fullSolution = new LinkedList<>();
+        LinkedList<Plan> partialPlans = new LinkedList<>();
 
-        //Initialize new agent
-        initialState = new Node(null, levelLines + 1, longestLine + 1);
+        for (Goal goal : sortedGoals) {
 
-        System.err.format("Column size: %d, row size: %d\n", Node.MAX_COLUMN, Node.MAX_ROW);
-        //Copy walls, boxes and goals into smaller array
-        for (int i = 0; i < Node.MAX_ROW; ++i) {
-            for (int j = 0; j < Node.MAX_COLUMN; j++) {
-                initialState.walls[i][j] = walls[i][j];
-                initialState.goals[i][j] = nodeGoals[i][j];
-                initialState.boxes[i][j] = nodeBoxes[i][j];
-            }
-        }
+            LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
 
-        initialState.agentCol = initialAgentCol;
-        initialState.agentRow = initialAgentRow;
-    }
-
-    public LinkedList<Node> solveLevel() throws IOException {
-
-        Agent agent = agents.get(0);
-
-        LinkedList<Node> fullSolution = new LinkedList<Node>();
-
-        for (Goal goal : level.goals) {
-
-            LinkedList<LinkedList<Node>> solutionList = new LinkedList<LinkedList<Node>>();
-//            Box box = null;
-            for (Box box : boxes) {
+            for (Box box : level.boxes) {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
-//                    box = b;
+
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-                    LinkedList<Node> solution = extractPartialOrderPlan(agent, goal, box);
+                    LinkedList<Node> solution = extractPartialOrderPlan(level, agent, goal, box);
                     solutionList.add(solution);
                 }
             }
@@ -175,6 +71,7 @@ public class POP {
             fullSolution.addAll(shortest);
 //            return fullSolution;
 
+            partialPlans.add(new Plan(shortest));
             Node endNode = shortest.getLast();
 
             agent.x = endNode.agentCol;
@@ -182,51 +79,147 @@ public class POP {
 
         }
 
-        return fullSolution;
+
+//        return resolveConflicts(level, partialPlans);
+        return new Plan(fullSolution);
     }
 
 
-    public LinkedList<Node> pickGoal() throws IOException {
+    private PriorityQueue<Goal> sortGoals() {
+//        ArrayList<Goal> sortedGoals = new ArrayList<>();
 
-        Goal g = level.goals.get(0);
+        PriorityQueue<Goal> sortedGoals = new PriorityQueue<Goal>(11, new Goal('0',0,0));
 
-        Box box = null;
-        for (Box b : boxes) {
-            if (Character.toLowerCase(g.name) == Character.toLowerCase(b.name)) {
-                box = b;
-                break;
-            }
-        }
+        Agent agent = level.agents.get(0);
 
-        Agent agent = agents.get(0);
+        LinkedList<PartialPlan> partialPlans = new LinkedList<>();
 
-        System.err.println("Agent: " + agent.number + ", goal: " + g.name + ", box: " + box.name);
+        for (Goal goal : level.goals) {
 
-        LinkedList<Node> solution = extractPartialOrderPlan(agent, g, box);
+            LinkedList<PartialPlan> solutionList = new LinkedList<>();
 
-        if (solution == null) {
-            System.err.println("Unable to solve level");
-            System.exit(0);
-        } else {
-            System.err.println("\nSummary for " + strategy);
-            System.err.println("Found solution of length " + solution.size());
-            System.err.println(strategy.searchStatus());
+            for (Box box : level.boxes) {
+                if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
 
-            for (Node n : solution) {
-                String act = n.action.toActionString();
-                System.out.println(act);
-                String response = serverMessages.readLine();
-                if (response.contains("false")) {
-                    System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
-                    System.err.format("%s was attempted in \n%s\n", act, n);
-                    break;
+                    System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
+                    LinkedList<Node> solution = extractPartialOrderPlan(level, agent, goal, box);
+
+                    solutionList.add(new PartialPlan(agent, goal, box, solution));
                 }
             }
 
+            PartialPlan shortestPlan = solutionList.pop();
+            for (PartialPlan plan : solutionList) {
+                if (plan.plan.size() < shortestPlan.plan.size()) {
+                    shortestPlan = plan;
+                }
+            }
+//            partialPlans.add(new Plan(shortest));
+            partialPlans.add(shortestPlan);
         }
 
-        return solution;
 
+        //TODO: Ordering constraints --> Check if any goals interfere with other plans
+
+        for (PartialPlan partialPlan : partialPlans) {
+            //TODO: Find partial plan goal - do not check if this goal is in the way for the actions
+            //TODO: Or find goals to check for
+
+            ArrayList<Goal> goals = new ArrayList<>(level.goals);
+            goals.remove(partialPlan.goal);
+
+            for (Node node : partialPlan.plan) {
+                //TODO: Check if agent passes other partial plan goals
+                for (Goal goal : goals) {
+                    if (goal.x == node.agentCol && goal.y == node.agentRow) {
+                        //TODO: indicate conflict and given cell
+                        //TODO: find plan that solves goal in conflict - order to happen after iterated plan
+//                        partialPlan.priority--;
+                        partialPlan.goal.priority--;
+                        System.err.format("Plan for: " + partialPlan.goal.name + " conflicting with " + goal.name + "\n");
+                    }
+                }
+            }
+
+            sortedGoals.add(partialPlan.goal);
+        }
+
+        return sortedGoals;
+    }
+
+    private Plan resolveConflicts(Level level, LinkedList<Plan> partialPlans) {
+
+
+        // Ordering constraints --> Check if any goals interfere with other plans
+
+        for (Plan partialPlan : partialPlans) {
+            //TODO: Find partial plan goal - do not check if this goal is in the way for the actions
+            //TODO: Or find goals to check for
+
+            ArrayList<Goal> goals = new ArrayList<>(level.goals);
+
+            goals.remove(partialPlan.GetPlan().get(0).pursuedGoal);
+
+            for (Node node : partialPlan.GetPlan()) {
+                //TODO: Check if agent passes other partial plan goals
+                for (Goal goal : goals) {
+                    if (goal.x == node.agentCol || goal.y == node.agentRow) {
+                        //TODO: indicate conflict and given cell
+                        //TODO: find plan that solves goal in conflict - order to happen after iterated plan
+
+                    }
+                }
+            }
+
+//        this.level.goals
+        }
+
+        //TODO: Return a merged plan
+        return new Plan(new LinkedList<>());
+    }
+
+
+//    public LinkedList<Node> pickGoal() throws IOException {
+//
+//        Goal g = level.goals.get(0);
+//
+//        Box box = null;
+//        for (Box b : boxes) {
+//            if (Character.toLowerCase(g.name) == Character.toLowerCase(b.name)) {
+//                box = b;
+//                break;
+//            }
+//        }
+//
+//        Agent agent = agents.get(0);
+//
+//        System.err.println("Agent: " + agent.number + ", goal: " + g.name + ", box: " + box.name);
+//
+//        LinkedList<Node> solution = extractPartialOrderPlan(agent, g, box);
+//
+//        if (solution == null) {
+//            System.err.println("Unable to solve level");
+//            System.exit(0);
+//        } else {
+//            System.err.println("\nSummary for " + strategy);
+//            System.err.println("Found solution of length " + solution.size());
+//            System.err.println(strategy.searchStatus());
+//
+//            for (Node n : solution) {
+//                String act = n.action.toActionString();
+//                System.out.println(act);
+//                String response = serverMessages.readLine();
+//                if (response.contains("false")) {
+//                    System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
+//                    System.err.format("%s was attempted in \n%s\n", act, n);
+//                    break;
+//                }
+//            }
+//
+//        }
+//
+//        return solution;
+//
 
 //        if (solution == null) {
 //            System.err.println("Unable to solve level");
@@ -262,22 +255,28 @@ public class POP {
 //        }
 
 
-    }
+//    }
 
-    private LinkedList<Node> extractPartialOrderPlan(Agent agent, Goal goal, Box box) {
+    private LinkedList<Node> extractPartialOrderPlan(Level level, Agent agent, Goal goal, Box box) {
 
 //        PartialPlanNode partialInitialState = new PartialPlanNode(level, agent, goal, box);
 //        partialInitialState.path.add(new PathFragment(agent, box, goal, null, 0));
 
 //        System.err.format("Initial state length: " + this.initialState.boxes);
+//        Node state = new Node(null, level.boxes.size(), level.boxes[0].length);
 
 
-        Node state = new Node(null, initialState.boxes.length, initialState.boxes[0].length);
-        state.goals[goal.y][goal.x] = goal.name;
-        state.boxes[box.y][box.x] = box.name;
+        Node state = new Node(null, level.height, level.width);   //new Node(null, level.height, level.width);
+
         state.walls = initialState.walls;
+//        state.agentCol = initialState.agentCol;
+//        state.agentRow = initialState.agentRow;
         state.agentCol = agent.x;
         state.agentRow = agent.y;
+
+        state.goals[goal.y][goal.x] = goal.name;
+        state.boxes[box.y][box.x] = box.name;
+
 
         strategy = new StrategyBestFirst(new AStar(state));
 

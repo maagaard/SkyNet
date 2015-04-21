@@ -83,6 +83,11 @@ public class LevelReader {
         Level level = new Level();
         level.walls = walls;
         level.goals = goals;
+        level.agents = agents;
+        level.boxes = boxes;
+        level.width = longestLine;
+        level.height = levelLines;
+
         return level;
     }
 }
