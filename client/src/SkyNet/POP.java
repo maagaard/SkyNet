@@ -106,7 +106,6 @@ public class POP implements Planner {
 //            agent.y = endNode.agentRow;
         }
 //        return resolveConflicts(level, partialPlans);
-
 //        return new Plan(fullSolution);
         return new Plan(initialState.extractPlan());
     }
@@ -167,20 +166,10 @@ public class POP implements Planner {
                         //TODO: indicate conflict and given cell
                         //TODO: find plan that solves goal in conflict - order to happen after iterated plan
 //                        partialPlan.priority--;
-
 //                        partialPlan.goal.priority--;
 
                         conflictingGoals.add(goal);
-
                         System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
-
-//                        <From Client> Goal: a conflicting with plan for b
-//                        <From Client> Goal: a conflicting with plan for b
-//                        <From Client> Goal: c conflicting with plan for d
-//                        <From Client> Goal: h conflicting with plan for d
-//                        <From Client> Goal: c conflicting with plan for h
-//                        <From Client> Goal order:
-//                        <From Client> b, h, d, a, c,
                     }
                 }
             }
@@ -229,83 +218,6 @@ public class POP implements Planner {
     }
 
 
-//    public LinkedList<Node> pickGoal() throws IOException {
-//
-//        Goal g = level.goals.get(0);
-//
-//        Box box = null;
-//        for (Box b : boxes) {
-//            if (Character.toLowerCase(g.name) == Character.toLowerCase(b.name)) {
-//                box = b;
-//                break;
-//            }
-//        }
-//
-//        Agent agent = agents.get(0);
-//
-//        System.err.println("Agent: " + agent.number + ", goal: " + g.name + ", box: " + box.name);
-//
-//        LinkedList<Node> solution = extractSubgoalSolution(agent, g, box);
-//
-//        if (solution == null) {
-//            System.err.println("Unable to solve level");
-//            System.exit(0);
-//        } else {
-//            System.err.println("\nSummary for " + strategy);
-//            System.err.println("Found solution of length " + solution.size());
-//            System.err.println(strategy.searchStatus());
-//
-//            for (Node n : solution) {
-//                String act = n.action.toActionString();
-//                System.out.println(act);
-//                String response = serverMessages.readLine();
-//                if (response.contains("false")) {
-//                    System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
-//                    System.err.format("%s was attempted in \n%s\n", act, n);
-//                    break;
-//                }
-//            }
-//
-//        }
-//
-//        return solution;
-//
-
-//        if (solution == null) {
-//            System.err.println("Unable to solve level");
-//            System.exit(0);
-//        } else {
-////            System.err.println("\nSummary for " + strategy);
-//            System.err.println("Found solution of length " + solution.size());
-//            System.err.println(strategy.searchStatus());
-//
-//            if (solution.get(0) == null) {
-//                solution.removeFirst();
-//            }
-////            for (int i = 0; i < 20; i++) {
-////                System.err.format("Action: %s\n", solution.get(i));
-////            }
-//
-//            System.err.format("Start\n");
-//
-//            for (Command c : solution) {
-//                if (c == null) { continue; }
-//                System.err.format("Action: %s\n", c);
-//                String act = c.toActionString();
-//                System.out.println(act);
-//                String response = this.serverMessages.readLine();
-//                if (response.contains("false")) {
-//                    System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
-//                    System.err.format("%s was attempted in \n%s\n", act, c);
-//                    continue;
-////                    break;
-//                }
-//            }
-//            System.err.format("Done\n");
-//        }
-
-
-//    }
 
     private LinkedList<Node> extractSubgoalSolution(Level level, Agent agent, Goal goal, Box box) {
 
@@ -343,28 +255,9 @@ public class POP implements Planner {
     private LinkedList<Node> extractPlan(Level level, Agent agent, Goal goal, Box box) {
 
 
-//        Node state = new Node(null, level.height, level.width);   //new Node(null, level.height, level.width);
-//        state.walls = initialState.walls;
-//        state.agentCol = agent.x;
-//        state.agentRow = agent.y;
-//        state.goals[goal.y][goal.x] = goal.name;
-//        state.boxes[box.y][box.x] = box.name;
-
-
-//        Node state = new Node(null, level.height, level.width);
-//        state.walls = initialState.walls;
-//        state.agentCol = agent.x;
-//        state.agentRow = agent.y;
-//        state.goals[goal.y][goal.x] = goal.name;
-//        state.boxes[box.y][box.x] = box.name;
-//        strategy = new StrategyBestFirst(new AStar(state));
-
 
         //TODO: State should contain all walls, boxes, goals and agents - however,
         //TODO: chosen agent, goal and box should also be known
-
-//        state.goals[goal.y][goal.x] = goal.name;
-//        state.boxes[box.y][box.x] = box.name;
 
 //        initialState.actingAgent = agent;
         initialState.chosenGoal = goal;
