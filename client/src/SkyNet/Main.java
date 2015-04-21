@@ -19,18 +19,14 @@ public class Main {
 
 
         BufferedReader serverMessages = new BufferedReader(new InputStreamReader(System.in));
-        Level level = LevelReader.ReadLevel(serverMessages);
 
+        Benchmarks b = new Benchmarks("TEST");
+        b.setBefore();
+        Level level = LevelReader.ReadLevel(serverMessages);
 //        Node state = new Node(null, level.height, level.width);
         Strategy strategy = null;//new StrategyBestFirst(new AStar(state));
 
         Planner planner = new POP(strategy);    //null; //TODO: Use POP or whatever
-
-        //Memory
-        //Time
-        //Plan size
-        Benchmarks b = new Benchmarks("TEST");
-        b.setBefore();
         Plan plan = planner.createPlan(level);
         b.setAfter();
         System.err.println(b.prettyPrint());

@@ -64,6 +64,7 @@ public class Benchmarks {
     public void printDiff() {
         System.err.println("Memory used:");
         System.err.println(after.usedMem - before.usedMem + "MB");
+//        System.err.println(before.usedMem + "MB");
         System.err.println("Time used:");
         System.err.println(after.time - before.time + "nanoseconds");
     }

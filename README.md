@@ -5,10 +5,10 @@
 
 ## Tasks
 - [x] Create project
-- [ ] Make stdin/stdout reader/writer (Bjarke)
-- [ ] Create domain model/framework for planners (Bjarke)
+- [x] Make stdin/stdout reader/writer (Bjarke)
+- [x] Create domain model/framework for planners (Bjarke)
 - [ ] Create benchmark framework for testing (Bjarke)
-- [ ] Wire everything together in main (Bjarke)
+- [x] Wire everything together in main (Bjarke)
 - [ ] Create initial heuristics (Emil)
 - [ ] Create initial POP-algorithm (Dennis)
 - [ ] Look into HTN-algorithm (Martin/Michel)
