@@ -22,6 +22,12 @@ public abstract class Heuristic implements Comparator<Node> {
 
     public Heuristic(Node initialState) {
         this.initialState = initialState;
+//        if (chosenGoal != null && chosenBox != null) {
+//            return;
+//        }
+
+
+
 
 //        this.chosenGoal = initialState.chosenGoal;
         for (int i = 0; i < initialState.goals.length; i++) {
@@ -114,22 +120,14 @@ public abstract class Heuristic implements Comparator<Node> {
 
     public int h(Node n) {
 
-//        double a = Math.pow(n.agentCol - goalColumn, 2);
-//        double b = Math.pow(n.agentRow - goalRow, 2);
-//        double distance = Math.sqrt(a + b);
-
         if (n.chosenGoal != null && n.chosenBox != null) {
             int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
             int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
-            return agentBoxDist + boxGoalDist;
+            int agentGoalDist = (Math.abs(n.chosenGoal.y - n.agentRow) + (Math.abs(n.chosenGoal.x - n.agentCol)));
+            return agentBoxDist + boxGoalDist + agentGoalDist;
         } else {
             return h2(n);
         }
-
-//        int dist = agentBoxDist + boxGoalDist;
-//        System.err.println("Dist: " + dist);
-
-//        return (int) distance;
     }
 
     public abstract int f(Node n);

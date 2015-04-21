@@ -131,14 +131,14 @@ public abstract class Strategy {
 		public Node getAndRemoveLeaf() {
 
             Node node;
-            if (frontier.size() == 0) {
-                node = oldFrontier.poll();
-            } else {
+//            if (frontier.size() == 0) {
+//                node = oldFrontier.poll();
+//            } else {
                 node = frontier.poll();
-
-                oldFrontier.addAll(frontier);
-                frontier.clear();
-            }
+//
+//                oldFrontier.addAll(frontier);
+//                frontier.clear();
+//            }
 			return node;
 		}
 

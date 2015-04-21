@@ -64,13 +64,17 @@ public class POP implements Planner {
             initialState.boxes[b.y][b.x] = b.name;
         }
 
+
+        //Create full plan
         for (Goal goal : sortedGoals) {
 
             LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
 
+            //TODO: Only solve for one box if there are more - best solution should have been found above in "sortGoals()"
             for (Box box : level.boxes) {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
+//                    System.err.println("Agent location: " + agent.x + "," + agent.y);
 
                     LinkedList<Node> solution = extractPlan(level, agent, goal, box);
                     solutionList.add(solution);
@@ -91,14 +95,14 @@ public class POP implements Planner {
 
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
             //TODO: OR change the
-            Node endNode = shortest.getLast();
-            agent.x = endNode.agentCol;
-            agent.y = endNode.agentRow;
+            initialState = shortest.getLast();
+//            agent.x = endNode.agentCol;
+//            agent.y = endNode.agentRow;
         }
-
-
 //        return resolveConflicts(level, partialPlans);
-        return new Plan(fullSolution);
+
+//        return new Plan(fullSolution);
+        return new Plan(initialState.extractPlan());
     }
 
 
@@ -338,8 +342,11 @@ public class POP implements Planner {
 //        initialState.actingAgent = agent;
         initialState.chosenGoal = goal;
         initialState.chosenBox = box;
-        initialState.agentCol = agent.x;
-        initialState.agentRow = agent.y;
+//        initialState.agentCol = agent.x;
+//        initialState.agentRow = agent.y;
+
+//        System.err.println("Is initial state: " + initialState.isInitialState());
+        System.err.format("State: \n%s\n", initialState);
 
         strategy = new StrategyBestFirst(new AStar(initialState));
 
