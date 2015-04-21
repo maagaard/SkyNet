@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Level {
 
-
     public boolean walls[][];
     public ArrayList<Goal> goals;
     public ArrayList<Box> boxes;
