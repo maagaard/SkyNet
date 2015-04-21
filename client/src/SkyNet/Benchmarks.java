@@ -18,6 +18,9 @@ public class Benchmarks {
     public String clientName;
     public Strategy strategy;
 
+    public Benchmarks(String clientName) {
+        this.clientName = clientName;
+    }
     public Benchmarks(String clientName, Strategy strategy) {
         this.clientName = clientName;
         this.strategy = strategy;
@@ -43,8 +46,10 @@ public class Benchmarks {
         if(before != null && after != null) {
             String res = "\n";
             res += "Client: " + clientName + "\n";
-            res += "Strategy: " + strategy.toString();
-            res += strategy.searchStatus() + "\n";
+            if(strategy != null) {
+                res += "Strategy: " + strategy.toString();
+                res += strategy.searchStatus() + "\n";
+            }
             res += "Memory used: " + (after.usedMem - before.usedMem) + "MB"+ "\n";
             res += "Time used: " + (after.time - before.time) + "ns";
             return res;
