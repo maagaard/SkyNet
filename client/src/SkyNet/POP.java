@@ -32,6 +32,7 @@ public class POP implements Planner {
         Agent agent = level.agents.get(0);
 
         initialState = new Node(null, level.height, level.width);
+        initialState.level = level;
         initialState.walls = level.walls;
         initialState.agentCol = agent.x;
         initialState.agentRow = agent.y;
@@ -96,6 +97,11 @@ public class POP implements Planner {
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
             //TODO: OR change the
             initialState = shortest.getLast();
+            initialState.level = level;
+            goal.solveGoal(initialState.chosenBox);
+
+            System.err.println("Solved goal: " + goal);
+
 //            agent.x = endNode.agentCol;
 //            agent.y = endNode.agentRow;
         }

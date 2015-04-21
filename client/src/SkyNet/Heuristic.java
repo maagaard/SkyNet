@@ -11,9 +11,10 @@ public abstract class Heuristic implements Comparator<Node> {
 
     public Node initialState;
     public Level level;
-    private Agent actingAgent;
-    private Goal chosenGoal;
-    private Box chosenBox;
+//    private Agent actingAgent;
+//    private Goal chosenGoal;
+//    private Box chosenBox;
+    private Map<Goal, Box> solvedGoals;
 
     public int goalRow, goalColumn;
 
@@ -22,14 +23,22 @@ public abstract class Heuristic implements Comparator<Node> {
 
     public Heuristic(Node initialState) {
         this.initialState = initialState;
-//        if (chosenGoal != null && chosenBox != null) {
-//            return;
-//        }
 
+        if (initialState.chosenGoal != null && initialState.chosenBox != null) {
+            solvedGoals = new HashMap<>();
+            if (initialState.level != null) {
+                for (Goal goal : initialState.level.goals) {
+                    if (goal.isSolved()) {
+                        solvedGoals.put(goal, goal.getBox());
 
+//                    Box box = initialState.boxes[goal.y][goal.x];
+//                    for (Box box : initialState.level.boxes) {
+//                    }
+                    }
+                }
+            }
+        }
 
-
-//        this.chosenGoal = initialState.chosenGoal;
         for (int i = 0; i < initialState.goals.length; i++) {
             for (int j = 0; j < initialState.goals[i].length; j++) {
                 if (initialState.goals[i][j] != 0) {
@@ -118,13 +127,29 @@ public abstract class Heuristic implements Comparator<Node> {
     }
 
 
+    public int solvedGoalDistance(Node n) {
+        int solvedGoalDistance = 0;
+        if (solvedGoals != null && solvedGoals.size() > 0) {
+            for (Goal goal : solvedGoals.keySet()) {
+//                Box box = solvedGoals.get(goal);
+//                System.err.println("Checking solved goal: " + goal.x + "," +goal.y);
+                if (n.boxes[goal.y][goal.x] == 0) {
+                    solvedGoalDistance += 100;
+                }
+            }
+
+        }
+
+        return solvedGoalDistance;
+    }
+
     public int h(Node n) {
 
         if (n.chosenGoal != null && n.chosenBox != null) {
             int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
             int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
             int agentGoalDist = (Math.abs(n.chosenGoal.y - n.agentRow) + (Math.abs(n.chosenGoal.x - n.agentCol)));
-            return agentBoxDist + boxGoalDist + agentGoalDist;
+            return agentBoxDist + boxGoalDist + agentGoalDist + solvedGoalDistance(n);
         } else {
             return h2(n);
         }

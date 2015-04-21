@@ -14,6 +14,7 @@ public class Goal implements Comparator<Goal> {
     public int x;
     public int y;
     public int priority = 0;
+    private Box solved = null;
 
     public Goal(char name, int x, int y) {
         this.name = name;
@@ -21,6 +22,17 @@ public class Goal implements Comparator<Goal> {
         this.y = y;
     }
 
+    public void solveGoal(Box box) {
+        this.solved = box;
+    }
+
+    public boolean isSolved() {
+        return solved != null;
+    }
+
+    public Box getBox() {
+        return solved;
+    }
 
 
     @Override
