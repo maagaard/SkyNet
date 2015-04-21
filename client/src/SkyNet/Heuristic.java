@@ -134,14 +134,15 @@ public abstract class Heuristic implements Comparator<Node> {
 //                Box box = solvedGoals.get(goal);
 //                System.err.println("Checking solved goal: " + goal.x + "," +goal.y);
                 if (n.boxes[goal.y][goal.x] == 0) {
-                    solvedGoalDistance += 100;
+                    solvedGoalDistance += 10;
                 }
             }
-
         }
 
         return solvedGoalDistance;
     }
+
+
 
     public int h(Node n) {
 
@@ -181,7 +182,7 @@ public abstract class Heuristic implements Comparator<Node> {
         }
 
         public int f(Node n) {
-            return n.g() + W * h2(n);
+            return n.g() + W * h(n);
         }
 
         public String toString() {
@@ -196,7 +197,7 @@ public abstract class Heuristic implements Comparator<Node> {
         }
 
         public int f(Node n) {
-            return h2(n);
+            return h(n);
         }
 
         public String toString() {

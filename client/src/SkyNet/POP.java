@@ -157,21 +157,42 @@ public class POP implements Planner {
             ArrayList<Goal> goals = new ArrayList<>(level.goals);
             goals.remove(partialPlan.goal);
 
+            Set<Goal> conflictingGoals = new HashSet<>();
+
             for (Node node : partialPlan.plan) {
                 //TODO: Check if agent passes other partial plan goals
+
                 for (Goal goal : goals) {
                     if (goal.x == node.agentCol && goal.y == node.agentRow) {
                         //TODO: indicate conflict and given cell
                         //TODO: find plan that solves goal in conflict - order to happen after iterated plan
 //                        partialPlan.priority--;
-                        partialPlan.goal.priority--;
-                        System.err.format("Plan for: " + partialPlan.goal.name + " conflicting with " + goal.name + "\n");
+
+//                        partialPlan.goal.priority--;
+
+                        conflictingGoals.add(goal);
+
+                        System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
+
+//                        <From Client> Goal: a conflicting with plan for b
+//                        <From Client> Goal: a conflicting with plan for b
+//                        <From Client> Goal: c conflicting with plan for d
+//                        <From Client> Goal: h conflicting with plan for d
+//                        <From Client> Goal: c conflicting with plan for h
+//                        <From Client> Goal order:
+//                        <From Client> b, h, d, a, c,
                     }
                 }
             }
 
+            partialPlan.goal.priority = conflictingGoals.size();
+
             sortedGoals.add(partialPlan.goal);
         }
+
+//        for (Goal g : sortedGoals) {
+//            System.err.println("Goal and priority: " + g.name + " - " + g.priority);
+//        }
 
         return sortedGoals;
     }
