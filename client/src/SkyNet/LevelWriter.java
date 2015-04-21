@@ -15,7 +15,8 @@ public class LevelWriter {
             if (response.contains("false")) {
                 System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
                 System.err.format("%s was attempted in \n%s\n", act, n);
-                break;
+//                break;
+                continue;
             }
         }
     }

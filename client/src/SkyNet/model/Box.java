@@ -19,6 +19,7 @@ public class Box {
 
 
 
+
     @Override
     public int hashCode() {
         final int prime = 37;

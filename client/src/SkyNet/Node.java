@@ -88,7 +88,31 @@ public class Node {
 
     public boolean isGoalState() {
         if (chosenGoal != null && chosenBox != null) {
-            return chosenGoal.x == chosenBox.x && chosenGoal.y == chosenBox.y;
+//            return chosenGoal.x == chosenBox.x && chosenGoal.y == chosenBox.y;
+            for (int row = 1; row < MAX_ROW - 1; row++) {
+                for (int col = 1; col < MAX_COLUMN - 1; col++) {
+
+                    char g = goals[row][col];
+                    char b = Character.toLowerCase(boxes[row][col]);
+                    char chosenB = Character.toLowerCase(chosenBox.name);
+
+//                    if (g == chosenGoal.name && b == chosenB)
+
+                    if (g != chosenGoal.name) {
+                        continue;
+                    }
+
+                    if (b != chosenB) {
+                        continue;
+                    }
+//                    if (b == Character.toLowerCase(chosenBox.name) && g == b)
+                    if (b == g) {
+                        return true;
+                    }
+
+                }
+            }
+            return false;
         }
         else {
             for (int row = 1; row < MAX_ROW - 1; row++) {
@@ -100,38 +124,11 @@ public class Node {
                     }
                 }
             }
+            return true;
         }
-        return true;
     }
 
 
-    //TODO: FIX
-//    public boolean isGoalState() {
-////        for ( int row = 1; row < MAX_ROW - 1; row++ ) {
-////            for ( int col = 1; col < MAX_COLUMN - 1; col++ ) {
-////                char g = goals[row][col];
-////                char b = Character.toLowerCase( boxes[row][col] );
-////                if ( g > 0 && b != g) {
-////                    return false;
-////                }
-////            }
-////        }
-//
-//        int goalCount = 0;
-//
-//        for (Goal goal : goals) {
-//            for (Box box : boxes) {
-//                if (goal.equals(box)) {
-//                    ++goalCount;
-//                    break;
-//                }
-//            }
-//        }
-//        return goalCount == goals.size();
-//    }
-
-
-    //TODO: FIX
     public LinkedList<Node> extractPlan() {
         LinkedList<Node> plan = new LinkedList<Node>();
         Node n = this;
@@ -172,6 +169,11 @@ public class Node {
                         n.agentCol = newAgentCol;
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
+
+//                        if (chosenBox != null) {
+//                            n.chosenBox.x = newBoxCol;
+//                            n.chosenBox.y = newBoxRow;
+//                        }
                         expandedNodes.add(n);
                     }
                 }
@@ -188,6 +190,18 @@ public class Node {
                         n.agentCol = newAgentCol;
                         n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
                         n.boxes[boxRow][boxCol] = 0;
+
+                        if (chosenBox != null) {
+//                            char b = n.boxes[this.agentRow][this.agentCol];
+//                            if (chosenBox.name != b) {
+//                                System.err.println("touching wrong box");
+//                            }
+
+//                            n.chosenBox.x = this.agentCol;
+//                            n.chosenBox.y = this.agentRow;
+//                            System.err.println("" + n.chosenBox.x + ":" + this.chosenBox.x + " - " + n.chosenBox.y + ":" + this.chosenBox.y);
+                        }
+
                         expandedNodes.add(n);
                     }
                 }
@@ -219,8 +233,10 @@ public class Node {
         for (int row = 0; row < MAX_ROW; row++) {
             System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, MAX_COLUMN);
         }
+//        copy.chosenBox = new
         return copy;
     }
+
 
 
     @Override
