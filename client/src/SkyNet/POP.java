@@ -55,6 +55,7 @@ public class POP implements Planner {
         LinkedList<Plan> partialPlans = new LinkedList<>();
 
 
+
         //Add all goals and boxes to initial state
         for (int i = 0; i < level.goals.size(); i++) {
             Goal g = level.goals.get(i);
@@ -146,8 +147,12 @@ public class POP implements Planner {
             partialPlans.add(shortestPlan);
         }
 
-
-        //TODO: Ordering constraints --> Check if any goals interfere with other plans
+        int longestPlan = 0;
+        for (PartialPlan p : partialPlans) {
+            if (p.size() > longestPlan) {
+                longestPlan = p.size();
+            }
+        }
 
         for (PartialPlan partialPlan : partialPlans) {
             //TODO: Find partial plan goal - do not check if this goal is in the way for the actions
@@ -159,12 +164,9 @@ public class POP implements Planner {
             Set<Goal> conflictingGoals = new HashSet<>();
 
             for (Node node : partialPlan.plan) {
-                //TODO: Check if agent passes other partial plan goals
-
                 for (Goal goal : goals) {
                     if (goal.x == node.agentCol && goal.y == node.agentRow) {
                         //TODO: indicate conflict and given cell
-                        //TODO: find plan that solves goal in conflict - order to happen after iterated plan
 //                        partialPlan.priority--;
 //                        partialPlan.goal.priority--;
 
@@ -174,7 +176,9 @@ public class POP implements Planner {
                 }
             }
 
-            partialPlan.goal.priority = conflictingGoals.size();
+            float planSizePriority = partialPlan.size() / (float)longestPlan * 10;
+            int goalConfliftPriority = conflictingGoals.size() * 20;
+            partialPlan.goal.priority = goalConfliftPriority + (int)planSizePriority;
 
             sortedGoals.add(partialPlan.goal);
         }
@@ -253,8 +257,6 @@ public class POP implements Planner {
 
     //TODO: Make extraction plan for whole level - based on goal sorting
     private LinkedList<Node> extractPlan(Level level, Agent agent, Goal goal, Box box) {
-
-
 
         //TODO: State should contain all walls, boxes, goals and agents - however,
         //TODO: chosen agent, goal and box should also be known

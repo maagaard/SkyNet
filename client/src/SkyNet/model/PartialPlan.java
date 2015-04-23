@@ -27,6 +27,9 @@ public class PartialPlan {
         this.plan = partialSolution;
     }
 
+    public int size() {
+        return plan.size();
+    }
     
 
 }
