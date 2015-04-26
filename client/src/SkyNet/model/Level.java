@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Level {
-
-
+    public ArrayList<Cell> cells;
     public boolean walls[][];
     public ArrayList<Goal> goals;
     public ArrayList<Box> boxes;

@@ -22,9 +22,10 @@ public abstract class Method {
     }
 
     public boolean PreconditionsHold(Set<Atom> state){
-        return state.stream()
-                    .filter(preconditions::contains)
-                    .count() == preconditions.size();
+        return state.containsAll(this.preconditions);
+        //return state.stream()
+        //            .filter(preconditions::contains)
+        //            .count() == preconditions.size();
     }
 
     public Set<Method> Decompose(Set<Atom> state){

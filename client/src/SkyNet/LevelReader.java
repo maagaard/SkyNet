@@ -1,9 +1,6 @@
 package SkyNet;
 
-import SkyNet.model.Agent;
-import SkyNet.model.Box;
-import SkyNet.model.Goal;
-import SkyNet.model.Level;
+import SkyNet.model.*;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
@@ -19,6 +16,7 @@ public class LevelReader {
     public static Level ReadLevel(BufferedReader serverMessages) throws Exception {
         ArrayList<Box> boxes = new ArrayList<>();
         ArrayList<Agent> agents = new ArrayList<>();
+        ArrayList<Cell> cells = new ArrayList<>();
 
         Map<Character, String> colors = new HashMap<>();
         String line, color;
@@ -65,14 +63,17 @@ public class LevelReader {
                         error("Not a single agent level");
                     }
                     agents.add(new Agent(chr, i, levelLines));
-
+                    cells.add(new Cell(i, levelLines));
                 } else if ('A' <= chr && chr <= 'Z') { // Boxes
 //                    boxes[levelLines][i] = chr;
                     boxes.add(new Box(chr, i, levelLines));
+                    cells.add(new Cell(i, levelLines));
                 } else if ('a' <= chr && chr <= 'z') { // Goal cells
 //                    goals[levelLines][i] = chr;
                     goals.add(new Goal(chr, i, levelLines));
-
+                    cells.add(new Cell(i, levelLines));
+                } else {
+                    cells.add(new Cell(i, levelLines));
                 }
             }
             line = serverMessages.readLine();
@@ -81,6 +82,7 @@ public class LevelReader {
 
 
         Level level = new Level();
+        level.cells = cells;
         level.walls = walls;
         level.goals = goals;
         level.agents = agents;
