@@ -17,6 +17,7 @@ public class Goal implements Comparator<Goal> {
     public int y;
     public int priority = 0;
     public HashSet<Box> conflictingBoxes = new HashSet<>();
+    public Box suggestedBox = null;
     private Box solved = null;
 
     public Goal(char name, int x, int y) {
@@ -27,6 +28,7 @@ public class Goal implements Comparator<Goal> {
 
     public void solveGoal(Box box) {
         this.solved = box;
+        System.err.println("Goal solved: " + name);
     }
 
     public boolean isSolved() {

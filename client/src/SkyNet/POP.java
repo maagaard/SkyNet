@@ -16,10 +16,51 @@ public class POP implements Planner {
     private Strategy strategy;
     private Level level;
     private Node initialState;
+    private LinkedList<PartialPlan> partialPlans = null;
 
     public POP(Strategy strategy) throws Exception {
         this.strategy = strategy;
     }
+
+
+    public void updateLevel(Goal updatedGoal, Box updateBox) {
+        for (Box box : level.boxes) {
+
+        }
+        for (Goal goal : level.goals) {
+
+        }
+    }
+
+//    public void updateLevel() {
+//        ArrayList<Goal> updatedGoals = new ArrayList<>();
+//        ArrayList<Box> updatedBoxes = new ArrayList<>();
+//
+//        for (int row = 0; row < initialState.goals.length; row++) {
+//            for (int col = 0; col < initialState.goals[0].length; col++) {
+//                if (initialState.goals[row][col] != 0) {
+//                    updatedGoals.add()
+//                }
+//
+//
+//                char g = goals[row][col];
+//                char b = Character.toLowerCase(boxes[row][col]);
+//                if (g > 0 && b != g) {
+//                    return false;
+//                }
+//            }
+//        }
+//
+//        //Add all goals and boxes to initial state
+//        for (int i = 0; i < level.goals.size(); i++) {
+//            Goal g = level.goals.get(i);
+//            initialState.goals[g.y][g.x] = g.name;
+//        }
+//        for (int i = 0; i < level.boxes.size(); i++) {
+//            Box b = level.boxes.get(i);
+//            initialState.boxes[b.y][b.x] = b.name;
+//        }
+//    }
 
     @Override
     public Plan createPlan(Level level) {
@@ -52,7 +93,7 @@ public class POP implements Planner {
         //TODO: Create plan based on ordering constraints
 
         LinkedList<Node> fullSolution = new LinkedList<>();
-        LinkedList<Plan> partialPlans = new LinkedList<>();
+//        LinkedList<Plan> partialPlans = new LinkedList<>();
 
 
         //Add all goals and boxes to initial state
@@ -92,15 +133,25 @@ public class POP implements Planner {
             fullSolution.addAll(shortest);
 //            return fullSolution;
 
-            partialPlans.add(new Plan(shortest));
+//            partialPlans.add(new Plan(shortest));
 
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
             //TODO: OR change the
             initialState = shortest.getLast();
-            initialState.level = level;
             goal.solveGoal(initialState.chosenBox);
+            initialState.chosenBox.x = goal.x;
+            initialState.chosenBox.y = goal.y;
 
-            System.err.println("Solved goal: " + goal);
+            //TODO: WHOLE LEVEL NEEDS TO UPDATED !!!!!!
+            addConflictingBoxes(partialPlans);
+
+
+
+//            System.err.println("Box  pos: " + initialState.chosenBox.x + "," + initialState.chosenBox.y);
+//            System.err.println("Goal pos: " + goal.x + "," + goal.y);
+//            initialState.level = level;
+
+//            System.err.println("Solved goal: " + goal);
 
 //            agent.x = endNode.agentCol;
 //            agent.y = endNode.agentRow;
@@ -116,7 +167,7 @@ public class POP implements Planner {
         //TODO: THIS needs re-working
         Agent agent = level.agents.get(0);
 
-        LinkedList<PartialPlan> partialPlans = createPartialPlans(agent);
+        partialPlans = createPartialPlans(agent);
         addConflictingBoxes(partialPlans);
         PriorityQueue<Goal> sortedGoals = sortConflictingGoals(partialPlans);
 
@@ -171,14 +222,12 @@ public class POP implements Planner {
 
             ArrayList<Goal> goals = new ArrayList<>(level.goals);
             goals.remove(partialPlan.goal);
-
             Set<Goal> conflictingGoals = new HashSet<>();
 
             for (Node node : partialPlan.plan) {
                 for (Goal goal : goals) {
                     if (goal.x == node.agentCol && goal.y == node.agentRow) {
                         //TODO: indicate conflict and given cell
-
                         conflictingGoals.add(goal);
                         System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
                     }
@@ -201,19 +250,26 @@ public class POP implements Planner {
     private void addConflictingBoxes(LinkedList<PartialPlan> partialPlans) {
         for (PartialPlan partialPlan : partialPlans) {
 
+            if (partialPlan.goal.isSolved()) {
+                continue;
+            }
+
             ArrayList<Box> boxes = new ArrayList<>(level.boxes);
             boxes.remove(partialPlan.box);
-//            Set<Box> conflictingBoxes = new HashSet<>();
+            Set<Box> conflictingBoxes = new HashSet<>();
 
             for (Node node : partialPlan.plan) {
                 for (Box box : boxes) {
                     if (box.x == node.agentCol && box.y == node.agentRow) {
                         System.err.format("Box: " + box.name + " interfering with plan for " + partialPlan.box.name + "\n");
-//                        conflictingBoxes.add(box);
-                        partialPlan.goal.conflictingBoxes.add(box);
+//                        System.err.format("Box: " + box.x + "," + box.y + "\n");
+                        conflictingBoxes.add(box);
+//                        partialPlan.goal.conflictingBoxes = conflictingBoxes
                     }
                 }
             }
+            partialPlan.goal.conflictingBoxes = new HashSet<>(conflictingBoxes);
+//            partialPlan.goal.conflictingBoxes.addAll(conflictingBoxes);
         }
     }
 
