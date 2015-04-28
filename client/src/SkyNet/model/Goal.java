@@ -1,6 +1,8 @@
 package SkyNet.model;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 
 /**
  * client
@@ -14,6 +16,7 @@ public class Goal implements Comparator<Goal> {
     public int x;
     public int y;
     public int priority = 0;
+    public HashSet<Goal> conflictingBoxes = new HashSet<>();
     private Box solved = null;
 
     public Goal(char name, int x, int y) {

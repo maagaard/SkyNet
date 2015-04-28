@@ -112,12 +112,16 @@ public class POP implements Planner {
 
 
     private PriorityQueue<Goal> sortGoals() {
-//        ArrayList<Goal> sortedGoals = new ArrayList<>();
 
-        PriorityQueue<Goal> sortedGoals = new PriorityQueue<Goal>(11, new Goal('0', 0, 0));
-
+        //TODO: THIS needs some re-working
         Agent agent = level.agents.get(0);
 
+        LinkedList<PartialPlan> partialPlans = createPartialPlans(agent);
+
+        return sortConflictingGoals(partialPlans);
+    }
+
+    private LinkedList<PartialPlan> createPartialPlans(Agent agent) {
         LinkedList<PartialPlan> partialPlans = new LinkedList<>();
 
         for (Goal goal : level.goals) {
@@ -146,6 +150,12 @@ public class POP implements Planner {
             partialPlans.add(shortestPlan);
         }
 
+        return partialPlans;
+    }
+
+    private PriorityQueue<Goal> sortConflictingGoals(LinkedList<PartialPlan> partialPlans) {
+        PriorityQueue<Goal> sortedGoals = new PriorityQueue<Goal>(11, new Goal('0', 0, 0));
+
         int longestPlan = 0;
         for (PartialPlan p : partialPlans) {
             if (p.size() > longestPlan) {
@@ -166,8 +176,6 @@ public class POP implements Planner {
                 for (Goal goal : goals) {
                     if (goal.x == node.agentCol && goal.y == node.agentRow) {
                         //TODO: indicate conflict and given cell
-//                        partialPlan.priority--;
-//                        partialPlan.goal.priority--;
 
                         conflictingGoals.add(goal);
                         System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
@@ -185,9 +193,10 @@ public class POP implements Planner {
 //        for (Goal g : sortedGoals) {
 //            System.err.println("Goal and priority: " + g.name + " - " + g.priority);
 //        }
-
         return sortedGoals;
     }
+
+
 
     private Plan resolveConflicts(Level level, LinkedList<Plan> partialPlans) {
         // Ordering constraints --> Check if any goals interfere with other plans
