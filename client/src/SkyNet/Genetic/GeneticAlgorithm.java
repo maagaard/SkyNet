@@ -1,111 +1,123 @@
 package SkyNet.Genetic;
+
 import fj.Equal;
-import fj.data.List;
 import fj.Ord;
-import fj.control.parallel.ParModule;
+import fj.data.Array;
+import fj.data.List;
+import fj.data.Stream;
+
+import java.util.Collection;
 import java.util.Random;
+import java.util.stream.Collectors;
+
 import static fj.data.List.list;
+import static fj.data.Stream.range;
+import static fj.data.Stream.stream;
 import static java.util.Collections.shuffle;
 import static java.util.Collections.swap;
 
-//TODO: use immutable array for population
 public class GeneticAlgorithm {
-    private Random rnd = new Random();
-    public GeneticAlgorithm(int populationCount, List<PopulationMemberGene> genes){
-        List<PopulationMember> initialPop =
-            List.range(0, populationCount)
-                .map(i -> {
-                    java.util.List<PopulationMemberGene> xs = genes.toJavaList();
+    private static Random rnd = new Random();
+
+    public static PopulationMember GenerateSolution(List<Gene> genes) {
+        return GenerateSolution(50, genes, 0.24, 0.5, 0.9, 25);
+    }
+
+    public static PopulationMember GenerateSolution(int populationCount, List<Gene> genes,
+                                                    double fstParentPopulationRange,
+                                                    double sndParentPopulationRange,
+                                                    double mutationChance,
+                                                    int correctCount) {
+        Array<PopulationMember> initialPopulation =
+                range(0, populationCount).map(i -> {
+                    java.util.List<Gene> xs = genes.toJavaList();
                     shuffle(xs);
                     return new PopulationMember(list(xs));
-                }).sort(Ord.intOrd.comap(x -> x.score));
+                }).sort(Ord.intOrd.comap(x -> x.score)).toArray();
+
+        return evolve(correctCount, (int)((double) populationCount * fstParentPopulationRange),
+                sndParentPopulationRange, mutationChance, 0, initialPopulation);
     }
 
-    private List<PopulationMemberGene> compose(List<PopulationMemberGene> genes1,
-                                               List<PopulationMemberGene> genes2, int cutPoint){
-        return genes2.take(cutPoint)
-                .append(genes1)
-                .append(genes2.drop(cutPoint));
+    private static PopulationMember evolve(int minCorrectCount, int fstParentPopulationRange,
+                                           double sndParentPopulationRange, double mutationChance,
+                                           int correctCount, Array<PopulationMember> population) {
+        if (minCorrectCount <= correctCount)
+            return population.get(0);
+
+        Collection<PopulationMember>
+                newMembers = population.toStream()
+                .take(fstParentPopulationRange)
+                .toCollection()
+                .parallelStream()
+                .map(fst -> {
+                    int sndIndex = (int) ((double) population.length() * sndParentPopulationRange * rnd.nextDouble());
+                    return crossover(fst.genes, population.get(sndIndex).genes)
+                            .map(childGenes -> mutate(childGenes, mutationChance))
+                            .toCollection().stream();
+                }).flatMap(x -> x)
+                .collect(Collectors.toList());
+        Array<PopulationMember>
+                newPopulation = list(newMembers)
+                .append(population.toStream()
+                        .take(population.length() - 2 * fstParentPopulationRange).toList())
+                .sort(Ord.intOrd.comap(x -> x.score))
+                .toArray();
+        if(newPopulation.get(0).score == population.get(0).score)
+            correctCount++;
+        else correctCount = 0;
+        return evolve(minCorrectCount, fstParentPopulationRange,
+                sndParentPopulationRange, mutationChance,
+                correctCount, newPopulation);
     }
 
-    private Kids crossover(PopulationMember mother, PopulationMember father){
-        int cutLen = (int)Math.ceil((double) mother.genes.length() / 5.0);
-        int cutPoint1 = (int)(rnd.nextDouble() * ((double)mother.genes.length() - cutLen));
-
-        List<PopulationMemberGene> father_part =
-                father.genes.drop(cutPoint1).take(cutLen);
-        List<PopulationMemberGene> remaining_from_mother =
-                mother.genes.minus(Equal.<PopulationMemberGene>anyEqual(), father_part);
-        List<PopulationMemberGene> child1 =
-                compose(father_part, remaining_from_mother, cutPoint1);
-
-        List<PopulationMemberGene> mother_part =
-                father.genes.drop(cutPoint1).take(cutLen);
-        List<PopulationMemberGene> remaining_from_father =
-                father.genes.minus(Equal.<PopulationMemberGene>anyEqual(), mother_part);
-        List<PopulationMemberGene> child2 =
-                compose(mother_part, remaining_from_father, cutPoint1);
-
-        return new Kids(new PopulationMember(child1),
-                new PopulationMember(child2));
+    private static Stream<List<Gene>> crossover(List<Gene> fstParent, List<Gene> sndParent) {
+        int
+                cutLen = (int) Math.ceil((double) fstParent.length() / 5.0),
+                cutPoint = (int) (rnd.nextDouble() * ((double) fstParent.length() - cutLen));
+        List<Gene>
+                child1 = mixGenes(fstParent, sndParent, cutLen, cutPoint),
+                child2 = mixGenes(sndParent, fstParent, cutLen, cutPoint);
+        return stream(child1, child2);
     }
 
-    private PopulationMember mutate(PopulationMember popMember, double mutationChance){
-        if(rnd.nextDouble() > mutationChance){
-            java.util.List<PopulationMemberGene> xs = popMember.genes.toJavaList();
-            int index1 = rnd.nextInt(popMember.genes.length());
-            int index2 = rnd.nextInt(popMember.genes.length());
+    private static PopulationMember mutate(List<Gene> genes, double mutationPercent) {
+        if (rnd.nextDouble() > mutationPercent) {
+            java.util.List<Gene> xs = genes.toJavaList();
+            int
+                    index1 = rnd.nextInt(genes.length()),
+                    index2 = rnd.nextInt(genes.length());
             if (index1 == index2)
                 if (index1 > 0) index1--;
                 else index1++;
             swap(xs, index1, index2);
             return new PopulationMember(list(xs));
-        } else return popMember;
+        } else return new PopulationMember(genes);
     }
 
-    /*
-    private List<PopulationMember> iterate(double matingPopPercent, double mutationPercent,
-                                           double matePercent,
-                                           List<PopulationMember> population){
-        List<Integer> test = list(1,2,3);
-        int toMutate = (int)((double)population.length() * matePercent);
-        List<PopulationMember> freshBlood =
-                //ParModule.parModule().parMap(population.take(toMutate))
-                population.take(toMutate).map(mother -> {
-                    int father_index =  (int)(((double) population.length()) *
-                            matingPopPercent * rnd.nextDouble());
-                    Kids kids = crossover(mother, population.index(father_index));
-                    PopulationMember child1 = mutate(kids.child1, mutationPercent);
-                    PopulationMember child2 = mutate(kids.child2, mutationPercent);
-                    return list(child1,child2);
-                }).co;
-
-        return null;
-    }
-    */
-
-    private class Kids {
-        private final PopulationMember child1;
-        private final PopulationMember child2;
-        private Kids(PopulationMember child1, PopulationMember child2) {
-            this.child1 = child1;
-            this.child2 = child2;
-        }
+    private static List<Gene> mixGenes(List<Gene> fstParent, List<Gene> sndParent, int cutLength, int cutPoint) {
+        List<Gene>
+                fstPart = fstParent.drop(cutPoint).take(cutLength),
+                remainingFromSnd = sndParent.minus(Equal.<Gene>anyEqual(), fstPart);
+        return remainingFromSnd
+                .take(cutPoint)
+                .append(fstPart)
+                .append(remainingFromSnd.drop(cutPoint));
     }
 
-    private class PopulationMember {
-        private final List<PopulationMemberGene> genes;
-        private final int score;
+    public static class PopulationMember {
+        public final List<Gene> genes;
+        public final int score;
 
-        private PopulationMember(List<PopulationMemberGene> genes){
+        public PopulationMember(List<Gene> genes) {
             this.genes = genes;
             this.score = score(0, genes);
         }
 
-        private int score(int acc, List<PopulationMemberGene> popMemberGenes){
+        private int score(int acc, List<Gene> popMemberGenes) {
             if (popMemberGenes.length() == 1)
                 return acc;
-            else if(popMemberGenes.length() == 2)
+            else if (popMemberGenes.length() == 2)
                 return acc + popMemberGenes.head().distanceTo(popMemberGenes.tail().head());
             else {
                 return score(

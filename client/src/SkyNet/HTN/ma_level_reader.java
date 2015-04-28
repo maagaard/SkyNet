@@ -1,9 +1,11 @@
-package client;
+package SkyNet.HTN;
+
+import SkyNet.model.Cell;
 
 import java.io.BufferedReader;
 import java.util.HashMap;
 
-public class Level {
+public class ma_level_reader {
 
 	public static int MAX_ROW = 80;
 	public static int MAX_COLUMN = 80;
@@ -16,7 +18,7 @@ public class Level {
 	
 	boolean walls[][];
 	
-	public Level(){
+	public ma_level_reader(){
 		this.agent_map = new HashMap<Integer, Agent>();
 		this.box_color = new HashMap<String, Color>();
 		this.goal_map = new HashMap<String, Goal>();
@@ -60,26 +62,18 @@ public class Level {
 			case "yellow":
 				c = Color.yellow;
 				break;
-				
 			default:
-				Sys.error( "Line with no color ?!?" );
 				break;
 			}
 			
 			for ( String id : colonSplit[1].split( "," ) ) {
-				
 				if (id.matches("[0-9]")) {
-			        Sys.print("hello agent " + id);
-			        
 			        Agent a = new Agent(Integer.parseInt(id), c);
 			        this.agent_map.put(Integer.parseInt(id), a);
 				}
 				
-				if (id.matches("[A-Z]")) {
-					Sys.print("Boxes " + id + " are " + color);
-				
+				if (id.matches("[A-Z]"))
 					this.box_color.put(id, c);
-				}
 			}
 		} // Done reading colors
 		
@@ -89,23 +83,18 @@ public class Level {
 		int goal_count = 0;
 		
 		while ( !line.equals( "" ) ) {
-			
-			if (line.length() > max_col) {
+			if (line.length() > max_col)
 				max_col = line.length();
-			}
-			
+
 			for ( int col = 0; col < line.length(); col++ ) {
 				char chr = line.charAt( col );
 				
-				if ( '+' == chr ) {
+				if ( '+' == chr )
 					this.walls[row][col] = true;
-				} 
 				else if ( '0' <= chr && chr <= '9' ) {
 					Integer id = Character.getNumericValue(chr);
 					
-					Sys.print("Hello agent: " + id.toString());
-					
-					Agent a = null;					
+					Agent a = null;
 					a = this.agent_map.get( id );
 
 					// If we find an agent with no color defined, make it and set color to blue.
@@ -119,15 +108,12 @@ public class Level {
 				else if ( 'A' <= chr && chr <= 'Z' ) {
 					String id = "" + chr;
 
-					Sys.print("Hello box: " + id);
-					
 					Color c = null;
 					c = this.box_color.get(id);
 					
-					if (null == c) {
+					if (null == c)
 						c = Color.blue;
-					}
-					
+
 					Box b = new Box(id, c, row, col);
 					
 					this.box_map.put(id + box_count, b);
@@ -136,8 +122,6 @@ public class Level {
 				} 
 				else if ( 'a' <= chr && chr <= 'z' ) {
 					String id = "" + chr;
-					
-					Sys.print("Hello goal: " + id);
 					
 					Goal g = new Goal(id + goal_count, row, col);
 					
@@ -150,6 +134,45 @@ public class Level {
 			row++;
 		}
 	}
-	
-	
+
+    private class Agent {
+        private final int i;
+        private final Color c;
+        private Cell cell;
+
+        public Agent(int i, Color c) {
+            this.i = i;
+            this.c = c;
+        }
+
+        public void set_pos(int row, int col) {
+            this.cell = new Cell(row,col);
+        }
+    }
+
+    private class Box {
+        private final String id;
+        private final Color c;
+        private final int row;
+        private final int col;
+
+        public Box(String id, Color c, int row, int col) {
+            this.id = id;
+            this.c = c;
+            this.row = row;
+            this.col = col;
+        }
+    }
+
+    private class Goal {
+        private final String s;
+        private final int row;
+        private final int col;
+
+        public Goal(String s, int row, int col) {
+            this.s = s;
+            this.row = row;
+            this.col = col;
+        }
+    }
 }
