@@ -55,7 +55,6 @@ public class POP implements Planner {
         LinkedList<Plan> partialPlans = new LinkedList<>();
 
 
-
         //Add all goals and boxes to initial state
         for (int i = 0; i < level.goals.size(); i++) {
             Goal g = level.goals.get(i);
@@ -115,7 +114,7 @@ public class POP implements Planner {
     private PriorityQueue<Goal> sortGoals() {
 //        ArrayList<Goal> sortedGoals = new ArrayList<>();
 
-        PriorityQueue<Goal> sortedGoals = new PriorityQueue<Goal>(11, new Goal('0',0,0));
+        PriorityQueue<Goal> sortedGoals = new PriorityQueue<Goal>(11, new Goal('0', 0, 0));
 
         Agent agent = level.agents.get(0);
 
@@ -176,9 +175,9 @@ public class POP implements Planner {
                 }
             }
 
-            float planSizePriority = partialPlan.size() / (float)longestPlan * 10;
+            float planSizePriority = partialPlan.size() / (float) longestPlan * 10;
             int goalConfliftPriority = conflictingGoals.size() * 20;
-            partialPlan.goal.priority = goalConfliftPriority + (int)planSizePriority;
+            partialPlan.goal.priority = goalConfliftPriority + (int) planSizePriority;
 
             sortedGoals.add(partialPlan.goal);
         }
@@ -191,18 +190,12 @@ public class POP implements Planner {
     }
 
     private Plan resolveConflicts(Level level, LinkedList<Plan> partialPlans) {
-
-
         // Ordering constraints --> Check if any goals interfere with other plans
-
         for (Plan partialPlan : partialPlans) {
             //TODO: Find partial plan goal - do not check if this goal is in the way for the actions
             //TODO: Or find goals to check for
-
             ArrayList<Goal> goals = new ArrayList<>(level.goals);
-
             goals.remove(partialPlan.GetPlan().get(0).chosenGoal);
-
             for (Node node : partialPlan.GetPlan()) {
                 //TODO: Check if agent passes other partial plan goals
                 for (Goal goal : goals) {
@@ -213,14 +206,11 @@ public class POP implements Planner {
                     }
                 }
             }
-
 //        this.level.goals
         }
-
         //TODO: Return a merged plan
         return new Plan(new LinkedList<>());
     }
-
 
 
     private LinkedList<Node> extractSubgoalSolution(Level level, Agent agent, Goal goal, Box box) {
@@ -254,7 +244,6 @@ public class POP implements Planner {
     }
 
 
-
     //TODO: Make extraction plan for whole level - based on goal sorting
     private LinkedList<Node> extractPlan(Level level, Agent agent, Goal goal, Box box) {
 
@@ -275,7 +264,7 @@ public class POP implements Planner {
         LinkedList<Node> partialPlan = null;
 
         try {
-            partialPlan = PartialSearch(strategy, initialState);
+            partialPlan = Search(strategy, initialState);
             if (partialPlan == null) return null;
             System.err.format("Search starting with strategy %s\n", strategy);
         } catch (IOException e) {
@@ -287,8 +276,6 @@ public class POP implements Planner {
     }
 
 
-
-
     public LinkedList<Node> PartialSearch(Strategy strategy, Node state) throws IOException {
         System.err.format("Search starting with strategy %s\n", strategy);
 //        strategy.addToFrontier(partialNode.path.get(0));
@@ -297,7 +284,7 @@ public class POP implements Planner {
 
         int iterations = 0;
         while (true) {
-            if ( iterations % 1000 == 0 ) {
+            if (iterations % 1000 == 0) {
                 System.err.println(strategy.searchStatus());
             }
             if (Memory.shouldEnd()) {
@@ -329,7 +316,51 @@ public class POP implements Planner {
 
             iterations++;
         }
+    }
 
+
+    public LinkedList<Node> Search(Strategy strategy, Node state) throws IOException {
+        System.err.format("Search starting with strategy %s\n", strategy);
+//        strategy.addToFrontier(partialNode.path.get(0));
+        Heuristic.AStar h = new Heuristic.AStar(initialState);
+
+        strategy.addToFrontier(state);
+
+        int iterations = 0;
+        while (true) {
+            if (iterations % 1000 == 0) {
+                System.err.println(strategy.searchStatus());
+            }
+            if (Memory.shouldEnd()) {
+                System.err.format("Memory limit almost reached, terminating search %s\n", Memory.stringRep());
+                return null;
+            }
+            if (strategy.timeSpent() > 300) { // Minutes timeout
+                System.err.format("Time limit reached, terminating search %s\n", Memory.stringRep());
+                return null;
+            }
+            if (strategy.frontierIsEmpty()) {
+                System.err.format("Frontier is empty\n");
+                return null;
+            }
+
+            Node leafNode = strategy.getAndRemoveLeaf();
+
+            if (leafNode.isGoalState()) {
+                System.err.format("Goal state reached\n");
+                return leafNode.extractPlan();
+            }
+
+            strategy.addToExplored(leafNode);
+            for (Node n : leafNode.getExpandedNodes()) {
+                if (!strategy.isExplored(n) && !strategy.inFrontier(n)) {
+                    strategy.addToFrontier(n);
+//                    System.err.println("H: " + h.f(n));
+                }
+            }
+
+            iterations++;
+        }
     }
 
 }
