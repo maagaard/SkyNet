@@ -47,7 +47,7 @@ public class Goal implements Comparator<Goal> {
 
     @Override
     public int compare(Goal g1, Goal g2) {
-        return g1.priority-g2.priority;
+        return g2.priority-g1.priority;
     }
 
     @Override
