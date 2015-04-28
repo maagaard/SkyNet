@@ -364,7 +364,7 @@ public class POP implements Planner {
                 System.err.format("Memory limit almost reached, terminating search %s\n", Memory.stringRep());
                 return null;
             }
-            if (strategy.timeSpent() > 300) { // Minutes timeout
+            if (strategy.timeSpent() > 1200) { // 20 Minutes timeout
                 System.err.format("Time limit reached, terminating search %s\n", Memory.stringRep());
                 return null;
             }
