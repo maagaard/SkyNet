@@ -16,8 +16,6 @@ public class Main {
         // Use stderr to print to console
         System.err.println("SearchClient initializing.");
 
-
-
         BufferedReader serverMessages = new BufferedReader(new InputStreamReader(System.in));
 
         Benchmarks b = new Benchmarks("TEST");
