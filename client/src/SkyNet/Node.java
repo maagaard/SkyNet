@@ -25,6 +25,7 @@ public class Node {
 
     public Goal chosenGoal = null;
     public Box chosenBox;
+    public char movingBox = 0;
     public Agent actingAgent;
     public Node parent;
     public Command action;
@@ -169,6 +170,7 @@ public class Node {
                         n.agentCol = newAgentCol;
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
+                        n.movingBox = n.boxes[newBoxRow][newBoxCol];
 
 //                        if (chosenBox != null) {
 //                            n.chosenBox.x = newBoxCol;
@@ -190,6 +192,7 @@ public class Node {
                         n.agentCol = newAgentCol;
                         n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
                         n.boxes[boxRow][boxCol] = 0;
+                        n.movingBox = n.boxes[this.agentRow][this.agentCol];
 
                         if (chosenBox != null) {
 //                            char b = n.boxes[this.agentRow][this.agentCol];

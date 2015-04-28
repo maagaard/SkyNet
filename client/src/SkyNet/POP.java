@@ -113,12 +113,14 @@ public class POP implements Planner {
 
     private PriorityQueue<Goal> sortGoals() {
 
-        //TODO: THIS needs some re-working
+        //TODO: THIS needs re-working
         Agent agent = level.agents.get(0);
 
         LinkedList<PartialPlan> partialPlans = createPartialPlans(agent);
+        addConflictingBoxes(partialPlans);
+        PriorityQueue<Goal> sortedGoals = sortConflictingGoals(partialPlans);
 
-        return sortConflictingGoals(partialPlans);
+        return sortedGoals;
     }
 
     private LinkedList<PartialPlan> createPartialPlans(Agent agent) {
@@ -196,6 +198,24 @@ public class POP implements Planner {
         return sortedGoals;
     }
 
+    private void addConflictingBoxes(LinkedList<PartialPlan> partialPlans) {
+        for (PartialPlan partialPlan : partialPlans) {
+
+            ArrayList<Box> boxes = new ArrayList<>(level.boxes);
+            boxes.remove(partialPlan.box);
+//            Set<Box> conflictingBoxes = new HashSet<>();
+
+            for (Node node : partialPlan.plan) {
+                for (Box box : boxes) {
+                    if (box.x == node.agentCol && box.y == node.agentRow) {
+                        System.err.format("Box: " + box.name + " interfering with plan for " + partialPlan.box.name + "\n");
+//                        conflictingBoxes.add(box);
+                        partialPlan.goal.conflictingBoxes.add(box);
+                    }
+                }
+            }
+        }
+    }
 
 
     private Plan resolveConflicts(Level level, LinkedList<Plan> partialPlans) {

@@ -134,7 +134,7 @@ public abstract class Heuristic implements Comparator<Node> {
 //                Box box = solvedGoals.get(goal);
 //                System.err.println("Checking solved goal: " + goal.x + "," +goal.y);
                 if (n.boxes[goal.y][goal.x] == 0) {
-                    solvedGoalDistance += 10;
+                    solvedGoalDistance += 101;
                 }
             }
         }
@@ -150,7 +150,22 @@ public abstract class Heuristic implements Comparator<Node> {
             int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
             int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
             int agentGoalDist = (Math.abs(n.chosenGoal.y - n.agentRow) + (Math.abs(n.chosenGoal.x - n.agentCol)));
-            return agentBoxDist + boxGoalDist + agentGoalDist + solvedGoalDistance(n);
+
+            int randomBoxMoveDisadvantage = 0;
+
+            if (n.chosenGoal.conflictingBoxes.size() == 0 && n.movingBox != 0 && n.movingBox != n.chosenBox.name) {
+                randomBoxMoveDisadvantage = 100;
+            } else if (n.movingBox != 0 && n.movingBox != n.chosenBox.name) {
+                for (Box box : n.chosenGoal.conflictingBoxes) {
+                    if (n.movingBox == box.name) {
+                        randomBoxMoveDisadvantage = 0;
+                        break;
+                    }
+                    randomBoxMoveDisadvantage = 100;
+                }
+            }
+
+            return agentBoxDist + boxGoalDist + agentGoalDist + solvedGoalDistance(n) + randomBoxMoveDisadvantage;
         } else {
             return h2(n);
         }
