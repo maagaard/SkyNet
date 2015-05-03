@@ -1,12 +1,13 @@
 package SkyNet.HTN;
 
 import SkyNet.Command;
-import SkyNet.Genetic.PopulationMemberGene;
+import SkyNet.Genetic.Gene;
 import SkyNet.model.Box;
 import SkyNet.model.Goal;
 import SkyNet.model.Level;
-import fj.data.List;
-import static fj.data.List.list;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class AbstractMethod {
     final List<AbstractMethod> reduction;
@@ -17,7 +18,7 @@ public abstract class AbstractMethod {
         this.score = this.score(reduction);
     }
     public AbstractMethod(){
-        this.reduction = list();
+        this.reduction = new LinkedList<>();
         this.score = 0;
     }
 
@@ -44,7 +45,7 @@ public abstract class AbstractMethod {
         }
     }
 
-    public class SubGoal extends AbstractMethod implements PopulationMemberGene {
+    public class SubGoal extends AbstractMethod implements Gene {
         private final Box box;
         private final Goal goal;
         public SubGoal(List<AbstractMethod> reduction, Box box, Goal goal) {
@@ -63,18 +64,17 @@ public abstract class AbstractMethod {
             return null;
         }
 
-        public int distanceTo(PopulationMemberGene other) {
+        public int distanceTo(Gene other) {
             SubGoal otherSubGoal = (SubGoal)other;
             return Math.abs(this.goal.x - otherSubGoal.box.x) +
                     Math.abs(this.goal.y - otherSubGoal.box.y);
         }
 
-        @Override
-        public boolean areEqual(PopulationMemberGene other) {
-            return this.box.x == ((SubGoal)other).box.x &&
-                this.box.y == ((SubGoal)other).box.y &&
-                this.goal.x == ((SubGoal)other).goal.x &&
-                this.goal.y == ((SubGoal)other).goal.y;
+        public boolean areEqual(SubGoal other) {
+            return this.box.x == other.box.x &&
+                this.box.y == other.box.y &&
+                this.goal.x == other.goal.x &&
+                this.goal.y == other.goal.y;
         }
     }
 
