@@ -171,6 +171,11 @@ public class Node {
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
                         n.movingBox = n.boxes[newBoxRow][newBoxCol];
+//                        n.movingBox
+//                        n.level.getBox()
+
+
+
 
 //                        if (chosenBox != null) {
 //                            n.chosenBox.x = newBoxCol;

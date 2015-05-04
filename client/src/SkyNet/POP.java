@@ -107,6 +107,7 @@ public class POP implements Planner {
         }
 
 
+        /** Full plan */
         //Create full plan
         for (Goal goal : sortedGoals) {
 
@@ -131,18 +132,20 @@ public class POP implements Planner {
             }
 
             fullSolution.addAll(shortest);
+
 //            return fullSolution;
 
 //            partialPlans.add(new Plan(shortest));
 
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
             //TODO: OR change the
+
             initialState = shortest.getLast();
             goal.solveGoal(initialState.chosenBox);
             initialState.chosenBox.x = goal.x;
             initialState.chosenBox.y = goal.y;
 
-            //TODO: WHOLE LEVEL NEEDS TO UPDATED !!!!!!
+            //TODO: WHOLE LEVEL NEEDS TO BE UPDATED !!!!!!
             addConflictingBoxes(partialPlans);
 
 

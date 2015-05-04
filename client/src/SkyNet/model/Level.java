@@ -19,4 +19,12 @@ public class Level {
     public boolean celIsFree(int row, int col) {
         return !(this.walls[row][col]);
     }
+
+    public Box getBox(int row, int column) {
+        for (Box box : boxes) {
+            if (box.x == column && box.y == row) return box;
+        }
+        return null;
+    }
+
 }
