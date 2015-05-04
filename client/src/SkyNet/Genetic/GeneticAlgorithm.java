@@ -1,4 +1,5 @@
 package SkyNet.Genetic;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,14 +11,14 @@ public class GeneticAlgorithm {
     private static Random rnd = new Random();
 
     public static PopulationMember GenerateSolution(List<Gene> genes) {
-        return GenerateSolution(50, genes, 0.24, 0.5, 0.9, 25);
+        return GenerateSolution(100, genes, 0.24, 0.5, 0.9, 25);
     }
 
     public static PopulationMember GenerateSolution(int populationCount, List<Gene> genes,
                                                     double fstParentPopulationRange,
                                                     double sndParentPopulationRange,
                                                     double mutationChance,
-                                                    int correctCount) {
+                                                    int stopCount) {
         PopulationMember[] initialPopulation = new PopulationMember[populationCount];
         for (int i = 0; i < populationCount; i++) {
             LinkedList<Gene> xs = new LinkedList<>(genes);
@@ -25,8 +26,7 @@ public class GeneticAlgorithm {
             initialPopulation[i] = new PopulationMember(xs);
         }
 
-
-        return evolve(correctCount, (int) ((double) populationCount * fstParentPopulationRange),
+        return evolve(stopCount, (int) ((double) populationCount * fstParentPopulationRange),
           sndParentPopulationRange, mutationChance, 0, initialPopulation);
     }
 
@@ -49,14 +49,19 @@ public class GeneticAlgorithm {
             .collect(Collectors.toList()));
         sort(newMembers);
 
+        if(newMembers.get(0).score == population[0].score)
+            correctCount++;
+        else
+            correctCount = 0;
+
         return evolve(minCorrectCount, fstParentPopulationRange,
           sndParentPopulationRange, mutationChance,
-          correctCount, (PopulationMember[])newMembers.toArray());
+          correctCount, newMembers.toArray(new PopulationMember[newMembers.size()]));
     }
 
     private static List<List<Gene>> crossover(List<Gene> fstParent, List<Gene> sndParent) {
         int
-          cutLen = (int) Math.ceil((double) fstParent.size() / 5.0),
+          cutLen = (int) Math.ceil((double) fstParent.size() / 3.0),
           cutPoint = (int) (rnd.nextDouble() * ((double) fstParent.size() - cutLen));
         List<Gene>
           child1 = mixGenes(fstParent, sndParent, cutLen, cutPoint),
@@ -69,7 +74,7 @@ public class GeneticAlgorithm {
 
     private static PopulationMember mutate(List<Gene> genes, double mutationPercent) {
         if (rnd.nextDouble() > mutationPercent) {
-            java.util.List<Gene> xs = new LinkedList<>(genes);
+            List<Gene> xs = new LinkedList<>(genes);
             int
               index1 = rnd.nextInt(genes.size()),
               index2 = rnd.nextInt(genes.size());
@@ -83,13 +88,12 @@ public class GeneticAlgorithm {
 
     private static List<Gene> mixGenes(List<Gene> fstParent, List<Gene> sndParent, int cutLength, int cutPoint) {
         List<Gene>
-          fstPart = fstParent.stream().skip(cutPoint).limit(cutLength). collect(Collectors.toList()),
-          remainingFromSnd = sndParent.stream().filter(x -> x.equals(fstParent)).collect(Collectors.toList());
-        List<Gene> collect = remainingFromSnd.stream().limit(cutPoint).collect(Collectors.toList());
-        collect.addAll(fstPart);
-        collect.addAll(remainingFromSnd.stream().skip(cutPoint).collect(Collectors.toList()));
-        return collect;
+          fstPart = fstParent.stream().skip(cutPoint).limit(cutLength).collect(Collectors.toList()),
+          remainingFromSnd = sndParent.stream().filter(x -> !fstPart.contains(x)).collect(Collectors.toList()),
+          result = remainingFromSnd.stream().limit(cutPoint).collect(Collectors.toList());
+        result.addAll(fstPart);
+        result.addAll(remainingFromSnd.stream().skip(cutPoint).collect(Collectors.toList()));
+        return result;
     }
 
 }
-
