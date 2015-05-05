@@ -1,6 +1,12 @@
 package SkyNet.model;
 
-public class Cell {
+import SkyNet.Command;
+
+public class Cell{
+
+    public int g;
+    public Cell parent;
+    public Command.dir direction;
     public final int x;
     public final int y;
 
