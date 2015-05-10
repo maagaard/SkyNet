@@ -43,7 +43,7 @@ public class MasterPlanner implements Planner {
         partialPlans = partialPlanner.createPartialPlans(level);
         PriorityQueue<Goal> sortedGoals = sortGoals();
 
-        updateConflictingBoxes(partialPlans);
+        updateConflictingBoxes();
 
         /** Add all goals and boxes to initial state node */
         updateInitialState();
@@ -77,7 +77,7 @@ public class MasterPlanner implements Planner {
 
             //TODO: WHOLE LEVEL NEEDS TO BE UPDATED !!!!!!
             updateLevel();
-            updateConflictingBoxes(partialPlans);
+            updateConflictingBoxes();
 
         }
 
@@ -110,6 +110,10 @@ public class MasterPlanner implements Planner {
         }
     }
 
+    private void updateGoalSorting() {
+
+    }
+
     private PriorityQueue<Goal> sortGoals() {
 
         //TODO: THIS agent choosing needs re-working
@@ -133,6 +137,7 @@ public class MasterPlanner implements Planner {
 
         int longestPlan = 0;
         for (PartialPlan p : partialPlans) {
+            System.err.println("Plan "+ p.goal.name +" length: "+ p.size());
             if (p.size() > longestPlan) {
                 longestPlan = p.size();
             }
@@ -155,9 +160,11 @@ public class MasterPlanner implements Planner {
                 }
             }
 
-            float planSizePriority = partialPlan.size() / (float) longestPlan * 10;
+            float planSizePriority = ((float)longestPlan / (float)partialPlan.size()) * 10;
             int goalConflictPriority = conflictingGoals.size() * 20;
             partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
+
+            System.err.println("Plan "+ partialPlan.goal.name +" size priority: "+ planSizePriority + " total priority: " + partialPlan.goal.priority);
 
             sortedGoals.add(partialPlan.goal);
         }
@@ -165,7 +172,7 @@ public class MasterPlanner implements Planner {
         return sortedGoals;
     }
 
-    private void updateConflictingBoxes(LinkedList<PartialPlan> partialPlans) {
+    private void updateConflictingBoxes() {
         for (PartialPlan partialPlan : partialPlans) {
 
             if (partialPlan.goal.isSolved()) {
