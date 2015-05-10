@@ -24,7 +24,8 @@ public class Main {
 //        Node state = new Node(null, level.height, level.width);
         Strategy strategy = null;//new StrategyBestFirst(new AStar(state));
 
-        Planner planner = new POP(strategy);    //null; //TODO: Use POP or whatever
+        Planner planner = new MasterPlanner(strategy);
+//        Planner planner = new POP(strategy);    //null; //TODO: Use POP or whatever
 
         Plan plan = planner.createPlan(level);
 //        LinkedList<Node> solution = popClient.solveLevel();
