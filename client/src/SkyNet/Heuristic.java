@@ -1,6 +1,5 @@
 package SkyNet;
 
-import SkyNet.model.Agent;
 import SkyNet.model.Box;
 import SkyNet.model.Goal;
 import SkyNet.model.Level;
@@ -55,7 +54,9 @@ public abstract class Heuristic implements Comparator<Node> {
         for (int i = 0; i < initialState.boxes.length; i++) {
             for (int j = 0; j < initialState.boxes[i].length; j++) {
                 if (initialState.boxes[i][j] != 0) {
-                    boxMap.put(Character.toLowerCase(initialState.boxes[i][j]), new int[]{i, j});
+//                    boxMap.put(Character.toLowerCase(initialState.boxes[i][j]), new int[]{i, j});
+                    boxMap.put(Character.toLowerCase(initialState.level.getBox(initialState.boxes[i][j]).name), new int[]{i, j});
+//                    boxMap.put(initialState.level.getBox(initialState.boxes[i][j]).name, new int[]{i, j});
                 }
             }
         }
@@ -153,11 +154,11 @@ public abstract class Heuristic implements Comparator<Node> {
 
             int randomBoxMoveDisadvantage = 0;
 
-            if (n.chosenGoal.conflictingBoxes.size() == 0 && n.movingBox != 0 && n.movingBox != n.chosenBox.name) {
+            if (n.chosenGoal.conflictingBoxes.size() == 0 && n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
                 randomBoxMoveDisadvantage = 100;
-            } else if (n.movingBox != 0 && n.movingBox != n.chosenBox.name) {
+            } else if (n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
                 for (Box box : n.chosenGoal.conflictingBoxes) {
-                    if (n.movingBox == box.name) {
+                    if (n.movingBoxId == box.id) {
                         randomBoxMoveDisadvantage = 0;
                         break;
                     }

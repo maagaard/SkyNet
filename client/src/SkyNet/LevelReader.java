@@ -16,6 +16,7 @@ public class LevelReader {
         throw new Exception("GSCError: " + msg);
     }
 
+
     public static Level ReadLevel(BufferedReader serverMessages) throws Exception {
         ArrayList<Box> boxes = new ArrayList<>();
         ArrayList<Agent> agents = new ArrayList<>();
@@ -87,6 +88,7 @@ public class LevelReader {
         level.boxes = boxes;
         level.width = longestLine;
         level.height = levelLines;
+        level.createBoxMap();
 
         return level;
     }

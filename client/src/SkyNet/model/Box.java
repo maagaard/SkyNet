@@ -1,5 +1,7 @@
 package SkyNet.model;
 
+import java.util.UUID;
+
 /**
  * client
  * Created by maagaard on 31/03/15.
@@ -10,11 +12,25 @@ public class Box {
     public char name;
     public int x;
     public int y;
+//    public UUID id;
+
+    static int enumChar = 0;
+    public int id = 0;
+
+//    public char EnumChar() {
+//        enumChar++;
+//        System.err.println("enumerating: " + enumChar);
+//        return enumChar;
+//    }
 
     public Box(char name, int x, int y) {
         this.name = name;
         this.x = x;
         this.y = y;
+
+        enumChar++;
+        id = enumChar;
+//        System.err.println("enumerating: " + id);
     }
 
 

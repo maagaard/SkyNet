@@ -20,12 +20,12 @@ public class Node {
 //    public ArrayList<Goal> goals;
 
     public boolean[][] walls; // = new boolean[MAX_ROW][MAX_COLUMN];
-    public char[][] boxes;// = new char[MAX_ROW][MAX_COLUMN];
+    public int[][] boxes;// = new char[MAX_ROW][MAX_COLUMN];
     public char[][] goals;//; = new char[MAX_ROW][MAX_COLUMN];
 
     public Goal chosenGoal = null;
     public Box chosenBox;
-    public char movingBox = 0;
+    public int movingBoxId = 0;
     public Agent actingAgent;
     public Node parent;
     public Command action;
@@ -62,7 +62,7 @@ public class Node {
         MAX_ROW = rows;
         MAX_COLUMN = columns;
 
-        boxes = new char[rows][columns];
+        boxes = new int[rows][columns];
 
         this.parent = parent;
         if (parent == null) {
@@ -71,6 +71,7 @@ public class Node {
             walls = new boolean[rows][columns];
         } else {
             g = parent.g() + 1;
+            level = parent.level;
             chosenBox = parent.chosenBox;
             chosenGoal = parent.chosenGoal;
             walls = parent.walls;
@@ -94,11 +95,18 @@ public class Node {
                 for (int col = 1; col < MAX_COLUMN - 1; col++) {
 
                     char g = goals[row][col];
-                    char b = Character.toLowerCase(boxes[row][col]);
+//                    char b = level.getBox(Character.toLowerCase(boxes[row][col])).name;
+
+                    Box box = level.getBox(boxes[row][col]);
+                    if (box == null) {
+                        continue;
+                    }
+                    char b = Character.toLowerCase(box.name);
+
+//                    char b = Character.toLowerCase(boxes[row][col]);
                     char chosenB = Character.toLowerCase(chosenBox.name);
 
 //                    if (g == chosenGoal.name && b == chosenB)
-
                     if (g != chosenGoal.name) {
                         continue;
                     }
@@ -119,13 +127,23 @@ public class Node {
             for (int row = 1; row < MAX_ROW - 1; row++) {
                 for (int col = 1; col < MAX_COLUMN - 1; col++) {
                     char g = goals[row][col];
-                    char b = Character.toLowerCase(boxes[row][col]);
-                    if (g > 0 && b != g) {
-                        return false;
+
+//                    char b = Character.toLowerCase(boxes[row][col]);
+//                    char b = level.getBox(boxes[row][col]).name;
+
+                    Box box = level.getBox(boxes[row][col]);
+                    if (box != null) {
+//                        char b = ;
+//                        System.err.println(Character.toLowerCase(box.name));
+//                        System.err.println(g);
+
+                        if (g > 0 && Character.toLowerCase(box.name) == g) {
+                            return true;
+                        }
                     }
                 }
             }
-            return true;
+            return false;
         }
     }
 
@@ -157,6 +175,7 @@ public class Node {
                     n.agentCol = newAgentCol;
                     expandedNodes.add(n);
                 }
+
             } else if (c.actType == type.Push) {
                 // Make sure that there's actually a box to move
                 if (boxAt(newAgentRow, newAgentCol)) {
@@ -170,12 +189,9 @@ public class Node {
                         n.agentCol = newAgentCol;
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
-                        n.movingBox = n.boxes[newBoxRow][newBoxCol];
-//                        n.movingBox
+                        n.movingBoxId = n.boxes[newBoxRow][newBoxCol];
+//                        n.movingBoxId
 //                        n.level.getBox()
-
-
-
 
 //                        if (chosenBox != null) {
 //                            n.chosenBox.x = newBoxCol;
@@ -184,6 +200,7 @@ public class Node {
                         expandedNodes.add(n);
                     }
                 }
+
             } else if (c.actType == type.Pull) {
                 // Cell is free where agent is going
                 if (cellIsFree(newAgentRow, newAgentCol)) {
@@ -197,7 +214,7 @@ public class Node {
                         n.agentCol = newAgentCol;
                         n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
                         n.boxes[boxRow][boxCol] = 0;
-                        n.movingBox = n.boxes[this.agentRow][this.agentCol];
+                        n.movingBoxId = n.boxes[this.agentRow][this.agentCol];
 
                         if (chosenBox != null) {
 //                            char b = n.boxes[this.agentRow][this.agentCol];
@@ -290,7 +307,13 @@ public class Node {
             }
             for (int col = 0; col < MAX_COLUMN; col++) {
                 if (this.boxes[row][col] > 0) {
-                    s.append(this.boxes[row][col]);
+//                    s.append(this.boxes[row][col]);
+                    Box box = level.getBox(this.boxes[row][col]);
+                    if (box != null) {
+                        s.append(box.name);
+                    } else {
+                        s.append(this.boxes[row][col]);
+                    }
                 } else if (this.goals[row][col] > 0) {
                     s.append(this.goals[row][col]);
                 } else if (this.walls[row][col]) {

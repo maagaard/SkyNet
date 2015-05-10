@@ -32,35 +32,36 @@ public class POP implements Planner {
         }
     }
 
-//    public void updateLevel() {
-//        ArrayList<Goal> updatedGoals = new ArrayList<>();
-//        ArrayList<Box> updatedBoxes = new ArrayList<>();
-//
-//        for (int row = 0; row < initialState.goals.length; row++) {
-//            for (int col = 0; col < initialState.goals[0].length; col++) {
-//                if (initialState.goals[row][col] != 0) {
+    public void updateLevel() {
+        ArrayList<Goal> updatedGoals = new ArrayList<>();
+        ArrayList<Box> updatedBoxes = new ArrayList<>();
+
+        for (int row = 0; row < initialState.goals.length; row++) {
+            for (int col = 0; col < initialState.goals[0].length; col++) {
+                if (initialState.goals[row][col] != 0) {
 //                    updatedGoals.add()
-//                }
-//
-//
-//                char g = goals[row][col];
-//                char b = Character.toLowerCase(boxes[row][col]);
+                }
+
+
+                char g = this.initialState.goals[row][col];
+//                char b = Character.toLowerCase(this.initialState.boxes[row][col]);
+
 //                if (g > 0 && b != g) {
 //                    return false;
 //                }
-//            }
-//        }
-//
-//        //Add all goals and boxes to initial state
-//        for (int i = 0; i < level.goals.size(); i++) {
-//            Goal g = level.goals.get(i);
-//            initialState.goals[g.y][g.x] = g.name;
-//        }
-//        for (int i = 0; i < level.boxes.size(); i++) {
-//            Box b = level.boxes.get(i);
-//            initialState.boxes[b.y][b.x] = b.name;
-//        }
-//    }
+            }
+        }
+
+        //Add all goals and boxes to initial state
+        for (int i = 0; i < level.goals.size(); i++) {
+            Goal g = level.goals.get(i);
+            initialState.goals[g.y][g.x] = g.name;
+        }
+        for (int i = 0; i < level.boxes.size(); i++) {
+            Box b = level.boxes.get(i);
+            initialState.boxes[b.y][b.x] = b.name;
+        }
+    }
 
     @Override
     public Plan createPlan(Level level) {
@@ -103,7 +104,8 @@ public class POP implements Planner {
         }
         for (int i = 0; i < level.boxes.size(); i++) {
             Box b = level.boxes.get(i);
-            initialState.boxes[b.y][b.x] = b.name;
+//            initialState.boxes[b.y][b.x] = b.name;
+            initialState.boxes[b.y][b.x] = b.id;
         }
 
 
@@ -146,6 +148,9 @@ public class POP implements Planner {
             initialState.chosenBox.y = goal.y;
 
             //TODO: WHOLE LEVEL NEEDS TO BE UPDATED !!!!!!
+
+//            updateLevel();
+
             addConflictingBoxes(partialPlans);
 
 
@@ -192,6 +197,8 @@ public class POP implements Planner {
 
                     if (solution == null) {
                         System.err.format("No solution found\n");
+                    } else if (solution.size() == 0) {
+                        System.err.println("Solution of length 0 is wrong");
                     }
                 }
             }
@@ -224,10 +231,12 @@ public class POP implements Planner {
             //TODO: Or find goals to check for
 
             ArrayList<Goal> goals = new ArrayList<>(level.goals);
+
             goals.remove(partialPlan.goal);
             Set<Goal> conflictingGoals = new HashSet<>();
 
             for (Node node : partialPlan.plan) {
+
                 for (Goal goal : goals) {
                     if (goal.x == node.agentCol && goal.y == node.agentRow) {
                         //TODO: indicate conflict and given cell
@@ -303,8 +312,9 @@ public class POP implements Planner {
 
     private LinkedList<Node> extractSubgoalSolution(Level level, Agent agent, Goal goal, Box box) {
 
-
         Node state = new Node(null, level.height, level.width);
+        state.level = level;
+
         state.walls = initialState.walls;
 //        state.actingAgent = agent;
 //        state.chosenGoal = goal;
@@ -313,7 +323,8 @@ public class POP implements Planner {
         state.agentRow = agent.y;
 
         state.goals[goal.y][goal.x] = goal.name;
-        state.boxes[box.y][box.x] = box.name;
+//        state.boxes[box.y][box.x] = box.name;
+        state.boxes[box.y][box.x] = box.id;
 
         strategy = new StrategyBestFirst(new AStar(state));
 
@@ -379,7 +390,7 @@ public class POP implements Planner {
                 System.err.format("Memory limit almost reached, terminating search %s\n", Memory.stringRep());
                 return null;
             }
-            if (strategy.timeSpent() > 300) { // Minutes timeout
+            if (strategy.timeSpent() > 600) { // Minutes timeout
                 System.err.format("Time limit reached, terminating search %s\n", Memory.stringRep());
                 return null;
             }
