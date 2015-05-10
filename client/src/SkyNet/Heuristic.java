@@ -144,10 +144,10 @@ public abstract class Heuristic implements Comparator<Node> {
     }
 
 
-
     public int h(Node n) {
 
         if (n.chosenGoal != null && n.chosenBox != null) {
+
             int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
             int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
             int agentGoalDist = (Math.abs(n.chosenGoal.y - n.agentRow) + (Math.abs(n.chosenGoal.x - n.agentCol)));

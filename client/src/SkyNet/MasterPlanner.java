@@ -161,7 +161,7 @@ public class MasterPlanner implements Planner {
             }
 
             float planSizePriority = ((float)longestPlan / (float)partialPlan.size()) * 10;
-            int goalConflictPriority = conflictingGoals.size() * 20;
+            int goalConflictPriority = conflictingGoals.size() * 10 * level.goals.size();
             partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
 
             System.err.println("Plan "+ partialPlan.goal.name +" size priority: "+ planSizePriority + " total priority: " + partialPlan.goal.priority);

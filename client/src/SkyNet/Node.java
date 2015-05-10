@@ -179,12 +179,11 @@ public class Node {
                         n.boxes[newAgentRow][newAgentCol] = 0;
                         n.movingBoxId = n.boxes[newBoxRow][newBoxCol];
                         expandedNodes.add(n);
-//                        n.movingBoxId
-//                        n.level.getBox()
-//                        if (chosenBox != null) {
-//                            n.chosenBox.x = newBoxCol;
-//                            n.chosenBox.y = newBoxRow;
-//                        }
+
+                        if (chosenBox != null && chosenBox.id == n.movingBoxId) {
+                            n.chosenBox.x = newBoxCol;
+                            n.chosenBox.y = newBoxRow;
+                        }
                     }
                 }
 
@@ -203,15 +202,12 @@ public class Node {
                         n.boxes[boxRow][boxCol] = 0;
                         n.movingBoxId = n.boxes[this.agentRow][this.agentCol];
                         expandedNodes.add(n);
-//                        if (chosenBox != null) {
-//                            char b = n.boxes[this.agentRow][this.agentCol];
-//                            if (chosenBox.name != b) {
-//                                System.err.println("touching wrong box");
-//                            }
-//                            n.chosenBox.x = this.agentCol;
-//                            n.chosenBox.y = this.agentRow;
-//                            System.err.println("" + n.chosenBox.x + ":" + this.chosenBox.x + " - " + n.chosenBox.y + ":" + this.chosenBox.y);
-//                        }
+
+                        if (chosenBox != null && chosenBox.id == n.movingBoxId) {
+                            n.chosenBox.x = this.agentCol;
+                            n.chosenBox.y = this.agentRow;
+                        }
+
                     }
                 }
             }

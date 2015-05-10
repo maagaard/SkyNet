@@ -1,7 +1,5 @@
 package SkyNet.model;
 
-import java.util.UUID;
-
 /**
  * client
  * Created by maagaard on 31/03/15.

@@ -2,17 +2,13 @@ package SkyNet;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
 
 //import SkyNet.PartialStrategy.*;
 //import SkyNet.PartialPlanHeuristic.*;
 import SkyNet.model.Level;
 import SkyNet.model.Plan;
-import SkyNet.Strategy.*;
-import SkyNet.Heuristic.*;
 
 public class Main {
-
 
     public static void main(String[] args) throws Exception {
 
