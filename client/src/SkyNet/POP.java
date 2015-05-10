@@ -36,14 +36,17 @@ public class POP implements Planner {
         ArrayList<Goal> updatedGoals = new ArrayList<>();
         ArrayList<Box> updatedBoxes = new ArrayList<>();
 
-        for (int row = 0; row < initialState.goals.length; row++) {
-            for (int col = 0; col < initialState.goals[0].length; col++) {
-                if (initialState.goals[row][col] != 0) {
+        for (int row = 0; row < initialState.boxes.length; row++) {
+            for (int col = 0; col < initialState.boxes[0].length; col++) {
+                if (initialState.boxes[row][col] != 0) {
 //                    updatedGoals.add()
+                    Box box = initialState.level.getBox(initialState.boxes[row][col]);
+                    box.x = col;
+                    box.y = row;
                 }
 
 
-                char g = this.initialState.goals[row][col];
+//                char g = this.initialState.goals[row][col];
 //                char b = Character.toLowerCase(this.initialState.boxes[row][col]);
 
 //                if (g > 0 && b != g) {
@@ -53,14 +56,14 @@ public class POP implements Planner {
         }
 
         //Add all goals and boxes to initial state
-        for (int i = 0; i < level.goals.size(); i++) {
-            Goal g = level.goals.get(i);
-            initialState.goals[g.y][g.x] = g.name;
-        }
-        for (int i = 0; i < level.boxes.size(); i++) {
-            Box b = level.boxes.get(i);
-            initialState.boxes[b.y][b.x] = b.name;
-        }
+//        for (int i = 0; i < level.goals.size(); i++) {
+//            Goal g = level.goals.get(i);
+//            initialState.goals[g.y][g.x] = g.name;
+//        }
+//        for (int i = 0; i < level.boxes.size(); i++) {
+//            Box b = level.boxes.get(i);
+//            initialState.boxes[b.y][b.x] = b.name;
+//        }
     }
 
     @Override
@@ -148,12 +151,9 @@ public class POP implements Planner {
             initialState.chosenBox.y = goal.y;
 
             //TODO: WHOLE LEVEL NEEDS TO BE UPDATED !!!!!!
-
-//            updateLevel();
+            updateLevel();
 
             addConflictingBoxes(partialPlans);
-
-
 
 //            System.err.println("Box  pos: " + initialState.chosenBox.x + "," + initialState.chosenBox.y);
 //            System.err.println("Goal pos: " + goal.x + "," + goal.y);
@@ -273,6 +273,7 @@ public class POP implements Planner {
             for (Node node : partialPlan.plan) {
                 for (Box box : boxes) {
                     if (box.x == node.agentCol && box.y == node.agentRow) {
+//                        initialState.level.getBox(box.id)
                         System.err.format("Box: " + box.name + " interfering with plan for " + partialPlan.box.name + "\n");
 //                        System.err.format("Box: " + box.x + "," + box.y + "\n");
                         conflictingBoxes.add(box);

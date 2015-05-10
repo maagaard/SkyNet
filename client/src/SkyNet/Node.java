@@ -90,31 +90,25 @@ public class Node {
 
     public boolean isGoalState() {
         if (chosenGoal != null && chosenBox != null) {
-//            return chosenGoal.x == chosenBox.x && chosenGoal.y == chosenBox.y;
             for (int row = 1; row < MAX_ROW - 1; row++) {
                 for (int col = 1; col < MAX_COLUMN - 1; col++) {
 
                     char g = goals[row][col];
-//                    char b = level.getBox(Character.toLowerCase(boxes[row][col])).name;
 
                     Box box = level.getBox(boxes[row][col]);
                     if (box == null) {
                         continue;
                     }
                     char b = Character.toLowerCase(box.name);
+                    char chosenBoxChar = Character.toLowerCase(chosenBox.name);
 
-//                    char b = Character.toLowerCase(boxes[row][col]);
-                    char chosenB = Character.toLowerCase(chosenBox.name);
-
-//                    if (g == chosenGoal.name && b == chosenB)
                     if (g != chosenGoal.name) {
                         continue;
                     }
 
-                    if (b != chosenB) {
+                    if (b != chosenBoxChar) {
                         continue;
                     }
-//                    if (b == Character.toLowerCase(chosenBox.name) && g == b)
                     if (b == g) {
                         return true;
                     }
@@ -128,14 +122,8 @@ public class Node {
                 for (int col = 1; col < MAX_COLUMN - 1; col++) {
                     char g = goals[row][col];
 
-//                    char b = Character.toLowerCase(boxes[row][col]);
-//                    char b = level.getBox(boxes[row][col]).name;
-
                     Box box = level.getBox(boxes[row][col]);
                     if (box != null) {
-//                        char b = ;
-//                        System.err.println(Character.toLowerCase(box.name));
-//                        System.err.println(g);
 
                         if (g > 0 && Character.toLowerCase(box.name) == g) {
                             return true;
