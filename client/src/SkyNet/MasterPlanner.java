@@ -57,38 +57,6 @@ public class MasterPlanner implements Planner {
             Goal goal = sortedGoals.get(solvedGoalCount);
             System.err.println("Goal location: " + goal.x + "," + goal.y);
 
-//        for (Goal goal : sortedGoals) {
-//            LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
-//            //TODO: Only solve for one box if there are more - best solution should have been found above in "sortGoals()"
-//            for (Box box : level.boxes) {
-//                if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
-//                    System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-//
-//                    LinkedList<Node> partialSolution = extractPlan(level, agent, goal, box);
-//
-//                    if (partialSolution.size() == 0) {
-//                        //TODO: Something is wrong - back-track
-//                        //TODO: Can we assume, that if frontier is empty, the problem is caused by the last solved goal???
-//
-//                        //TODO: Back-track from last node
-//                        Node node = solutionList.getLast().getLast();
-//                        node.stupidMoveHeuristics = 300;
-//
-//                    }
-//
-//                    solutionList.add(partialSolution);
-//                }
-//            }
-//
-//            LinkedList<Node> shortest = solutionList.pop();
-//            for (LinkedList<Node> solution : solutionList) {
-//                if (solution.size() < shortest.size()) {
-//                    shortest = solution;
-//                }
-//            }
-//
-//            initialState = shortest.getLast();
-
             initialState = goalSolvedState(null, agent, goal);
 
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge

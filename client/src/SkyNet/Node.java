@@ -92,7 +92,7 @@ public class Node {
 
     public boolean isGoalState() {
         if (chosenGoal != null && chosenBox != null) {
-            //Maybe use chosenBox for something?
+
             Box box = level.getBox(boxes[chosenGoal.y][chosenGoal.x]);
             if (box != null && chosenBox.id == box.id && box.lowerCaseName == chosenGoal.name) {
                 return true;
