@@ -2,7 +2,6 @@ package SkyNet.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class Level {
 
@@ -25,13 +24,23 @@ public class Level {
     public Level() {
     }
 
+
+    //Used for mapping box ids to boxes
     public void createBoxMap() {
         for (Box box : boxes) {
             boxMap.put(box.id, box);
         }
     }
 
-    public void createUnsolvedMap() {
+    //Used for mapping goal ids to boxes
+    public void createGoalMap() {
+        for (Goal goal : goals) {
+            goalMap.put(goal.id, goal);
+        }
+    }
+
+    //Create list of unsolved goals
+    public void createUnsolvedList() {
         for (Goal goal: goals) {
             unsolvedGoals.add(goal);
         }
@@ -42,24 +51,21 @@ public class Level {
         return !(this.walls[row][col]);
     }
 
-//    public Box getBox(int row, int column) {
-//        for (Box box : boxes) {
-//            if (box.x == column && box.y == row) return box;
-//        }
-//        return null;
-//    }
 
     public Box getBox(Integer id) {
-//        System.err.println("get box for id: " + id);
         return boxMap.get(id);
     }
+
+    public Goal getGoal(Integer id) {
+        return goalMap.get(id);
+    }
+
 
     public void unsolveGoal(Goal goal) {
         goal.solveGoal(null);
         solvedGoals.remove(goal);
         unsolvedGoals.add(goal);
     }
-
 
 
     public void solveGoalWithBox(Goal goal, Box box) {

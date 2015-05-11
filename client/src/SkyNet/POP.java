@@ -59,7 +59,7 @@ public class POP {//} implements Planner {
         state.walls = level.walls;
         state.agentCol = agent.x;
         state.agentRow = agent.y;
-        state.goals[goal.y][goal.x] = goal.name;
+        state.goals[goal.y][goal.x] = goal.id;
         state.boxes[box.y][box.x] = box.id;
 
         Strategy strategy = new StrategyBestFirst(new AStar(state));

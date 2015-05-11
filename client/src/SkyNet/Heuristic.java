@@ -41,6 +41,7 @@ public abstract class Heuristic implements Comparator<Node> {
             }
         }
 
+        //TODO: Make dynamic maybe??
 
         //TODO: OLD STUFF - MAYBE RE-WRITE TO BE USED AGAIN
         for (int i = 0; i < initialState.goals.length; i++) {

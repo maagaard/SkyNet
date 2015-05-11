@@ -1,7 +1,5 @@
 package SkyNet.model;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 
 /**
@@ -16,14 +14,20 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     public int x;
     public int y;
     public int priority = 0;
+    static int enumChar = 0;
+    public int id = 0;
+
     public HashSet<Box> conflictingBoxes = new HashSet<>();
-    public Box suggestedBox = null;
+//    public Box suggestedBox = null;
     private Box solved = null;
 
     public Goal(char name, int x, int y) {
         this.name = name;
         this.x = x;
         this.y = y;
+
+        enumChar++;
+        id = enumChar;
     }
 
     public void solveGoal(Box box) {

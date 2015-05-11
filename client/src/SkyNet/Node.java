@@ -21,7 +21,7 @@ public class Node {
 
     public boolean[][] walls; // = new boolean[MAX_ROW][MAX_COLUMN];
     public int[][] boxes;// = new char[MAX_ROW][MAX_COLUMN];
-    public char[][] goals;//; = new char[MAX_ROW][MAX_COLUMN];
+    public int[][] goals;//; = new char[MAX_ROW][MAX_COLUMN];
 
     public Goal chosenGoal = null;
     public Box chosenBox;
@@ -69,7 +69,7 @@ public class Node {
         this.parent = parent;
         if (parent == null) {
             g = 0;
-            goals = new char[rows][columns];
+            goals = new int[rows][columns];
             walls = new boolean[rows][columns];
         } else {
             g = parent.g() + 1;
@@ -95,23 +95,23 @@ public class Node {
             for (int row = 1; row < MAX_ROW - 1; row++) {
                 for (int col = 1; col < MAX_COLUMN - 1; col++) {
 
-                    char g = goals[row][col];
-
+//                    char g = goals[row][col];
+                    Goal goal = level.getGoal(goals[row][col]);
+                    if (goal == null || goal.id != chosenGoal.id) {continue;}
                     Box box = level.getBox(boxes[row][col]);
-                    if (box == null) {
-                        continue;
-                    }
+                    if (box == null) {continue;}
+
                     char b = Character.toLowerCase(box.name);
                     char chosenBoxChar = Character.toLowerCase(chosenBox.name);
 
-                    if (g != chosenGoal.name) {
+                    if (goal.name != chosenGoal.name) {
                         continue;
                     }
 
                     if (b != chosenBoxChar) {
                         continue;
                     }
-                    if (b == g ) { //&& //) level.unsolvedGoals.size() == 0) {
+                    if (b == goal.name ) { //&& //) level.unsolvedGoals.size() == 0) {
                         return true;
                     }
 
@@ -122,14 +122,13 @@ public class Node {
         else {
             for (int row = 1; row < MAX_ROW - 1; row++) {
                 for (int col = 1; col < MAX_COLUMN - 1; col++) {
-                    char g = goals[row][col];
-
+//                    char g = goals[row][col];
+                    Goal goal = level.getGoal(goals[row][col]);
+                    if (goal == null) {continue;}
                     Box box = level.getBox(boxes[row][col]);
-                    if (box != null) {
-
-                        if (g > 0 && Character.toLowerCase(box.name) == g) {
-                            return true;
-                        }
+                    if (box == null) {continue;}
+                    if (Character.toLowerCase(box.name) == goal.name) {
+                        return true;
                     }
                 }
             }
@@ -185,14 +184,14 @@ public class Node {
                             n.chosenBox.x = newBoxCol;
                             n.chosenBox.y = newBoxRow;
                         }
-                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
+//                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
                             Goal solvedGoal = level.hasSolvedGoal(n.movingBoxId);
                             if (solvedGoal != null) {
 
                                 n.destroyingGoal = n.movingBoxId;
                                 continue;
                             }
-                        }
+//                        }
                         expandedNodes.add(n);
                     }
                 }
@@ -216,14 +215,14 @@ public class Node {
                             n.chosenBox.x = this.agentCol;
                             n.chosenBox.y = this.agentRow;
                         }
-                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
+//                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
                             Goal solvedGoal = level.hasSolvedGoal(n.movingBoxId);
                             if (solvedGoal != null) {
 
                                 n.destroyingGoal = n.movingBoxId;
                                 continue;
                             }
-                        }
+//                        }
 
                         expandedNodes.add(n);
                     }
@@ -313,7 +312,13 @@ public class Node {
                         s.append(this.boxes[row][col]);
                     }
                 } else if (this.goals[row][col] > 0) {
-                    s.append(this.goals[row][col]);
+//                    s.append(this.goals[row][col]);
+                    Goal goal = level.getGoal(this.goals[row][col]);
+                    if (goal != null) {
+                        s.append(goal.name);
+                    } else {
+                        s.append(this.boxes[row][col]);
+                    }
                 } else if (this.walls[row][col]) {
                     s.append("+");
                 } else if (row == this.agentRow && col == this.agentCol) {
