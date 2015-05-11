@@ -8,6 +8,7 @@ package SkyNet.model;
 public class Box {
 
     public char name;
+    public char lowerCaseName;
     public int x;
     public int y;
 
@@ -16,6 +17,7 @@ public class Box {
 
     public Box(char name, int x, int y) {
         this.name = name;
+        this.lowerCaseName = Character.toLowerCase(name);
         this.x = x;
         this.y = y;
 

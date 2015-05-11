@@ -139,6 +139,7 @@ public abstract class Heuristic implements Comparator<Node> {
             if (n.chosenGoal.conflictingBoxes.size() == 0 && n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
                 randomBoxMoveDisadvantage = 100;
             } else if (n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
+
                 for (Box box : n.chosenGoal.conflictingBoxes) {
                     if (n.movingBoxId == box.id) {
                         randomBoxMoveDisadvantage = 0;
@@ -146,6 +147,7 @@ public abstract class Heuristic implements Comparator<Node> {
                     }
                     randomBoxMoveDisadvantage = 100;
                 }
+
             }
 
             return agentBoxDist + boxGoalDist + agentGoalDist + solvedGoalDistance(n) + randomBoxMoveDisadvantage;
