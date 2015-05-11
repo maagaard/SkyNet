@@ -150,7 +150,14 @@ public class MasterPlanner implements Planner {
             goals.remove(partialPlan.goal);
             Set<Goal> conflictingGoals = new HashSet<>();
 
+//            System.err.println("________________________________________________");
+//            System.err.println(partialPlan.goal);
+
             for (Node node : partialPlan.plan) {
+
+//                if (partialPlan.goal.name == 'h') {
+//                    System.err.println("Agent: " + node.agentCol + "," + node.agentRow);
+//                }
 
                 for (Goal goal : goals) {
                     if (goal.x == node.agentCol && goal.y == node.agentRow) {
@@ -160,11 +167,13 @@ public class MasterPlanner implements Planner {
                 }
             }
 
+//            System.err.println("________________________________________________");
+
             float planSizePriority = ((float)longestPlan / (float)partialPlan.size()) * 10;
             int goalConflictPriority = conflictingGoals.size() * 10 * level.goals.size();
             partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
 
-            System.err.println("Plan "+ partialPlan.goal.name +" size priority: "+ planSizePriority + " total priority: " + partialPlan.goal.priority);
+            System.err.println("Plan "+ partialPlan.goal.name +" size priority: "+ planSizePriority + " conflict size: " + conflictingGoals.size() + " total priority: " + partialPlan.goal.priority);
 
             sortedGoals.add(partialPlan.goal);
         }
