@@ -46,7 +46,7 @@ public abstract class Heuristic implements Comparator<Node> {
                     goalRow = i;
                     goalColumn = j;
 
-                    //Advanced
+                    /g /Advanced
                     goalMap.put(Character.toLowerCase(initialState.goals[i][j]), new int[]{i, j});
                 }
             }
@@ -65,46 +65,6 @@ public abstract class Heuristic implements Comparator<Node> {
     public int compare(Node n1, Node n2) {
         return f(n1) - f(n2);
     }
-
-
-    public int h3(Node n) {
-        ArrayList<Integer> combinedDistances = new ArrayList<Integer>();
-//        Map<Character, Integer> combinedDistances = new HashMap<Character, Integer>();
-
-        Map<Character, Integer> boxDistances = new HashMap<Character, Integer>();
-        for (Character c : boxMap.keySet()) {
-            double a = Math.pow(n.agentRow - boxMap.get(c)[0], 2);
-            double b = Math.pow(n.agentCol - boxMap.get(c)[1], 2);
-            int distance = (int) Math.sqrt(a + b);
-//            boxDistances.add(distance);
-            boxDistances.put(c, distance);
-//            System.err.println("a: "+a+ " b: "+b + " c: " + distance);
-        }
-
-//        ArrayList<Integer> goalDistances = new ArrayList<Integer>();
-        Map<Character, Integer> goalDistances = new HashMap<Character, Integer>();
-        for (Character c : goalMap.keySet()) {
-            double a = Math.pow(n.agentRow - goalMap.get(c)[0], 2);
-            double b = Math.pow(n.agentCol - goalMap.get(c)[1], 2);
-            int distance = (int) Math.sqrt(a + b);
-            goalDistances.put(c, distance);
-//            goalDistances.add(distance);
-//            System.err.println("a: "+a+ " b: "+b + " c: " + distance);
-            combinedDistances.add(distance + boxDistances.get(Character.toUpperCase(c)));
-        }
-
-//        Collection<Integer> dists = combinedDistances.values();
-
-//        double a = Math.pow(n.agentCol-goalColumn, 2);
-//        double b = Math.pow(n.agentRow-goalRow, 2);
-//        double distance = Math.sqrt(a+b);
-
-        Collections.sort(combinedDistances);
-        System.err.println("Distance" + combinedDistances);
-//		System.err.println(dists.get(0));
-        return combinedDistances.get(0);
-    }
-
 
     public int h2(Node n) {
         ArrayList<Integer> combinedDistances = new ArrayList<Integer>();
@@ -127,6 +87,15 @@ public abstract class Heuristic implements Comparator<Node> {
         return combinedDistances.get(0);
     }
 
+
+    public int partialH(Node n) {
+
+
+
+        int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
+        int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
+        int agentGoalDist = (Math.abs(n.chosenGoal.y - n.agentRow) + (Math.abs(n.chosenGoal.x - n.agentCol)));
+    }
 
     public int solvedGoalDistance(Node n) {
         int solvedGoalDistance = 0;
