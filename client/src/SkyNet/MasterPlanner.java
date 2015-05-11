@@ -160,10 +160,18 @@ public class MasterPlanner implements Planner {
 //                }
 
                 for (Goal goal : goals) {
-                    if (goal.x == node.agentCol && goal.y == node.agentRow) {
+
+                    //Goal box movement conflict
+                    if (node.boxes[goal.y][goal.x] != 0) {
                         conflictingGoals.add(goal);
                         System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
                     }
+
+                    // Goal agent conflict
+//                    if (goal.x == node.agentCol && goal.y == node.agentRow) {
+//                        conflictingGoals.add(goal);
+//                        System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
+//                    }
                 }
             }
 

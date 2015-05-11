@@ -52,7 +52,13 @@ public class Goal implements Comparator<Goal> {
 
     @Override
     public int compare(Goal g1, Goal g2) {
-        return g2.priority-g1.priority;
+
+        //compare (x, y) = - compare(y,x)
+        if (g1.priority < g2.priority) { return -1;}
+        else if (g1.priority > g2.priority) { return 1;}
+        else { return 0;}
+
+//        return g2.priority-g1.priority;
     }
 
     @Override
