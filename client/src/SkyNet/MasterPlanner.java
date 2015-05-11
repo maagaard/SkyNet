@@ -41,7 +41,7 @@ public class MasterPlanner implements Planner {
 
         /** Goal ordering determined by partial plans */
         partialPlans = partialPlanner.createPartialPlans(level);
-        PriorityQueue<Goal> sortedGoals = sortGoals();
+        ArrayList<Goal> sortedGoals = sortGoals();
 
         updateConflictingBoxes();
 
@@ -114,12 +114,12 @@ public class MasterPlanner implements Planner {
 
     }
 
-    private PriorityQueue<Goal> sortGoals() {
+    private ArrayList<Goal> sortGoals() {
 
         //TODO: THIS agent choosing needs re-working
         Agent agent = level.agents.get(0);
 
-        PriorityQueue<Goal> sortedGoals = sortConflictingGoals(partialPlans);
+        ArrayList<Goal> sortedGoals = sortConflictingGoals(partialPlans);
 
         //Print goal order
         System.err.format("Goal order: \n");
@@ -132,8 +132,9 @@ public class MasterPlanner implements Planner {
     }
 
 
-    private PriorityQueue<Goal> sortConflictingGoals(LinkedList<PartialPlan> partialPlans) {
-        PriorityQueue<Goal> sortedGoals = new PriorityQueue<Goal>(11, new Goal('0', 0, 0));
+    private ArrayList<Goal> sortConflictingGoals(LinkedList<PartialPlan> partialPlans) {
+//        PriorityQueue<Goal> sortedGoals = new PriorityQueue<Goal>(11, new Goal('0', 0, 0));
+        ArrayList<Goal> sortedGoals = new ArrayList<>();
 
         int longestPlan = 0;
         for (PartialPlan p : partialPlans) {
@@ -150,14 +151,7 @@ public class MasterPlanner implements Planner {
             goals.remove(partialPlan.goal);
             Set<Goal> conflictingGoals = new HashSet<>();
 
-//            System.err.println("________________________________________________");
-//            System.err.println(partialPlan.goal);
-
             for (Node node : partialPlan.plan) {
-
-//                if (partialPlan.goal.name == 'h') {
-//                    System.err.println("Agent: " + node.agentCol + "," + node.agentRow);
-//                }
 
                 for (Goal goal : goals) {
 
@@ -175,8 +169,6 @@ public class MasterPlanner implements Planner {
                 }
             }
 
-//            System.err.println("________________________________________________");
-
             float planSizePriority = ((float)longestPlan / (float)partialPlan.size()) * 10;
             int goalConflictPriority = conflictingGoals.size() * 10 * level.goals.size();
             partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
@@ -186,6 +178,7 @@ public class MasterPlanner implements Planner {
             sortedGoals.add(partialPlan.goal);
         }
 
+        Collections.sort(sortedGoals);
         return sortedGoals;
     }
 

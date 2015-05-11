@@ -10,7 +10,7 @@ import java.util.HashSet;
  * Copyright (c) maagaard 2015.
  */
 
-public class Goal implements Comparator<Goal> {
+public class Goal implements Comparable<Goal> {//Comparator<Goal> {
 
     public char name;
     public int x;
@@ -50,16 +50,22 @@ public class Goal implements Comparator<Goal> {
         return result;
     }
 
-    @Override
-    public int compare(Goal g1, Goal g2) {
-
-        //compare (x, y) = - compare(y,x)
-        if (g1.priority < g2.priority) { return -1;}
-        else if (g1.priority > g2.priority) { return 1;}
-        else { return 0;}
-
+//    @Override
+//    public int compare(Goal g1, Goal g2) {
+//        //compare (x, y) = - compare(y,x)
+////        if (g1.priority < g2.priority) { return -1;}
+////        else if (g1.priority > g2.priority) { return 1;}
+////        else { return 0;}
+//        System.err.println("g2(" + g2.name+"): " + g2.priority + ", g1("+g1.name+"): " + g1.priority);
 //        return g2.priority-g1.priority;
+//    }
+
+
+    @Override
+    public int compareTo(Goal g) {
+        return g.priority-this.priority;
     }
+
 
     @Override
     public boolean equals( Object obj ) {
@@ -73,7 +79,8 @@ public class Goal implements Comparator<Goal> {
         if (this.hashCode() == obj.hashCode())
             return true;
 
-
         return false;
     }
+
+
 }
