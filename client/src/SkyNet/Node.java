@@ -37,6 +37,8 @@ public class Node {
     public int agentRow;
     public int agentCol;
     public char agentNumber;
+    public int destroyingGoal = 0;
+    public int stupidMoveHeuristics = 0;
 
     private int g;
 
@@ -109,7 +111,7 @@ public class Node {
                     if (b != chosenBoxChar) {
                         continue;
                     }
-                    if (b == g) {
+                    if (b == g ) { //&& //) level.unsolvedGoals.size() == 0) {
                         return true;
                     }
 
@@ -178,12 +180,20 @@ public class Node {
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
                         n.movingBoxId = n.boxes[newBoxRow][newBoxCol];
-                        expandedNodes.add(n);
 
                         if (chosenBox != null && chosenBox.id == n.movingBoxId) {
                             n.chosenBox.x = newBoxCol;
                             n.chosenBox.y = newBoxRow;
                         }
+                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
+                            Goal solvedGoal = level.hasSolvedGoal(n.movingBoxId);
+                            if (solvedGoal != null) {
+
+                                n.destroyingGoal = n.movingBoxId;
+                                continue;
+                            }
+                        }
+                        expandedNodes.add(n);
                     }
                 }
 
@@ -201,13 +211,21 @@ public class Node {
                         n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
                         n.boxes[boxRow][boxCol] = 0;
                         n.movingBoxId = n.boxes[this.agentRow][this.agentCol];
-                        expandedNodes.add(n);
 
                         if (chosenBox != null && chosenBox.id == n.movingBoxId) {
                             n.chosenBox.x = this.agentCol;
                             n.chosenBox.y = this.agentRow;
                         }
+                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
+                            Goal solvedGoal = level.hasSolvedGoal(n.movingBoxId);
+                            if (solvedGoal != null) {
 
+                                n.destroyingGoal = n.movingBoxId;
+                                continue;
+                            }
+                        }
+
+                        expandedNodes.add(n);
                     }
                 }
             }

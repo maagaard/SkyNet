@@ -26,6 +26,7 @@ public abstract class Heuristic implements Comparator<Node> {
     public Heuristic(Node initialState) {
         this.initialState = initialState;
 
+        //TODO: Make some of this dynamic !!!!
         if (initialState.chosenGoal != null && initialState.chosenBox != null) {
             solvedGoals = new HashMap<>();
             if (initialState.level != null) {
@@ -91,6 +92,13 @@ public abstract class Heuristic implements Comparator<Node> {
         return combinedDistances.get(0);
     }
 
+
+    public int completeH(Node n) {
+
+
+
+        return 0;
+    }
 
     public int partialH(Node n) {
 

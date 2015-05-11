@@ -18,9 +18,9 @@ public class Main {
         Level level = LevelReader.ReadLevel(serverMessages);
 
 //        Node state = new Node(null, level.height, level.width);
-        Strategy strategy = null;//new StrategyBestFirst(new AStar(state));
+//        Strategy strategy = null;//new StrategyBestFirst(new AStar(state));
 
-        Planner planner = new MasterPlanner(strategy);
+        Planner planner = new MasterPlanner();
 //        Planner planner = new POP(strategy);    //null; //TODO: Use POP or whatever
 
         Plan plan = planner.createPlan(level);

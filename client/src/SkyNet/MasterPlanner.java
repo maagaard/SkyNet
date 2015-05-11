@@ -17,9 +17,11 @@ public class MasterPlanner implements Planner {
     private Node initialState;
     private POP partialPlanner;
     private LinkedList<PartialPlan> partialPlans = null;
+    private ArrayList<Goal> sortedGoals = new ArrayList<>();
+    private int solvedGoalCount = 0;
 
-    public MasterPlanner(Strategy strategy) {
-        this.strategy = strategy;
+    public MasterPlanner() {
+//        this.strategy = strategy;
         this.partialPlanner = new POP();
     }
 
@@ -41,37 +43,59 @@ public class MasterPlanner implements Planner {
 
         /** Goal ordering determined by partial plans */
         partialPlans = partialPlanner.createPartialPlans(level);
-        ArrayList<Goal> sortedGoals = sortGoals();
+        sortedGoals = sortGoals();
 
         updateConflictingBoxes();
 
         /** Add all goals and boxes to initial state node */
         updateInitialState();
 
+        this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(initialState));
+
         /** Create full plan */
-        for (Goal goal : sortedGoals) {
+        for (solvedGoalCount = 0; solvedGoalCount < sortedGoals.size(); solvedGoalCount++) {
+            Goal goal = sortedGoals.get(solvedGoalCount);
 
-            LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
+//        }
+//        for (Goal goal : sortedGoals) {
+//            LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
+//            //TODO: Only solve for one box if there are more - best solution should have been found above in "sortGoals()"
+//            for (Box box : level.boxes) {
+//                if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
+//                    System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
+//
+//                    LinkedList<Node> partialSolution = extractPlan(level, agent, goal, box);
+//
+//                    if (partialSolution.size() == 0) {
+//                        //TODO: Something is wrong - back-track
+//                        //TODO: Can we assume, that if frontier is empty, the problem is caused by the last solved goal???
+//
+//                        //TODO: Back-track from last node
+//                        Node node = solutionList.getLast().getLast();
+//                        node.stupidMoveHeuristics = 300;
+//
+//                    }
+//
+//                    solutionList.add(partialSolution);
+//                }
+//            }
+//
+//            LinkedList<Node> shortest = solutionList.pop();
+//            for (LinkedList<Node> solution : solutionList) {
+//                if (solution.size() < shortest.size()) {
+//                    shortest = solution;
+//                }
+//            }
+//
+//            initialState = shortest.getLast();
 
-            //TODO: Only solve for one box if there are more - best solution should have been found above in "sortGoals()"
-            for (Box box : level.boxes) {
-                if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
-                    System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-                    solutionList.add(extractPlan(level, agent, goal, box));
-                }
-            }
-
-            LinkedList<Node> shortest = solutionList.pop();
-            for (LinkedList<Node> solution : solutionList) {
-                if (solution.size() < shortest.size()) {
-                    shortest = solution;
-                }
-            }
+            initialState = goalSolvedState(null, agent, goal);
 
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
 
-            initialState = shortest.getLast();
-            goal.solveGoal(initialState.chosenBox);
+//            goal.solveGoal(initialState.chosenBox);
+            initialState.level.solveGoalWithBox(goal, initialState.chosenBox);
+
             initialState.chosenBox.x = goal.x;
             initialState.chosenBox.y = goal.y;
 
@@ -83,6 +107,50 @@ public class MasterPlanner implements Planner {
 
         return new Plan(initialState.extractPlan());
     }
+
+
+    private Node goalSolvedState(Strategy strategy, Agent agent, Goal goal) {
+        LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
+
+        //TODO: Only solve for one box if there are more - best solution should have been found above in "sortGoals()"
+        for (Box box : level.boxes) {
+            if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
+                System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
+
+                LinkedList<Node> partialSolution = extractPlan(strategy, level, agent, goal, box);
+
+                if (partialSolution == null || partialSolution.size() == 0) {
+                    //TODO: Something is wrong - back-track
+                    //TODO: Can we assume, that if frontier is empty, the problem is caused by the last solved goal???
+
+                    //TODO: Back-track from last node
+
+                    Node node = initialState.parent; //solutionList.getLast().getLast();¨
+//                    System.err.format("Last goal state: \n%s\n", node);
+
+                    node.stupidMoveHeuristics = 300;
+                    solvedGoalCount--;
+                    initialState = node;
+
+                    return goalSolvedState(this.strategy, agent, sortedGoals.get(solvedGoalCount));
+//                    return goalSolvedState(agent, sortedGoals.get(sortedGoals.indexOf(goal)-1));
+                }
+
+                solutionList.add(partialSolution);
+            }
+        }
+
+        LinkedList<Node> shortest = solutionList.pop();
+        for (LinkedList<Node> solution : solutionList) {
+            if (solution.size() < shortest.size()) {
+                shortest = solution;
+            }
+        }
+
+        return shortest.getLast();
+    }
+
+
 
     private void updateInitialState() {
         //Add all goals and boxes to initial state
@@ -147,33 +215,35 @@ public class MasterPlanner implements Planner {
         for (PartialPlan partialPlan : partialPlans) {
 
             ArrayList<Goal> goals = new ArrayList<>(level.goals);
-
             goals.remove(partialPlan.goal);
-            Set<Goal> conflictingGoals = new HashSet<>();
+
+            Set<Goal> conflictGoalBox = new HashSet<>();
+            Set<Goal> conflictGoalAgent = new HashSet<>();
 
             for (Node node : partialPlan.plan) {
-
                 for (Goal goal : goals) {
 
                     //Goal box movement conflict
                     if (node.boxes[goal.y][goal.x] != 0) {
-                        conflictingGoals.add(goal);
+                        conflictGoalBox.add(goal);
                         System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
                     }
 
                     // Goal agent conflict
-//                    if (goal.x == node.agentCol && goal.y == node.agentRow) {
-//                        conflictingGoals.add(goal);
-//                        System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
-//                    }
+                    if (goal.x == node.agentCol && goal.y == node.agentRow) {
+                        conflictGoalAgent.add(goal);
+                        System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
+                    }
                 }
             }
 
+//            conflictingGoals.size()
+
             float planSizePriority = ((float)longestPlan / (float)partialPlan.size()) * 10;
-            int goalConflictPriority = conflictingGoals.size() * 10 * level.goals.size();
+            int goalConflictPriority = (conflictGoalBox.size()) * 10 * level.goals.size();
             partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
 
-            System.err.println("Plan "+ partialPlan.goal.name +" size priority: "+ planSizePriority + " conflict size: " + conflictingGoals.size() + " total priority: " + partialPlan.goal.priority);
+            System.err.println("Plan "+ partialPlan.goal.name +" size priority: "+ planSizePriority + " conflict size: " + conflictGoalBox.size() + " total priority: " + partialPlan.goal.priority);
 
             sortedGoals.add(partialPlan.goal);
         }
@@ -206,7 +276,7 @@ public class MasterPlanner implements Planner {
     }
 
 
-    private LinkedList<Node> extractPlan(Level level, Agent agent, Goal goal, Box box) {
+    private LinkedList<Node> extractPlan(Strategy strategy, Level level, Agent agent, Goal goal, Box box) {
 
         //TODO: State should contain all walls, boxes, goals and agents - however,
         //TODO: chosen agent, goal and box should also be known
@@ -217,13 +287,14 @@ public class MasterPlanner implements Planner {
 //        initialState.agentCol = agent.x;
 //        initialState.agentRow = agent.y;
 
-
         System.err.format("State: \n%s\n", initialState);
 
-        strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(initialState));
+        if (strategy == null) {
+            this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(initialState));
+        }
 
         try {
-            LinkedList<Node> partialPlan = Search(strategy, initialState);
+            LinkedList<Node> partialPlan = Search(this.strategy, initialState);
             if (partialPlan == null) return null;
             System.err.format("Search starting with strategy %s\n", strategy);
             return partialPlan;
@@ -238,6 +309,7 @@ public class MasterPlanner implements Planner {
     public LinkedList<Node> Search(Strategy strategy, Node state) throws IOException {
         System.err.format("Search starting with strategy %s\n", strategy);
         Heuristic.AStar h = new Heuristic.AStar(initialState);
+        Node lastNode = null;
 
         strategy.addToFrontier(state);
 
@@ -256,10 +328,15 @@ public class MasterPlanner implements Planner {
             }
             if (strategy.frontierIsEmpty()) {
                 System.err.format("Frontier is empty\n");
+
+                //TODO: Back Track
+
                 return null;
+//                return lastNode.extractPlan();
             }
 
             Node leafNode = strategy.getAndRemoveLeaf();
+            lastNode = leafNode;
 
             if (leafNode.isGoalState()) {
                 System.err.format("Goal state reached\n");
@@ -267,6 +344,10 @@ public class MasterPlanner implements Planner {
             }
 
             strategy.addToExplored(leafNode);
+            if (leafNode.destroyingGoal != 0) {
+
+            }
+
             for (Node n : leafNode.getExpandedNodes()) {
                 if (!strategy.isExplored(n) && !strategy.inFrontier(n)) {
                     strategy.addToFrontier(n);

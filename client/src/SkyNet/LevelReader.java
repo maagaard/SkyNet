@@ -89,6 +89,7 @@ public class LevelReader {
         level.width = longestLine;
         level.height = levelLines;
         level.createBoxMap();
+        level.createUnsolvedMap();
 
         return level;
     }

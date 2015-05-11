@@ -27,6 +27,11 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     }
 
     public void solveGoal(Box box) {
+        if (box == null) {
+            this.solved = null;
+            System.err.println("Goal destroyed: " + name);
+            return;
+        }
         this.solved = box;
         System.err.println("Goal solved: " + name);
     }

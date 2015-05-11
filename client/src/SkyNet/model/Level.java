@@ -3,7 +3,6 @@ package SkyNet.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 public class Level {
 
@@ -14,6 +13,11 @@ public class Level {
     public ArrayList<Agent> agents;
 
     public HashMap<Integer, Box> boxMap = new HashMap<>();
+    public HashMap<Integer, Goal> goalMap = new HashMap<>();
+
+    public HashMap<Integer, Goal> solvedGoals = new HashMap<>();
+    public ArrayList<Goal> unsolvedGoals = new ArrayList<>();
+//    public HashMap<Integer, Goal> unsolvedGoals = new HashMap<>();
 
     public int width;
     public int height;
@@ -26,6 +30,13 @@ public class Level {
             boxMap.put(box.id, box);
         }
     }
+
+    public void createUnsolvedMap() {
+        for (Goal goal: goals) {
+            unsolvedGoals.add(goal);
+        }
+    }
+
 
     public boolean celIsFree(int row, int col) {
         return !(this.walls[row][col]);
@@ -43,5 +54,26 @@ public class Level {
         return boxMap.get(id);
     }
 
+    public void unsolveGoal(Goal goal) {
+        goal.solveGoal(null);
+        solvedGoals.remove(goal);
+        unsolvedGoals.add(goal);
+    }
+
+
+
+    public void solveGoalWithBox(Goal goal, Box box) {
+        System.err.println("Solving goal: " + goal.name);
+        goal.solveGoal(box);
+        solvedGoals.put(box.id, goal);
+        unsolvedGoals.remove(goal);
+    }
+
+    public Goal hasSolvedGoal(Box box) {
+        return solvedGoals.get(box);
+    }
+    public Goal hasSolvedGoal(Integer boxId) {
+        return solvedGoals.get(boxId);
+    }
 
 }
