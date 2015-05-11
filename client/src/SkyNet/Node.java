@@ -92,46 +92,13 @@ public class Node {
 
     public boolean isGoalState() {
         if (chosenGoal != null && chosenBox != null) {
-
-//            Goal goal = level.getGoal(chosenGoal.id);
-//            Box box = level.getBox(boxes[goal.y][goal.x]);
+            //Maybe use chosenBox for something?
             Box box = level.getBox(boxes[chosenGoal.y][chosenGoal.x]);
-            if (box != null && box.lowerCaseName == chosenGoal.name) {
+            if (box != null && chosenBox.id == box.id && box.lowerCaseName == chosenGoal.name) {
                 return true;
             } else {
                 return false;
             }
-
-
-//            for (int row = 1; row < MAX_ROW - 1; row++) {
-//                for (int col = 1; col < MAX_COLUMN - 1; col++) {
-//
-////                    char g = goals[row][col];
-//                    Goal goal = level.getGoal(goals[row][col]);
-//                    if (goal == null || goal.id != chosenGoal.id) {
-//                        continue;
-//                    }
-//                    Box box = level.getBox(boxes[row][col]);
-//                    if (box == null) {
-//                        continue;
-//                    }
-//
-//                    char b = Character.toLowerCase(box.name);
-//                    char chosenBoxChar = Character.toLowerCase(chosenBox.name);
-//
-//                    if (goal.name != chosenGoal.name) {
-//                        continue;
-//                    }
-//
-//                    if (b != chosenBoxChar) {
-//                        continue;
-//                    }
-//                    if (b == goal.name) { //&& //) level.unsolvedGoals.size() == 0) {
-//                        return true;
-//                    }
-//                }
-//            }
-//            return false;
 
         } else {
             for (int row = 1; row < MAX_ROW - 1; row++) {
