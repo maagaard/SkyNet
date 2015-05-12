@@ -2,20 +2,18 @@ package SkyNet.HTN;
 
 import SkyNet.Command;
 import SkyNet.Genetic.Gene;
-import SkyNet.model.Box;
-import SkyNet.model.Goal;
 import SkyNet.model.Level;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractMethod {
+public abstract class AbstractMethod extends Gene {
     final List<AbstractMethod> reduction;
     final int score;
 
-    public AbstractMethod(List<AbstractMethod> reduction){
+    public AbstractMethod(int initialScore, List<AbstractMethod> reduction){
         this.reduction = reduction;
-        this.score = this.score(reduction);
+        this.score = initialScore + this.score(reduction);
     }
     public AbstractMethod(){
         this.reduction = new LinkedList<>();
@@ -31,27 +29,7 @@ public abstract class AbstractMethod {
 
     public class SolveGoals extends AbstractMethod {
         public SolveGoals(List<AbstractMethod> reduction){
-            super(reduction);
-        }
-
-        @Override
-        public int score(List<AbstractMethod> reduction) {
-            return 0;
-        }
-
-        @Override
-        public List<AbstractMethod> Decompose(Level lvl) {
-            return null;
-        }
-    }
-
-    public class SubGoal extends AbstractMethod implements Gene {
-        private final Box box;
-        private final Goal goal;
-        public SubGoal(List<AbstractMethod> reduction, Box box, Goal goal) {
-            super(reduction);
-            this.box = box;
-            this.goal = goal;
+            super(0, reduction);
         }
 
         @Override
@@ -64,24 +42,16 @@ public abstract class AbstractMethod {
             return null;
         }
 
+        @Override
         public int distanceTo(Gene other) {
-            SubGoal otherSubGoal = (SubGoal)other;
-            return Math.abs(this.goal.x - otherSubGoal.box.x) +
-                    Math.abs(this.goal.y - otherSubGoal.box.y);
-        }
-
-        public boolean areEqual(SubGoal other) {
-            return this.box.x == other.box.x &&
-                this.box.y == other.box.y &&
-                this.goal.x == other.goal.x &&
-                this.goal.y == other.goal.y;
+            return 0;
         }
     }
 
     public class Action extends AbstractMethod {
         private final Command cmd;
         public Action(List<AbstractMethod> reduction, Command cmd) {
-            super(reduction);
+            super(0, reduction);
             this.cmd = cmd;
         }
 
@@ -93,6 +63,11 @@ public abstract class AbstractMethod {
         @Override
         public List<AbstractMethod> Decompose(Level lvl) {
             return null;
+        }
+
+        @Override
+        public int distanceTo(Gene other) {
+            return 0;
         }
     }
 }

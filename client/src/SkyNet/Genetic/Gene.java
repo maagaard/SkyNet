@@ -1,5 +1,5 @@
 package SkyNet.Genetic;
 
-public interface Gene {
-    public int distanceTo(Gene other);
+public abstract class Gene {
+    public abstract int distanceTo(Gene other);
 }
