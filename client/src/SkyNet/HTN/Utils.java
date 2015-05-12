@@ -1,8 +1,7 @@
 package SkyNet.HTN;
 
 import SkyNet.Command;
-import SkyNet.model.Level;
-import SkyNet.model.Cell;
+import SkyNet.model.*;
 
 import java.util.*;
 
@@ -46,8 +45,6 @@ public class Utils implements HTNUtils{
         List<Command> commands = new LinkedList<Command>();
         frontier.add(start);
 
-        printMap(start, goal, level);
-
         while(true) {
             if (frontier.isEmpty()) {
                 return null;
@@ -55,7 +52,7 @@ public class Utils implements HTNUtils{
 
             Cell current = frontier.poll();
             if(current.x == goal.x && current.y == goal.y) {
-                return getPath(current);
+                return getPath(current, goal, level);
             }
 
             explored.add(current);
@@ -67,17 +64,40 @@ public class Utils implements HTNUtils{
         }
     }
 
-    private List<Command> getPath(Cell c) {
+    @Override
+    public Level boxesToWalls(Level level, List<Box> boxes) {
+        Level rtnLevel = new Level();
+        boolean[][] walls = new boolean[level.walls.length][level.walls.length];
+        rtnLevel.height = level.height;
+        rtnLevel.width = level.width;
+        rtnLevel.cells = (ArrayList<Cell>) level.cells.clone();
+        rtnLevel.goals = (ArrayList<Goal>) level.goals.clone();
+        rtnLevel.boxes = new ArrayList<Box>();
+        rtnLevel.agents = (ArrayList<Agent>) level.agents.clone();
+
+        for(int i = 0; i < level.walls.length; i++) {
+            walls[i] = Arrays.copyOf(level.walls[i], level.walls[i].length);
+        }
+
+        for(Box box: level.boxes) {
+            walls[box.y][box.x] = true;
+        }
+
+        rtnLevel.walls = walls;
+        return rtnLevel;
+    }
+
+    private List<Command> getPath(Cell c, Cell goal, Level level) {
         LinkedList<Command> commands = new LinkedList<Command>();
         while(c.parent != null) {
             commands.add(new Command(c.direction));
             c = c.parent;
         }
-
+        Collections.reverse(commands);
         return commands;
     }
 
-    private void printMap(Cell start, Cell goal, Level level) {
+    public void printMap(Cell start, Cell goal, Level level) {
           for(int h = 0; h < level.height; h++) {
               for(int w = 0; w < level.width; w++) {
                   if(level.walls[h][w]) {
