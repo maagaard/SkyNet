@@ -59,44 +59,17 @@ public class MasterPlanner implements Planner {
 
         this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(currentState));
 
+        int size = 0;
+        for (Goal g : sortedGoals) {
+            size += g.optimalSolutionLength;
+        }
+//        System.err.println(size);
+//        System.exit(0);
+
+
+
         /** Create full plan */
         Node solvedState = solveGoals(agent);
-//        for (solvedGoalCount = 0; solvedGoalCount < sortedGoals.size(); solvedGoalCount++) {
-//
-//            Goal goal = sortedGoals.get(solvedGoalCount);
-//            System.err.println("Goal location: " + goal.x + "," + goal.y);
-//
-//            ArrayList<Box> matchingBoxes = level.getMatchingBoxesForGoal(goal);
-//
-//            LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
-//
-//            for (Box box : matchingBoxes) {
-//                solutionList.add(solveGoalWithBox(null, agent, goal, box));
-//            }
-//
-//            //Find the shortest of the proposed solutions
-//            LinkedList<Node> shortest = solutionList.pop();
-//            for (LinkedList<Node> solution : solutionList) {
-//                if (solution.size() < shortest.size()) {
-//                    shortest = solution;
-//                }
-//            }
-//
-//            //Take shortest solution as current state and continue
-//            currentState = shortest.getLast();
-//            lastSolvedGoalState = currentState;
-//
-//            currentState.level.solveGoalWithBox(goal, currentState.chosenBox); // goal.solveGoal(currentState.chosenBox);
-//
-//            currentState.chosenBox.x = goal.x;
-//            currentState.chosenBox.y = goal.y;
-//
-//            //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
-//            //TODO: WHOLE LEVEL NEEDS TO BE UPDATED !!!!!!
-//            updateLevel();
-//            updateConflictingBoxes();
-//
-//        }
 
         return new Plan(solvedState.extractPlan());
     }
@@ -179,60 +152,6 @@ public class MasterPlanner implements Planner {
         }
 
         return partialSolution;
-    }
-
-
-    private Node goalSolvedState(Strategy strategy, Agent agent, Goal goal) {
-        LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
-
-
-        //TODO: Maybe only solve for one box if there are more - best solution should have been found above in "sortGoals()"
-        for (Box box : level.boxes) {
-
-            if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
-                System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-
-                LinkedList<Node> partialSolution = extractPlan(strategy, level, agent, goal, box);
-
-                /** Back track from last successful node and solve goal again */
-                if (partialSolution == null || partialSolution.size() == 0) {
-                    System.err.println("Back track");
-                    //TODO: Something is wrong - back-track
-                    //TODO: Can we assume, that if frontier is empty, the problem is caused by the last solved goal???
-
-                    Node node = currentState.parent;
-//                    System.err.format("Last goal state: \n%s\n", node);
-
-                    node.stupidMoveHeuristics = 300;
-
-                    if (solvedGoalCount >= 1) {
-                        solvedGoalCount--;
-                        currentState = node;
-                        return goalSolvedState(this.strategy, agent, sortedGoals.get(solvedGoalCount));
-                    } else {
-                        // Backtracked to first goal - skip back-tracking and try another box
-                        currentState = lastSolvedGoalState;
-
-                        return goalSolvedState(this.strategy, agent, sortedGoals.get(solvedGoalCount));
-                    }
-
-                }
-
-                solutionList.add(partialSolution);
-            }
-        }
-
-
-        LinkedList<Node> shortest = solutionList.pop();
-        for (LinkedList<Node> solution : solutionList) {
-            if (solution.size() < shortest.size()) {
-                shortest = solution;
-            }
-        }
-
-        System.err.println("Solution length: " + shortest.size());
-
-        return shortest.getLast();
     }
 
 
@@ -372,8 +291,6 @@ public class MasterPlanner implements Planner {
 //        currentState.agentCol = agent.x;
 //        currentState.agentRow = agent.y;
 
-        System.err.format("State: \n%s\n", currentState);
-
         if (strategy == null) {
             this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(currentState));
         }
@@ -433,12 +350,6 @@ public class MasterPlanner implements Planner {
             }
 
             for (Node n : leafNode.getExpandedNodes()) {
-                if (backtracking) {
-                    System.err.println("####################");
-                    System.err.println(n.action);
-                    System.err.println(n);
-                }
-
                 if (!strategy.isExplored(n) && !strategy.inFrontier(n)) {
                     strategy.addToFrontier(n);
 //                    System.err.println("H: " + h.f(n));
