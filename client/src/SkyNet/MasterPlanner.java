@@ -14,7 +14,7 @@ public class MasterPlanner implements Planner {
 
     private Strategy strategy;
     private Level level;
-    private Node initialState;
+    private Node currentState;
     private POP partialPlanner;
     private LinkedList<PartialPlan> partialPlans = null;
     private ArrayList<Goal> sortedGoals = new ArrayList<>();
@@ -32,13 +32,13 @@ public class MasterPlanner implements Planner {
         //TODO: Do agent choosing in another way than this?
         Agent agent = level.agents.get(0);
 
-        initialState = new Node(null, level.height, level.width);
-        initialState.level = level;
-        initialState.walls = level.walls;
+        currentState = new Node(null, level.height, level.width);
+        currentState.level = level;
+        currentState.walls = level.walls;
 
         //TODO: Do agent choosing in another way than this?
-        initialState.agentCol = agent.x;
-        initialState.agentRow = agent.y;
+        currentState.agentCol = agent.x;
+        currentState.agentRow = agent.y;
 
 
         /** Goal ordering determined by partial plans */
@@ -50,22 +50,22 @@ public class MasterPlanner implements Planner {
         /** Add all goals and boxes to initial state node */
         updateInitialState();
 
-        this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(initialState));
+        this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(currentState));
 
         /** Create full plan */
         for (solvedGoalCount = 0; solvedGoalCount < sortedGoals.size(); solvedGoalCount++) {
             Goal goal = sortedGoals.get(solvedGoalCount);
             System.err.println("Goal location: " + goal.x + "," + goal.y);
 
-            initialState = goalSolvedState(null, agent, goal);
+            currentState = goalSolvedState(null, agent, goal);
 
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
 
-//            goal.solveGoal(initialState.chosenBox);
-            initialState.level.solveGoalWithBox(goal, initialState.chosenBox);
+//            goal.solveGoal(currentState.chosenBox);
+            currentState.level.solveGoalWithBox(goal, currentState.chosenBox);
 
-            initialState.chosenBox.x = goal.x;
-            initialState.chosenBox.y = goal.y;
+            currentState.chosenBox.x = goal.x;
+            currentState.chosenBox.y = goal.y;
 
             //TODO: WHOLE LEVEL NEEDS TO BE UPDATED !!!!!!
             updateLevel();
@@ -73,7 +73,7 @@ public class MasterPlanner implements Planner {
 
         }
 
-        return new Plan(initialState.extractPlan());
+        return new Plan(currentState.extractPlan());
     }
 
 
@@ -87,26 +87,33 @@ public class MasterPlanner implements Planner {
 
                 LinkedList<Node> partialSolution = extractPlan(strategy, level, agent, goal, box);
 
+                /** Back track from last successful node and solve goal again */
                 if (partialSolution == null || partialSolution.size() == 0) {
                     System.err.println("Back track");
                     //TODO: Something is wrong - back-track
                     //TODO: Can we assume, that if frontier is empty, the problem is caused by the last solved goal???
 
-                    //TODO: Back-track from last node
-                    Node node = initialState.parent; //solutionList.getLast().getLast();¨
+                    Node node = currentState.parent;
 //                    System.err.format("Last goal state: \n%s\n", node);
 
                     node.stupidMoveHeuristics = 300;
-                    solvedGoalCount--;
 
-                    initialState = node;
+                    if (solvedGoalCount <= 1) {
+                        solvedGoalCount--;
+                    } else {
+                        //TODO: Do something else
+
+                    }
+//                    solvedGoalCount--;
+
+                    currentState = node;
                     return goalSolvedState(this.strategy, agent, sortedGoals.get(solvedGoalCount));
-//                    return goalSolvedState(agent, sortedGoals.get(sortedGoals.indexOf(goal)-1));
                 }
 
                 solutionList.add(partialSolution);
             }
         }
+
 
         LinkedList<Node> shortest = solutionList.pop();
         for (LinkedList<Node> solution : solutionList) {
@@ -126,21 +133,21 @@ public class MasterPlanner implements Planner {
         //Add all goals and boxes to initial state
         for (int i = 0; i < level.goals.size(); i++) {
             Goal g = level.goals.get(i);
-            initialState.goals[g.y][g.x] = g.id;
+            currentState.goals[g.y][g.x] = g.id;
         }
         for (int i = 0; i < level.boxes.size(); i++) {
             Box b = level.boxes.get(i);
-//            initialState.boxes[b.y][b.x] = b.name;
-            initialState.boxes[b.y][b.x] = b.id;
+//            currentState.boxes[b.y][b.x] = b.name;
+            currentState.boxes[b.y][b.x] = b.id;
         }
     }
 
     public void updateLevel() {
 
-        for (int row = 0; row < initialState.boxes.length; row++) {
-            for (int col = 0; col < initialState.boxes[0].length; col++) {
-                if (initialState.boxes[row][col] != 0) {
-                    Box box = initialState.level.getBox(initialState.boxes[row][col]);
+        for (int row = 0; row < currentState.boxes.length; row++) {
+            for (int col = 0; col < currentState.boxes[0].length; col++) {
+                if (currentState.boxes[row][col] != 0) {
+                    Box box = currentState.level.getBox(currentState.boxes[row][col]);
                     box.x = col;
                     box.y = row;
                 }
@@ -252,20 +259,20 @@ public class MasterPlanner implements Planner {
         //TODO: State should contain all walls, boxes, goals and agents - however,
         //TODO: chosen agent, goal and box should also be known
 
-//        initialState.actingAgent = agent;
-        initialState.chosenGoal = goal;
-        initialState.chosenBox = box;
-//        initialState.agentCol = agent.x;
-//        initialState.agentRow = agent.y;
+//        currentState.actingAgent = agent;
+        currentState.chosenGoal = goal;
+        currentState.chosenBox = box;
+//        currentState.agentCol = agent.x;
+//        currentState.agentRow = agent.y;
 
-        System.err.format("State: \n%s\n", initialState);
+        System.err.format("State: \n%s\n", currentState);
 
         if (strategy == null) {
-            this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(initialState));
+            this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(currentState));
         }
 
         try {
-            LinkedList<Node> partialPlan = Search(this.strategy, initialState);
+            LinkedList<Node> partialPlan = Search(this.strategy, currentState);
             if (partialPlan == null) return null;
 //            System.err.format("Search starting with strategy %s\n", this.strategy);
             return partialPlan;
@@ -279,7 +286,7 @@ public class MasterPlanner implements Planner {
 
     public LinkedList<Node> Search(Strategy strategy, Node state) throws IOException {
         System.err.format("Search starting with strategy %s\n", strategy);
-        Heuristic.AStar h = new Heuristic.AStar(initialState);
+        Heuristic.AStar h = new Heuristic.AStar(currentState);
         Node lastNode = null;
 
         strategy.addToFrontier(state);

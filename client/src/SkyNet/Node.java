@@ -94,7 +94,7 @@ public class Node {
         if (chosenGoal != null && chosenBox != null) {
 
             Box box = level.getBox(boxes[chosenGoal.y][chosenGoal.x]);
-            if (box != null && chosenBox.id == box.id && box.lowerCaseName == chosenGoal.name) {
+            if (box != null && chosenBox.id == box.id) {// && box.lowerCaseName == chosenGoal.name) {
                 return true;
             } else {
                 return false;
@@ -199,7 +199,6 @@ public class Node {
                         }
 //                        Goal solvedGoal = level.hasSolvedGoal(n.movingBoxId);
                         if (level.hasSolvedGoal(n.movingBoxId) != null) {
-
                             n.destroyingGoal = n.movingBoxId;
                             continue;
                         }

@@ -1,6 +1,8 @@
 package SkyNet.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * client
@@ -18,7 +20,8 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     public int id = 0;
 
     public HashSet<Box> conflictingBoxes = new HashSet<>();
-//    public Box suggestedBox = null;
+//    public ArrayList<Box>
+    public Box suggestedBox = null;
     private Box solved = null;
 
     public Goal(char name, int x, int y) {

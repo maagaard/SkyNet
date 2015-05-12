@@ -27,8 +27,8 @@ public class POP {//} implements Planner {
 
             for (Box box : level.boxes) {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
-
                     System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
+
                     LinkedList<Node> solution = extractSubgoalSolution(level, agent, goal, box);
                     solutionList.add(new PartialPlan(agent, goal, box, solution));
 
@@ -46,6 +46,14 @@ public class POP {//} implements Planner {
                     shortestPlan = plan;
                 }
             }
+
+            //TODO: Set suggested box to solve goal
+            shortestPlan.goal.suggestedBox = shortestPlan.box;
+
+            //TODO: See if any goals uses the same box for shortest solution - and solve problem?
+
+
+
             partialPlans.add(shortestPlan);
         }
         return partialPlans;
