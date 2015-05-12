@@ -13,6 +13,7 @@ public class Level {
 
     public HashMap<Integer, Box> boxMap = new HashMap<>();
     public HashMap<Integer, Goal> goalMap = new HashMap<>();
+    public HashMap<Character, ArrayList<Box>> matchingBoxes = new HashMap<>();
 
     public HashMap<Integer, Goal> solvedGoals = new HashMap<>();
     public ArrayList<Goal> unsolvedGoals = new ArrayList<>();
@@ -44,6 +45,23 @@ public class Level {
         for (Goal goal: goals) {
             unsolvedGoals.add(goal);
         }
+    }
+
+    //Add box to list of matching boxes
+    public void createMatchingBoxesForGoal() {
+        for (Box box : boxes) {
+            ArrayList<Box> list = matchingBoxes.get(box.lowerCaseName);
+            if (list == null) {
+                list = new ArrayList<>();
+                matchingBoxes.put(box.lowerCaseName, list);
+            }
+            list.add(box);
+        }
+    }
+
+    // Get matching boxes for a goal
+    public ArrayList<Box> getMatchingBoxesForGoal(Goal goal) {
+        return matchingBoxes.get(goal.name);
     }
 
 

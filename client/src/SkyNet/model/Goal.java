@@ -40,7 +40,6 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
             return;
         }
         this.solved = box;
-        System.err.println("Goal solved: " + name);
     }
 
     public boolean isSolved() {

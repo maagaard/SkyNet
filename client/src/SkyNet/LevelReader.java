@@ -91,6 +91,9 @@ public class LevelReader {
         level.createBoxMap();
         level.createGoalMap();
         level.createUnsolvedList();
+        level.createMatchingBoxesForGoal();
+
+
 
         return level;
     }
