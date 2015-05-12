@@ -104,18 +104,27 @@ public class MasterPlanner implements Planner {
     private Node solveGoals(Agent agent) {
         for (solvedGoalCount = 0; solvedGoalCount < sortedGoals.size(); solvedGoalCount++) {
             Goal goal = sortedGoals.get(solvedGoalCount);
-            System.err.println("Goal location: " + goal.x + "," + goal.y);
 
             ArrayList<Box> matchingBoxes = level.getMatchingBoxesForGoal(goal);
 
             LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
 
             for (Box box : matchingBoxes) {
-                solutionList.add(solveGoalWithBox(null, agent, goal, box));
+                LinkedList<Node> solution = solveGoalWithBox(null, agent, goal, box);
+                solutionList.add(solution);
+
+                System.err.println("Found solution: " + solution.size());
+                System.err.println("Optimal solution: " + goal.optimalSolutionLength);
+
+                // Check if solution is close to the admissible result - if yes just go with it?
+//                if (solution.size() < (level.width * 5)) {
+//                    break;
+//                }
             }
+
             if (solutionList.getFirst() == null) {
                 // No solutions found - new plan
-
+                //TODO: Move to for loop ??? and FIX THIS !!!
             }
 
             //Find the shortest of the proposed solutions
@@ -158,30 +167,13 @@ public class MasterPlanner implements Planner {
             node.stupidMoveHeuristics = 300;
 
             if (solvedGoalCount >= 1) {
-//                solvedGoalCount--;
                 currentState = node;
-                recursionCount++;
-                backtracking = true;
-
-                //EXPERIMENT
-
-//                if (this.strategy.explored.size() == 12) {
-//                    int lol = strategy.countFrontier();
-//                    for (int i = 0; i < lol; i++) {
-//                        System.err.println(strategy.getAndRemoveLeaf());
-//                    }
-//                }
-                if (recursionCount >= 4) {
-                    System.exit(0);
-                }
-
+                solvedGoalCount = sortedGoals.indexOf(currentState.chosenGoal)-1;
                 return solveGoalWithBox(this.strategy, agent, currentState.chosenGoal, currentState.chosenBox);
-//                return solveGoalWithBox(this.strategy, agent, sortedGoals.get(solvedGoalCount), currentState.chosenBox);
             } else {
                 // Backtracked to first goal - skip back-tracking and try another box
                 System.err.println("########### I SHOULDN'T BE IN HERE !!!!!! I THINK ############");
                 currentState = lastSolvedGoalState;
-//                solvedGoalCount++;
 //                return solveGoalWithBox(this.strategy, agent, sortedGoals.get(solvedGoalCount), box);
             }
         }

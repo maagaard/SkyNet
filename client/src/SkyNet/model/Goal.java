@@ -22,6 +22,8 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     public HashSet<Box> conflictingBoxes = new HashSet<>();
 //    public ArrayList<Box>
     public Box suggestedBox = null;
+    public int optimalSolutionLength = 0;
+
     private Box solved = null;
 
     public Goal(char name, int x, int y) {

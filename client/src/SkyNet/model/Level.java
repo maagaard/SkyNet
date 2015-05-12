@@ -61,7 +61,24 @@ public class Level {
 
     // Get matching boxes for a goal
     public ArrayList<Box> getMatchingBoxesForGoal(Goal goal) {
-        return matchingBoxes.get(goal.name);
+        ArrayList<Box> freeBoxes = new ArrayList<>(matchingBoxes.get(goal.name));
+
+        for (Box b : matchingBoxes.get(goal.name)) {
+            if (hasSolvedGoal(b) != null) {
+                freeBoxes.remove(b);
+            }
+        }
+
+        if (freeBoxes.size() > 0) {
+            if (freeBoxes.contains(goal.suggestedBox)) {
+                Box optimalBox = freeBoxes.remove(freeBoxes.indexOf(goal.suggestedBox));
+                freeBoxes.add(0, optimalBox);
+            }
+            return freeBoxes;
+        } else {
+            return matchingBoxes.get(goal.name);
+        }
+
     }
 
 
@@ -87,14 +104,14 @@ public class Level {
 
 
     public void solveGoalWithBox(Goal goal, Box box) {
-        System.err.println("Solving goal: " + goal.name);
+        System.err.println("Solving goal: " + goal.name + " at: " + goal.x + "," + goal.y);
         goal.solveGoal(box);
         solvedGoals.put(box.id, goal);
         unsolvedGoals.remove(goal);
     }
 
     public Goal hasSolvedGoal(Box box) {
-        return solvedGoals.get(box);
+        return solvedGoals.get(box.id);
     }
     public Goal hasSolvedGoal(Integer boxId) {
         return solvedGoals.get(boxId);

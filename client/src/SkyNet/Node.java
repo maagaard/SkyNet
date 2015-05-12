@@ -169,10 +169,12 @@ public class Node {
                             n.chosenBox.x = newBoxCol;
                             n.chosenBox.y = newBoxRow;
                         }
-//                        Goal solvedGoal = level.hasSolvedGoal(n.movingBoxId);
-                        if (level.hasSolvedGoal(n.movingBoxId) != null) {
-                            n.destroyingGoal = n.movingBoxId;
-                            continue;
+                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
+                            if (level.hasSolvedGoal(n.movingBoxId) != null) {
+
+                                n.destroyingGoal = n.movingBoxId;
+                                continue;
+                            }
                         }
                         expandedNodes.add(n);
                     }
@@ -197,10 +199,12 @@ public class Node {
                             n.chosenBox.x = this.agentCol;
                             n.chosenBox.y = this.agentRow;
                         }
-//                        Goal solvedGoal = level.hasSolvedGoal(n.movingBoxId);
-                        if (level.hasSolvedGoal(n.movingBoxId) != null) {
-                            n.destroyingGoal = n.movingBoxId;
-                            continue;
+                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
+                            if (level.hasSolvedGoal(n.movingBoxId) != null) {
+
+                                n.destroyingGoal = n.movingBoxId;
+                                continue;
+                            }
                         }
 
                         expandedNodes.add(n);
