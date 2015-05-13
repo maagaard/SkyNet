@@ -79,6 +79,7 @@ public class MasterPlanner implements Planner {
             Goal goal = sortedGoals.get(solvedGoalCount);
 
             ArrayList<Box> matchingBoxes = level.getMatchingBoxesForGoal(goal);
+//            System.err.println("Matching boxes: " + matchingBoxes.size());
 
             LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
 
@@ -90,8 +91,10 @@ public class MasterPlanner implements Planner {
                 System.err.println("Optimal solution: " + goal.optimalSolutionLength);
 
                 // Check if solution is close to the admissible result - if yes just go with it?
-                if (solution.size() <= (goal.optimalSolutionLength)) {
+                if (solution.size() <= (goal.optimalSolutionLength + 10)) {
                     break;
+                } else {
+                    System.err.println("Trying next box. " + matchingBoxes.size() + " boxes left");
                 }
             }
 
@@ -127,8 +130,8 @@ public class MasterPlanner implements Planner {
 
 
     private LinkedList<Node> solveGoalWithBox(Strategy strategy, Agent agent, Goal goal, Box box) {
-        System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
-
+        System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name + " at " + box.x + "," + box.y);
+        
         LinkedList<Node> partialSolution = extractPlan(strategy, level, agent, goal, box);
 
         /** Back track from last successful node and solve goal again */
@@ -270,7 +273,7 @@ public class MasterPlanner implements Planner {
             for (Node node : partialPlan.plan) {
                 for (Box box : boxes) {
                     if (box.x == node.agentCol && box.y == node.agentRow) {
-                        System.err.println("Box: " + box.name + " interfering with plan for " + partialPlan.box.name);
+//                        System.err.println("Box: " + box.name + " interfering with plan for " + partialPlan.box.name);
                         conflictingBoxes.add(box);
                     }
                 }
