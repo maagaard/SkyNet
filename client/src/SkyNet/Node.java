@@ -26,6 +26,9 @@ public class Node {
     public Goal chosenGoal = null;
     public Box chosenBox;
     public int movingBoxId = 0;
+    public int movingBoxX, movingBoxY = 0;
+    public int chosenBoxX, chosenBoxY = 0;
+
     public Agent actingAgent;
     public Node parent;
     public Command action;
@@ -41,6 +44,8 @@ public class Node {
     public int stupidMoveHeuristics = 0;
 
     private int g;
+    private int boxMoves;
+
 
 //    public Node(Node parent) {
 //        boxes = new char[MAX_ROW][MAX_COLUMN];
@@ -69,10 +74,12 @@ public class Node {
         this.parent = parent;
         if (parent == null) {
             g = 0;
+            boxMoves = 0;
             goals = new int[rows][columns];
             walls = new boolean[rows][columns];
         } else {
             g = parent.g() + 1;
+            boxMoves = parent.boxMoves;
             level = parent.level;
             chosenBox = parent.chosenBox;
             chosenGoal = parent.chosenGoal;
@@ -84,6 +91,10 @@ public class Node {
 
     public int g() {
         return g;
+    }
+
+    public int boxMoves() {
+        return boxMoves;
     }
 
     public boolean isInitialState() {
@@ -148,6 +159,8 @@ public class Node {
                     n.agentRow = newAgentRow;
                     n.agentCol = newAgentCol;
                     expandedNodes.add(n);
+                    n.movingBoxX = this.movingBoxX;
+                    n.movingBoxY = this.movingBoxY;
                 }
 
             } else if (c.actType == type.Push) {
@@ -159,11 +172,15 @@ public class Node {
                     if (cellIsFree(newBoxRow, newBoxCol)) {
                         Node n = this.ChildNode();
                         n.action = c;
+                        n.boxMoves++;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
                         n.movingBoxId = n.boxes[newBoxRow][newBoxCol];
+                        n.movingBoxX = newBoxCol;
+                        n.movingBoxY = newBoxRow;
+
 
                         if (chosenBox != null && chosenBox.id == n.movingBoxId) {
                             n.chosenBox.x = newBoxCol;
@@ -189,11 +206,14 @@ public class Node {
                     if (boxAt(boxRow, boxCol)) {
                         Node n = this.ChildNode();
                         n.action = c;
+                        n.boxMoves++;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
                         n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
                         n.boxes[boxRow][boxCol] = 0;
                         n.movingBoxId = n.boxes[this.agentRow][this.agentCol];
+                        n.movingBoxX = this.agentCol;
+                        n.movingBoxY = this.agentRow;
 
                         if (chosenBox != null && chosenBox.id == n.movingBoxId) {
                             n.chosenBox.x = this.agentCol;
@@ -201,7 +221,6 @@ public class Node {
                         }
                         else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
                             if (level.hasSolvedGoal(n.movingBoxId) != null) {
-
                                 n.destroyingGoal = n.movingBoxId;
                                 continue;
                             }
@@ -212,7 +231,7 @@ public class Node {
                 }
             }
         }
-        Collections.shuffle(expandedNodes, rnd);
+//        Collections.shuffle(expandedNodes, rnd);
         return expandedNodes;
     }
 

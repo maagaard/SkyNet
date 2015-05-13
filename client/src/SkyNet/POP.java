@@ -44,6 +44,10 @@ public class POP {//} implements Planner {
             for (PartialPlan plan : solutionList) {
                 if (plan.plan.size() < shortestPlan.plan.size()) {
                     shortestPlan = plan;
+                } else if (plan.plan.size() == shortestPlan.plan.size()) {
+                    if (plan.plan.getLast().boxMoves() < shortestPlan.plan.getLast().boxMoves()) {
+                        shortestPlan = plan;
+                    }
                 }
             }
 

@@ -90,9 +90,9 @@ public class MasterPlanner implements Planner {
                 System.err.println("Optimal solution: " + goal.optimalSolutionLength);
 
                 // Check if solution is close to the admissible result - if yes just go with it?
-//                if (solution.size() < (level.width * 5)) {
-//                    break;
-//                }
+                if (solution.size() <= (goal.optimalSolutionLength)) {
+                    break;
+                }
             }
 
             if (solutionList.getFirst() == null) {

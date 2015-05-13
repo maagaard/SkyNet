@@ -17,7 +17,7 @@ public abstract class Heuristic implements Comparator<Node> {
 
     public int goalRow, goalColumn;
 
-    public int partialGoalY, partialGoalX, partialBoxY, partialBoxX;
+    public int goalY, goalX, initialBoxY, initialBoxX;
 
 
     public Map<Character, int[]> goalMap = new HashMap<Character, int[]>();
@@ -52,8 +52,8 @@ public abstract class Heuristic implements Comparator<Node> {
 //                    goalRow = i;
 //                    goalColumn = j;
 
-                    partialGoalY = i;
-                    partialGoalX = j;
+                    goalY = i;
+                    goalX = j;
                 }
             }
         }
@@ -61,8 +61,8 @@ public abstract class Heuristic implements Comparator<Node> {
             for (int j = 0; j < initialState.boxes[i].length; j++) {
                 if (initialState.boxes[i][j] != 0) {
 //                    boxMap.put(Character.toLowerCase(initialState.level.getBox(initialState.boxes[i][j]).name), new int[]{i, j});
-                    partialBoxY = i;
-                    partialBoxX = j;
+                    initialBoxY = i;
+                    initialBoxX = j;
                 }
             }
         }
@@ -94,21 +94,33 @@ public abstract class Heuristic implements Comparator<Node> {
     }
 
 
-    public int completeH(Node n) {
+    public int fullH(Node n) {
 
 
 
         return 0;
     }
 
+
     public int partialH(Node n) {
 
-        int agentBoxDist = (Math.abs(partialBoxY - n.agentRow) + (Math.abs(partialBoxX - n.agentCol)));
-        int boxGoalDist = (Math.abs(partialGoalY - partialBoxY) + (Math.abs(partialGoalX - partialBoxX)));
-        int agentGoalDist = (Math.abs(partialGoalY - n.agentRow) + (Math.abs(partialGoalX - n.agentCol)));
-
-        return agentBoxDist + boxGoalDist + agentGoalDist;
+        if (n.action.actType == Command.type.Move) {
+            // return distance to box and distance from box to goal
+            if (n.boxes[initialBoxY][initialBoxX] > 0) {
+                int agentBoxDist = (Math.abs(initialBoxY - n.agentRow) + (Math.abs(initialBoxX - n.agentCol)));
+                int boxGoalDist = (Math.abs(goalY - initialBoxY) + (Math.abs(goalX - initialBoxX)));
+                return boxGoalDist + agentBoxDist + 5;
+            } else {
+                int agentBoxDist = (Math.abs(n.movingBoxY - n.agentRow) + (Math.abs(n.movingBoxX - n.agentCol)));
+                int boxGoalDist = (Math.abs(goalY - n.movingBoxY) + (Math.abs(goalX - n.movingBoxX)));
+                return boxGoalDist + agentBoxDist + 5;
+            }
+        } else { //if (n.action.actType == Command.type.Push) {
+            //Return distance from box to goal
+            return (Math.abs(goalY - n.movingBoxY) + (Math.abs(goalX - n.movingBoxX)));
+        }
     }
+
 
     public int solvedGoalDistance(Node n) {
         int solvedGoalDistance = 0;
@@ -130,29 +142,56 @@ public abstract class Heuristic implements Comparator<Node> {
 
         if (n.chosenGoal != null && n.chosenBox != null) {
 
-            int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
-            int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
-            int agentGoalDist = (Math.abs(n.chosenGoal.y - n.agentRow) + (Math.abs(n.chosenGoal.x - n.agentCol)));
+            if (n.action.actType == Command.type.Move) {
+                // return distance to box and distance from box to goal
+                int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
+                int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
 
-            int randomBoxMoveDisadvantage = 0;
+                return boxGoalDist + agentBoxDist + 5;
 
-            if (n.chosenGoal.conflictingBoxes.size() == 0 && n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
-                randomBoxMoveDisadvantage = 100;
-            } else if (n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
-
-                for (Box box : n.chosenGoal.conflictingBoxes) {
-                    if (n.movingBoxId == box.id) {
-                        randomBoxMoveDisadvantage = 0;
-                        break;
-                    }
-                    randomBoxMoveDisadvantage = 100;
+            } else {
+                if (n.movingBoxId != n.chosenBox.id) {
+                    int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
+                    int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
+                    return boxGoalDist + agentBoxDist + 3;
                 }
 
+                //TODO: Discourage moving irrelevant boxes
+
+
+                //TODO: Courage moving of correct box towards goal
+
+
+                //TODO: Correlate with setting of chosen box in Node
+
+
+                return (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
             }
 
-            return agentBoxDist + boxGoalDist + agentGoalDist + solvedGoalDistance(n) + randomBoxMoveDisadvantage;
+
+//            int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
+//            int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
+//            int agentGoalDist = (Math.abs(n.chosenGoal.y - n.agentRow) + (Math.abs(n.chosenGoal.x - n.agentCol)));
+//
+//            int randomBoxMoveDisadvantage = 0;
+//
+//            if (n.chosenGoal.conflictingBoxes.size() == 0 && n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
+//                randomBoxMoveDisadvantage = 100;
+//            } else if (n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
+//
+//                for (Box box : n.chosenGoal.conflictingBoxes) {
+//                    if (n.movingBoxId == box.id) {
+//                        randomBoxMoveDisadvantage = 0;
+//                        break;
+//                    }
+//                    randomBoxMoveDisadvantage = 100;
+//                }
+//
+//            }
+//            return agentBoxDist + boxGoalDist + agentGoalDist + solvedGoalDistance(n) + randomBoxMoveDisadvantage;
+
+
         } else {
-//            return h2(n);
             return partialH(n);
         }
     }
