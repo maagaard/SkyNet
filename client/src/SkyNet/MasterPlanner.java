@@ -245,9 +245,7 @@ public class MasterPlanner implements Planner {
                 }
             }
 
-//            conflictingGoals.size()
-
-            float planSizePriority = ((float) longestPlan / (float) partialPlan.size()) * 10;
+            float planSizePriority = (((float) longestPlan / (float) partialPlan.size()) * 10) / (level.goals.size());
             int goalConflictPriority = (conflictGoalBox.size()) * 10 * level.goals.size();
             partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
 
