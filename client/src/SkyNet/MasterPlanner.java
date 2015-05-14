@@ -86,17 +86,19 @@ public class MasterPlanner implements Planner {
             for (Box box : matchingBoxes) {
                 LinkedList<Node> solution = solveGoalWithBox(null, agent, goal, box);
                 solutionList.add(solution);
+                int subSolutionLength = solution.size() - currentState.g();
 
-                System.err.println("Found solution: " + solution.size());
+                System.err.println("Found solution: " + subSolutionLength);
                 System.err.println("Optimal solution: " + goal.optimalSolutionLength);
 
                 // Check if solution is close to the admissible result - if yes just go with it?
-                if (solution.size() <= (goal.optimalSolutionLength + 10)) {
+                if (subSolutionLength <= (goal.optimalSolutionLength + 5)) {
                     break;
                 } else {
                     System.err.println("Trying next box. " + matchingBoxes.size() + " boxes left");
                 }
             }
+            
 
             if (solutionList.getFirst() == null) {
                 // No solutions found - new plan
@@ -130,8 +132,9 @@ public class MasterPlanner implements Planner {
 
 
     private LinkedList<Node> solveGoalWithBox(Strategy strategy, Agent agent, Goal goal, Box box) {
+        System.err.println("___________________________________");
         System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name + " at " + box.x + "," + box.y);
-        
+
         LinkedList<Node> partialSolution = extractPlan(strategy, level, agent, goal, box);
 
         /** Back track from last successful node and solve goal again */
