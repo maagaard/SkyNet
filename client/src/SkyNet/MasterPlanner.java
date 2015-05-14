@@ -2,7 +2,9 @@ package SkyNet;
 
 import SkyNet.model.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -27,9 +29,12 @@ public class MasterPlanner implements Planner {
     public boolean backtracking = false;
     public int recursionCount = 0;
 
-    public MasterPlanner() {
+    private BufferedReader serverMessages;
+
+    public MasterPlanner(BufferedReader serverMessages) {
 //        this.strategy = strategy;
         this.partialPlanner = new POP();
+        this.serverMessages = serverMessages;
     }
 
     @Override
@@ -68,12 +73,6 @@ public class MasterPlanner implements Planner {
 
 
         /** Create full plan */
-        Node solvedState = solveGoals(agent);
-
-        return new Plan(solvedState.extractPlan());
-    }
-
-    private Node solveGoals(Agent agent) {
         for (solvedGoalCount = 0; solvedGoalCount < sortedGoals.size(); solvedGoalCount++) {
             Goal goal = sortedGoals.get(solvedGoalCount);
 
@@ -96,7 +95,7 @@ public class MasterPlanner implements Planner {
                     System.err.println("Trying next box. " + matchingBoxes.size() + " boxes left");
                 }
             }
-            
+
 
             if (solutionList.getFirst() == null) {
                 // No solutions found - new plan
@@ -116,16 +115,28 @@ public class MasterPlanner implements Planner {
             lastSolvedGoalState = currentState;
 
             currentState.level.solveGoalWithBox(goal, currentState.chosenBox); // goal.solveGoal(currentState.chosenBox);
-
             currentState.chosenBox.x = goal.x;
             currentState.chosenBox.y = goal.y;
 
+
+            //TODO: Goal solved. Execute
+//            try {
+//                LevelWriter.ExecutePlan(new Plan(currentState.extractPlan()), serverMessages);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+
+
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
             //TODO: WHOLE LEVEL NEEDS TO BE UPDATED !!!!!!
+
             updateLevel();
-            updateConflictingBoxes();
+//            updateConflictingBoxes();
+
         }
-        return currentState;
+
+        return new Plan(currentState.extractPlan());
     }
 
 
@@ -172,7 +183,23 @@ public class MasterPlanner implements Planner {
         }
     }
 
-    public void updateLevel() {
+    private void updateLevel() {
+//        currentState.parent = null;
+//        currentState
+        for (int row = 0; row < currentState.boxes.length; row++) {
+            for (int col = 0; col < currentState.boxes[0].length; col++) {
+                if (currentState.boxes[row][col] != 0) {
+                    Box box = currentState.level.getBox(currentState.boxes[row][col]);
+                    box.x = col;
+                    box.y = row;
+                }
+            }
+        }
+    }
+
+    private Node updateCurrentState() {
+        Node newState = new Node(null, level.height, level.width);
+        newState.level = level;
 
         for (int row = 0; row < currentState.boxes.length; row++) {
             for (int col = 0; col < currentState.boxes[0].length; col++) {
@@ -183,6 +210,9 @@ public class MasterPlanner implements Planner {
                 }
             }
         }
+//        currentState.level
+
+        return newState;
     }
 
     private void updateGoalSorting() {
@@ -245,8 +275,8 @@ public class MasterPlanner implements Planner {
                 }
             }
 
-            float planSizePriority = (((float) longestPlan / (float) partialPlan.size()) * 10) / (level.goals.size());
-            int goalConflictPriority = (conflictGoalBox.size()) * 10 * level.goals.size();
+            float planSizePriority = (((float) longestPlan / (float) partialPlan.size()) * 10) / (level.goals.size()) * 10;
+            int goalConflictPriority = (conflictGoalBox.size()) * 100 * level.goals.size();
             partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
 
             System.err.println("Plan " + partialPlan.goal.name + " size priority: " + planSizePriority + " conflict size: " + conflictGoalBox.size() + " total priority: " + partialPlan.goal.priority);
@@ -257,6 +287,46 @@ public class MasterPlanner implements Planner {
         Collections.sort(sortedGoals);
         return sortedGoals;
     }
+
+
+    public void shit(LinkedList<PartialPlan> partialPlans) {
+
+        for (PartialPlan partialPlan : partialPlans) {
+            ArrayList<Goal> goals = new ArrayList<>(level.goals);
+            goals.remove(partialPlan.goal);
+
+            for (Node node : partialPlan.plan) {
+
+//                int x = node.agentCol;
+//                int y = node.agentRow;
+
+
+                for (Goal goal : goals) {
+                    int x = goal.x;
+                    int y = goal.y;
+
+                    if (node.boxes[y][x] != 0) {
+                        // Horizontal issue
+                        if (node.walls[y-1][x] && node.walls[y+1][x] && (node.action.dir1 == Command.dir.E || node.action.dir1 == Command.dir.W)) {
+
+                        }
+                        else if (node.walls[y][x+1] && node.walls[y][x+1] && (node.action.dir1 == Command.dir.S || node.action.dir1 == Command.dir.N)) {
+
+                        }
+
+
+
+                    }
+
+                }
+
+            }
+
+
+        }
+
+    }
+
 
     private void updateConflictingBoxes() {
         for (PartialPlan partialPlan : partialPlans) {

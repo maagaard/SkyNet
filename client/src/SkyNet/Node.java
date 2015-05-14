@@ -32,6 +32,7 @@ public class Node {
     public Agent actingAgent;
     public Node parent;
     public Command action;
+    public boolean isExecuted = false;
 
     private static Random rnd = new Random(1);
     public static int MAX_ROW = 50;     //Default setting
@@ -136,8 +137,9 @@ public class Node {
     public LinkedList<Node> extractPlan() {
         LinkedList<Node> plan = new LinkedList<Node>();
         Node n = this;
-        while (!n.isInitialState()) {
+        while (!n.isInitialState()) {//&& !n.isExecuted) {
             plan.addFirst(n);
+            n.isExecuted = true;
             n = n.parent;
         }
         return plan;

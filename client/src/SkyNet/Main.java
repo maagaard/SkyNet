@@ -20,7 +20,7 @@ public class Main {
 //        Node state = new Node(null, level.height, level.width);
 //        Strategy strategy = null;//new StrategyBestFirst(new AStar(state));
 
-        Planner planner = new MasterPlanner();
+        Planner planner = new MasterPlanner(serverMessages);
 //        Planner planner = new POP(strategy);    //null; //TODO: Use POP or whatever
 
         Plan plan = planner.createPlan(level);
@@ -31,6 +31,7 @@ public class Main {
             System.err.println("Unable to solve level");
         } else {
             System.err.println("Found solution of length " + plan.GetPlan().size());
+
             LevelWriter.ExecutePlan(plan, serverMessages);
         }
 

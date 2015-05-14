@@ -170,22 +170,12 @@ public abstract class Heuristic implements Comparator<Node> {
 
                 //TODO: Discourage moving irrelevant boxes
 
-
                 //TODO: Courage moving of correct box towards goal
 
-
                 //TODO: Correlate with setting of chosen box in Node
-
 //                return (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
             }
 
-
-//            int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
-//            int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
-//            int agentGoalDist = (Math.abs(n.chosenGoal.y - n.agentRow) + (Math.abs(n.chosenGoal.x - n.agentCol)));
-//
-//            int randomBoxMoveDisadvantage = 0;
-//
 //            if (n.chosenGoal.conflictingBoxes.size() == 0 && n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
 //                randomBoxMoveDisadvantage = 100;
 //            } else if (n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
@@ -197,11 +187,8 @@ public abstract class Heuristic implements Comparator<Node> {
 //                    }
 //                    randomBoxMoveDisadvantage = 100;
 //                }
-//
 //            }
 //            return agentBoxDist + boxGoalDist + agentGoalDist + solvedGoalDistance(n) + randomBoxMoveDisadvantage;
-
-
         } else {
             return partialH(n);
         }
