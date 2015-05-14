@@ -59,13 +59,12 @@ public class MasterPlanner implements Planner {
 
         this.strategy = new Strategy.StrategyBestFirst(new Heuristic.AStar(currentState));
 
-        int size = 0;
-        for (Goal g : sortedGoals) {
-            size += g.optimalSolutionLength;
-        }
+//        int size = 0;
+//        for (Goal g : sortedGoals) {
+//            size += g.optimalSolutionLength;
+//        }
 //        System.err.println(size);
 //        System.exit(0);
-
 
 
         /** Create full plan */
@@ -91,7 +90,7 @@ public class MasterPlanner implements Planner {
                 System.err.println("Optimal solution: " + goal.optimalSolutionLength);
 
                 // Check if solution is close to the admissible result - if yes just go with it?
-                if (subSolutionLength <= (goal.optimalSolutionLength + 5)) {
+                if (subSolutionLength <= (goal.optimalSolutionLength + 20)) {
                     break;
                 } else {
                     System.err.println("Trying next box. " + matchingBoxes.size() + " boxes left");
@@ -293,6 +292,7 @@ public class MasterPlanner implements Planner {
 //        currentState.actingAgent = agent;
         currentState.chosenGoal = goal;
         currentState.chosenBox = box;
+        System.err.println("Goal: " + goal.x + "," + goal.y + " box: " + box.x + "," + box.y);
 //        currentState.agentCol = agent.x;
 //        currentState.agentRow = agent.y;
 

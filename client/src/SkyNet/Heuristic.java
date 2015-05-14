@@ -107,17 +107,17 @@ public abstract class Heuristic implements Comparator<Node> {
         if (n.action.actType == Command.type.Move) {
             // return distance to box and distance from box to goal
             if (n.boxes[initialBoxY][initialBoxX] > 0) {
-                int agentBoxDist = (Math.abs(initialBoxY - n.agentRow) + (Math.abs(initialBoxX - n.agentCol)));
-                int boxGoalDist = (Math.abs(goalY - initialBoxY) + (Math.abs(goalX - initialBoxX)));
+                int agentBoxDist = Math.abs(initialBoxY - n.agentRow) + Math.abs(initialBoxX - n.agentCol);
+                int boxGoalDist = Math.abs(goalY - initialBoxY) + Math.abs(goalX - initialBoxX);
                 return boxGoalDist + agentBoxDist + 5;
             } else {
-                int agentBoxDist = (Math.abs(n.movingBoxY - n.agentRow) + (Math.abs(n.movingBoxX - n.agentCol)));
-                int boxGoalDist = (Math.abs(goalY - n.movingBoxY) + (Math.abs(goalX - n.movingBoxX)));
+                int agentBoxDist = Math.abs(n.movingBoxY - n.agentRow) + Math.abs(n.movingBoxX - n.agentCol);
+                int boxGoalDist = Math.abs(goalY - n.movingBoxY) + Math.abs(goalX - n.movingBoxX);
                 return boxGoalDist + agentBoxDist + 5;
             }
         } else { //if (n.action.actType == Command.type.Push) {
             //Return distance from box to goal
-            return (Math.abs(goalY - n.movingBoxY) + (Math.abs(goalX - n.movingBoxX)));
+            return Math.abs(goalY - n.movingBoxY) + Math.abs(goalX - n.movingBoxX);
         }
     }
 
@@ -144,16 +144,28 @@ public abstract class Heuristic implements Comparator<Node> {
 
             if (n.action.actType == Command.type.Move) {
                 // return distance to box and distance from box to goal
-                int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
-                int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
+                int agentBoxDist = Math.abs(n.chosenBox.y - n.agentRow) + Math.abs(n.chosenBox.x - n.agentCol);
+                int boxGoalDist = Math.abs(n.chosenGoal.y - n.chosenBox.y) + Math.abs(n.chosenGoal.x - n.chosenBox.x);
 
-                return boxGoalDist + agentBoxDist + 5;
+                return boxGoalDist + agentBoxDist + 7;
 
             } else {
+                //When pushing and pulling
                 if (n.movingBoxId != n.chosenBox.id) {
-                    int agentBoxDist = (Math.abs(n.chosenBox.y - n.agentRow) + (Math.abs(n.chosenBox.x - n.agentCol)));
-                    int boxGoalDist = (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
-                    return boxGoalDist + agentBoxDist + 3;
+                    int agentBoxDist = Math.abs(n.chosenBox.y - n.agentRow) + Math.abs(n.chosenBox.x - n.agentCol);
+                    int boxGoalDist = Math.abs(n.chosenGoal.y - n.chosenBox.y) + Math.abs(n.chosenGoal.x - n.chosenBox.x);
+//                    int extra = 3;
+//                    if (n.destroyingGoal > 0) { extra += 50; }
+                    return boxGoalDist + agentBoxDist + 5 + n.destroyingGoal;
+                } else {
+
+                    if (n.action.actType == Command.type.Push) {
+
+                    }
+
+                    int agentBoxDist = Math.abs(n.movingBoxY - n.agentRow) + Math.abs(n.movingBoxX - n.agentCol); //Always 1
+                    int boxGoalDist = Math.abs(n.chosenGoal.y - n.movingBoxY) + Math.abs(n.chosenGoal.x - n.movingBoxX);
+                    return boxGoalDist + agentBoxDist;
                 }
 
                 //TODO: Discourage moving irrelevant boxes
@@ -164,8 +176,7 @@ public abstract class Heuristic implements Comparator<Node> {
 
                 //TODO: Correlate with setting of chosen box in Node
 
-
-                return (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
+//                return (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
             }
 
 

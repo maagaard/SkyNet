@@ -45,18 +45,19 @@ public class POP {//} implements Planner {
 
             for (PartialPlan plan : solutionList) {
 
-                int prioritizedSize = plan.size();
+//                int prioritizedSize = plan.size();
+                plan.priority = plan.size();
 
                 if (plan.size() < shortestPlan.size()) {
                     shortestPlan = plan;
                 } else if (plan.size() == shortestPlan.size()) {
                     if (plan.lastNode().boxMoves() < shortestPlan.lastNode().boxMoves()) {
+                        plan.priority = shortestPlan.priority-1;
                         shortestPlan = plan;
-                        prioritizedSize--;
                     }
                 }
 
-                goal.addSolutionBox(plan.box, prioritizedSize);
+                goal.addSolutionBox(plan.box, plan.priority);
             }
 
             goal.suggestedBox = shortestPlan.box;

@@ -177,19 +177,19 @@ public class Node {
                         n.agentCol = newAgentCol;
                         n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
                         n.boxes[newAgentRow][newAgentCol] = 0;
+
                         n.movingBoxId = n.boxes[newBoxRow][newBoxCol];
-                        n.movingBoxX = newBoxCol;
                         n.movingBoxY = newBoxRow;
+                        n.movingBoxX = newBoxCol;
 
 
-                        if (chosenBox != null && chosenBox.id == n.movingBoxId) {
+                        if (n.chosenBox != null && n.chosenBox.id == n.movingBoxId) {
                             n.chosenBox.x = newBoxCol;
                             n.chosenBox.y = newBoxRow;
                         }
-                        else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
+                        else if (n.chosenBox != null && n.chosenBox.id != n.movingBoxId ) {
                             if (level.hasSolvedGoal(n.movingBoxId) != null) {
-
-                                n.destroyingGoal = n.movingBoxId;
+                                n.destroyingGoal = 1000;//n.movingBoxId;
                                 continue;
                             }
                         }
@@ -211,9 +211,10 @@ public class Node {
                         n.agentCol = newAgentCol;
                         n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
                         n.boxes[boxRow][boxCol] = 0;
+
                         n.movingBoxId = n.boxes[this.agentRow][this.agentCol];
-                        n.movingBoxX = this.agentCol;
                         n.movingBoxY = this.agentRow;
+                        n.movingBoxX = this.agentCol;
 
                         if (chosenBox != null && chosenBox.id == n.movingBoxId) {
                             n.chosenBox.x = this.agentCol;
@@ -221,7 +222,7 @@ public class Node {
                         }
                         else if (chosenBox != null && chosenBox.id != n.movingBoxId ) {
                             if (level.hasSolvedGoal(n.movingBoxId) != null) {
-                                n.destroyingGoal = n.movingBoxId;
+                                n.destroyingGoal = 1000;//n.movingBoxId;
                                 continue;
                             }
                         }
