@@ -1,8 +1,6 @@
 package SkyNet.model;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * client
@@ -20,8 +18,10 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     public int id = 0;
 
     public HashSet<Box> conflictingBoxes = new HashSet<>();
-//    public ArrayList<Box>
-    public Box suggestedBox = null;
+    public ArrayList<ProposedSolution> suggestedBoxOrder = new ArrayList<>();
+
+    public Box suggestedBox;
+    public PriorityQueue<Box> boxQueue;
     public int optimalSolutionLength = 0;
 
     private Box solved = null;
@@ -50,6 +50,24 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
 
     public Box getBox() {
         return solved;
+    }
+
+
+    //Priority queue with boxes for solving goal
+    public void addSolutionBox(Box box, int length) {
+
+        suggestedBoxOrder.add(new ProposedSolution(box, length));
+
+//        suggestedBoxOrder.add(box);
+//        if (boxQueue == null) {
+//            boxQueue = null;
+//        }
+//
+    }
+
+    public ArrayList<ProposedSolution> getProposedSolutions() {
+        Collections.sort(suggestedBoxOrder);
+        return suggestedBoxOrder;
     }
 
 
@@ -96,4 +114,21 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     }
 
 
+}
+
+
+class ProposedSolution implements Comparable<ProposedSolution> {
+
+    Box box;
+    int length;
+
+    ProposedSolution(Box box, int length) {
+        this.box = box;
+        this.length = length;
+    }
+
+    @Override
+    public int compareTo(ProposedSolution solution) {
+        return this.length - solution.length;
+    }
 }

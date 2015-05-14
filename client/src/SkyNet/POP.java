@@ -41,23 +41,29 @@ public class POP {//} implements Planner {
             }
 
             PartialPlan shortestPlan = solutionList.pop();
+            goal.addSolutionBox(shortestPlan.box, shortestPlan.size());
+
             for (PartialPlan plan : solutionList) {
-                if (plan.plan.size() < shortestPlan.plan.size()) {
+
+                int prioritizedSize = plan.size();
+
+                if (plan.size() < shortestPlan.size()) {
                     shortestPlan = plan;
-                } else if (plan.plan.size() == shortestPlan.plan.size()) {
-                    if (plan.plan.getLast().boxMoves() < shortestPlan.plan.getLast().boxMoves()) {
+                } else if (plan.size() == shortestPlan.size()) {
+                    if (plan.lastNode().boxMoves() < shortestPlan.lastNode().boxMoves()) {
                         shortestPlan = plan;
+                        prioritizedSize--;
                     }
                 }
+
+                goal.addSolutionBox(plan.box, prioritizedSize);
             }
 
-            //TODO: Set suggested box to solve goal
-            shortestPlan.goal.suggestedBox = shortestPlan.box;
-            shortestPlan.goal.optimalSolutionLength = shortestPlan.size();
+            goal.suggestedBox = shortestPlan.box;
+            goal.optimalSolutionLength = shortestPlan.size();
+
 
             //TODO: See if any goals uses the same box for shortest solution - and solve problem?
-
-
 
             partialPlans.add(shortestPlan);
         }

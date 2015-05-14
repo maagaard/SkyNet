@@ -79,7 +79,6 @@ public class MasterPlanner implements Planner {
             Goal goal = sortedGoals.get(solvedGoalCount);
 
             ArrayList<Box> matchingBoxes = level.getMatchingBoxesForGoal(goal);
-//            System.err.println("Matching boxes: " + matchingBoxes.size());
 
             LinkedList<LinkedList<Node>> solutionList = new LinkedList<>();
 

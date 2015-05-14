@@ -30,6 +30,9 @@ public class PartialPlan {
     public int size() {
         return plan.size();
     }
-    
+
+    public Node lastNode() {
+        return plan.getLast();
+    }
 
 }

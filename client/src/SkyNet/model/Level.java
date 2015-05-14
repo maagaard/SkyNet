@@ -61,19 +61,29 @@ public class Level {
 
     // Get matching boxes for a goal
     public ArrayList<Box> getMatchingBoxesForGoal(Goal goal) {
-        ArrayList<Box> freeBoxes = new ArrayList<>(matchingBoxes.get(goal.name));
+//        ArrayList<Box> freeBoxes = new ArrayList<>(matchingBoxes.get(goal.name));
+//        for (Box b : matchingBoxes.get(goal.name)) {
+//            if (hasSolvedGoal(b) != null) {
+//                freeBoxes.remove(b);
+//            }
+//        }
 
-        for (Box b : matchingBoxes.get(goal.name)) {
-            if (hasSolvedGoal(b) != null) {
-                freeBoxes.remove(b);
+
+        ArrayList<Box> freeBoxes = new ArrayList<>();
+        ArrayList<ProposedSolution> proposedSolutions = goal.getProposedSolutions();
+
+        for (ProposedSolution solution : proposedSolutions) {
+            if (hasSolvedGoal(solution.box) == null) {
+                freeBoxes.add(solution.box);
             }
         }
 
+
         if (freeBoxes.size() > 0) {
-            if (freeBoxes.contains(goal.suggestedBox)) {
-                Box optimalBox = freeBoxes.remove(freeBoxes.indexOf(goal.suggestedBox));
-                freeBoxes.add(0, optimalBox);
-            }
+//            if (freeBoxes.contains(goal.suggestedBox)) {
+//                Box optimalBox = freeBoxes.remove(freeBoxes.indexOf(goal.suggestedBox));
+//                freeBoxes.add(0, optimalBox);
+//            }
             return freeBoxes;
         } else {
             return matchingBoxes.get(goal.name);
