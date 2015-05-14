@@ -13,11 +13,13 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     public char name;
     public int x;
     public int y;
-    public int priority = 0;
+    public int conflictPriority = 0;
+    public int sizePriority = 0;
     static int enumChar = 0;
     public int id = 0;
 
     public HashSet<Box> conflictingBoxes = new HashSet<>();
+    public HashSet<Goal> conflictingPlans = new HashSet<>();
     public ArrayList<ProposedSolution> suggestedBoxOrder = new ArrayList<>();
 
     public Box suggestedBox;
@@ -94,7 +96,12 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
 
     @Override
     public int compareTo(Goal g) {
-        return g.priority-this.priority;
+        if (this.conflictingPlans.contains(g)) {
+            //Mutual conflict
+            return this.conflictPriority - g.conflictPriority;
+        } else {
+            return this.sizePriority - g.sizePriority;
+        }
     }
 
 

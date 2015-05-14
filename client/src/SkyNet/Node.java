@@ -48,23 +48,6 @@ public class Node {
     private int boxMoves;
 
 
-//    public Node(Node parent) {
-//        boxes = new char[MAX_ROW][MAX_COLUMN];
-//
-//        this.parent = parent;
-//        if (parent == null) {
-//            g = 0;
-//            goals = new char[MAX_ROW][MAX_COLUMN];
-//            ;
-//            walls = new boolean[MAX_ROW][MAX_COLUMN];
-//            ;
-//        } else {
-//            g = parent.g() + 1;
-//            walls = parent.walls;
-//            goals = parent.goals;
-//        }
-//    }
-
     public Node(Node parent, int rows, int columns) {
 
         MAX_ROW = rows;
@@ -137,9 +120,8 @@ public class Node {
     public LinkedList<Node> extractPlan() {
         LinkedList<Node> plan = new LinkedList<Node>();
         Node n = this;
-        while (!n.isInitialState()) {//&& !n.isExecuted) {
+        while (!n.isInitialState() && !n.isExecuted) {
             plan.addFirst(n);
-            n.isExecuted = true;
             n = n.parent;
         }
         return plan;

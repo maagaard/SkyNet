@@ -22,7 +22,7 @@ public class POP {//} implements Planner {
         //TODO: Update to handle multiple agents
         Agent agent = level.agents.get(0);
 
-        for (Goal goal : level.goals) {
+        for (Goal goal : level.unsolvedGoals) {//.goals) {
             LinkedList<PartialPlan> solutionList = new LinkedList<>();
 
             for (Box box : level.boxes) {
