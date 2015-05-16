@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface HTNUtils {
     public List<Command> findAgentMovePath(Cell start, Cell goal, Level level);
+    public Node accomplishLevel(Level initial, Level end);
     public Level boxesToWalls(Level level, List<Box> boxes);
 }
