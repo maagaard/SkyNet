@@ -66,31 +66,6 @@ public class Utils implements HTNUtils {
         }
     }
 
-    public static class FromTo {
-        private final Cell a;
-        private final Cell b;
-
-        public FromTo(Cell a, Cell b){
-            this.a = a;
-            this.b = b;
-        }
-
-        @Override
-        public int hashCode(){
-            int hash = 71;
-            hash = hash*17 + this.a.x;
-            hash = hash*17 + this.a.y;
-            hash = hash*17 + this.b.x;
-            hash = hash*17 + this.b.y;
-            return hash;
-        }
-
-        @Override
-        public String toString(){
-            return this.a.x + "," + this.a.y + " -> " + this.b.x + "," + this.b.y;
-        }
-    }
-
     private boolean goalAchieved(List<Box> boxes, Goal g){
         return boxes.stream().anyMatch(b ->
                 (int) g.name - 32 == (int) b.name &&
@@ -104,51 +79,45 @@ public class Utils implements HTNUtils {
             this.goal = goal;
         }
 
-        private int h(Level lvl) {
-            int heuristic_sum = 0;
-            for(Agent a : lvl.agents){
+        private int h(Level lvl, Agent a) {
+            List<Integer> dists = new LinkedList<>();
+            LinkedList<Integer> agentToBoxesDists = new LinkedList<>();
 
-                List<Integer> dists = new LinkedList<>();
-                LinkedList<Integer> agentToBoxesDists = new LinkedList<>();
+            for(Goal g : lvl.goals){
+                //skipping completed goals
+                if(goalAchieved(lvl.boxes, g))
+                    continue;
 
-                for(Goal g : lvl.goals){
-                    //skipping completed goals
-                    if(goalAchieved(lvl.boxes, g))
-                        continue;
+                List<Box> boxes = lvl.boxes.stream().filter(b -> (int) g.name - 32 == (int) b.name).collect(Collectors.toList());
 
-                    List<Box> boxes = lvl.boxes.stream().filter(b -> (int) g.name - 32 == (int) b.name).collect(Collectors.toList());
+                int closestBoxToGoal = 0;
+                LinkedList<Integer> boxesDists = new LinkedList<>();
+                Box closestBoxToAgent = boxes.get(0);
 
-                    int closestBoxToGoal = 0;
-                    LinkedList<Integer> boxesDists = new LinkedList<>();
-                    Box closestBoxToAgent = boxes.get(0);
+                for(Box box : boxes){
+                    int distToGoal = manhatten_dist(box.x, box.y, g.x, g.y);
+                    boxesDists.add(distToGoal);
 
-                    for(Box box : boxes){
-                        int distToGoal = manhatten_dist(box.x, box.y, g.x, g.y);
-                        boxesDists.add(distToGoal);
-
-                        if(boxesDists.get(closestBoxToGoal) > distToGoal){
-                            closestBoxToGoal = boxesDists.size() - 1;
-                            closestBoxToAgent = box;
-                        }
+                    if(boxesDists.get(closestBoxToGoal) > distToGoal){
+                        closestBoxToGoal = boxesDists.size() - 1;
+                        closestBoxToAgent = box;
                     }
-                    int agentToBoxDist = manhatten_dist(closestBoxToAgent.x,
-                            closestBoxToAgent.y, a.x, a.y);
-                    agentToBoxesDists.add(agentToBoxDist);
-                    dists.add(boxesDists.get(closestBoxToGoal));
                 }
-                if(agentToBoxesDists.size() > 0) {
-                    int agent_heuristic = dists.stream().reduce((acc, d) -> acc + d).get() +
-                            agentToBoxesDists.stream().min(Integer::min).get();
-                    heuristic_sum += agent_heuristic;
-                } else {
-                    heuristic_sum += dists.stream().reduce((acc, x) -> acc + x).get();
-                }
+                int agentToBoxDist = manhatten_dist(closestBoxToAgent.x,
+                        closestBoxToAgent.y, a.x, a.y);
+                agentToBoxesDists.add(agentToBoxDist);
+                dists.add(boxesDists.get(closestBoxToGoal));
             }
-            return heuristic_sum;
+            if(agentToBoxesDists.size() > 0) {
+                return dists.stream().reduce((acc, d) -> acc + d).get() +
+                        agentToBoxesDists.stream().min(Integer::min).get();
+            } else {
+                return dists.stream().reduce((acc, x) -> acc + x).get();
+            }
         }
 
-        public int f(Node lvlNode) {
-            return lvlNode.g + h(lvlNode.level);
+        public int f(Node n) {
+            return n.g + h(n.level, n.agent);
         }
 
         @Override
@@ -158,8 +127,8 @@ public class Utils implements HTNUtils {
     }
 
     @Override
-    public Node accomplishLevel(Level initial, Level end) {
-        Node start = new Node(initial);
+    public Node accomplishLevel(Agent agent, Level initial, Level end) {
+        Node start = new Node(initial, agent);
         LevelHeuristic h = new LevelHeuristic(end);
         PriorityQueue<Node> frontier = new PriorityQueue<Node>(10, h);
         HashSet<Node> explored = new HashSet<Node>();
@@ -243,16 +212,14 @@ public class Utils implements HTNUtils {
         List<Node> neighbours = new LinkedList<>();
         for( Command c : Command.every) {
 
-            Agent agent = current.level.agents.get(0);
+            Agent agent = current.agent;
             int newAgentCol = agent.x + dirToColChange(c.dir1);
             int newAgentRow = agent.y + dirToRowChange(c.dir1);
 
             if(c.actType == Command.type.Move) {
                 if(current.level.cellIsFree(newAgentRow, newAgentCol)) {
-                    Level lvl = new Level(current.level,
-                            Arrays.asList(new Agent(agent.number, newAgentCol, newAgentRow)));
-
-                    Node n = new Node(current, lvl, c);
+                    Agent newAgent = new Agent(agent.number, newAgentCol, newAgentRow);
+                    Node n = new Node(current, current.level, c, newAgent);
                     neighbours.add(n);
                 }
             } else if ( c.actType == Command.type.Push ) {
@@ -267,11 +234,10 @@ public class Utils implements HTNUtils {
                                 .filter(b -> b.x == newAgentCol && b.y == newAgentRow).collect(Collectors.toList());
                         boxes.add(new Box(anyBox.get().name, newBoxCol, newBoxRow));
 
-                        Level lvl = new Level(current.level,
-                                Arrays.asList(new Agent(agent.number,newAgentCol,newAgentRow)),
-                                boxes);
+                        Agent newAgent = new Agent(agent.number, newAgentCol, newAgentRow);
+                        Level lvl = new Level(current.level, boxes);
 
-                        Node n = new Node(current, lvl, c);
+                        Node n = new Node(current, lvl, c, newAgent);
                         neighbours.add(n);
                     }
                 }
@@ -287,11 +253,10 @@ public class Utils implements HTNUtils {
                                 .filter(b -> b.x == boxCol && b.y == boxRow).collect(Collectors.toList());
                         boxes.add(new Box(anyBox.get().name, agent.x, agent.y));
 
-                        Level lvl = new Level(current.level,
-                                Arrays.asList(new Agent(agent.number,newAgentCol,newAgentRow)),
-                                boxes);
+                        Agent newAgent = new Agent(agent.number, newAgentCol, newAgentRow);
+                        Level lvl = new Level(current.level, boxes);
 
-                        Node n = new Node(current, lvl, c);
+                        Node n = new Node(current, lvl, c, newAgent);
                         neighbours.add(n);
                     }
                 }

@@ -82,7 +82,6 @@ public class LevelReader {
 
 
         Level level = new Level();
-        level.cells = cells;
         level.walls = walls;
         level.goals = goals;
         level.agents = agents;
