@@ -7,7 +7,7 @@ package SkyNet;
  */
 public class LOG {
 
-    private static boolean debug = true;
+    private static boolean debug = false;
     private static boolean verbose = true;
 
 
@@ -24,14 +24,14 @@ public class LOG {
 
     }
 
-    public static void D(String message) {
+    public static void d(String message) {
         if (debug) {
             System.err.println(message);
         }
     }
 
 
-    public static void V(String message) {
+    public static void v(String message) {
         if (verbose) {
             System.err.println(message);
         }

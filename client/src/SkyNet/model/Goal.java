@@ -42,7 +42,7 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     public void solveGoal(Box box) {
         if (box == null) {
             this.solved = null;
-            LOG.D("Goal destroyed: " + name);
+            LOG.d("Goal destroyed: " + name);
             return;
         }
         this.solved = box;
@@ -98,13 +98,13 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
 
     @Override
     public int compareTo(Goal g) {
-        LOG.D("Comparing this: " + this.name + " to " + g.name);
+        LOG.d("Comparing this: " + this.name + " to " + g.name);
         if (this.conflictingPlans.contains(g) || g.conflictingPlans.contains(this)) {
             //Mutual conflict
-            LOG.D("This conflicts: " + this.conflictPriority+ " and g: "+ g.conflictPriority);
+            LOG.d("This conflicts: " + this.conflictPriority + " and g: " + g.conflictPriority);
             return this.conflictPriority - g.conflictPriority;
         } else {
-            LOG.D("This size: " + this.sizePriority + " and g: "+ g.sizePriority);
+            LOG.d("This size: " + this.sizePriority + " and g: " + g.sizePriority);
             return g.sizePriority - this.sizePriority;
         }
     }

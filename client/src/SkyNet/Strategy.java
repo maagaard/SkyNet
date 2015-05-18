@@ -45,6 +45,8 @@ public abstract class Strategy {
 	
 	public abstract String toString();
 
+	public boolean doubleFrontier;
+
 	public static class StrategyBFS extends Strategy {
 
 		private ArrayDeque< Node > frontier;
@@ -119,6 +121,8 @@ public abstract class Strategy {
 	public static class StrategyBestFirst extends Strategy {
 		private Heuristic heuristic;
 
+		boolean doubleFrontier = false;
+
         private PriorityQueue<Node> frontier;
         private PriorityQueue<Node> oldFrontier;
 
@@ -128,11 +132,10 @@ public abstract class Strategy {
             frontier = new PriorityQueue<Node>(11, heuristic); //11 is default initial capacity
             oldFrontier = new PriorityQueue<Node>(11, heuristic); //11 is default initial capacity
 		}
+
 		public Node getAndRemoveLeaf() {
 
-            Node node;
-
-			boolean doubleFrontier = false;
+			Node node;
 
 			if (doubleFrontier) {
 				if (frontier.size() == 0) {
@@ -148,7 +151,7 @@ public abstract class Strategy {
 			}
 
 			if (heuristic != null && !node.isInitialState()) {
-//				LOG.D("H: " + heuristic.f(node));
+//				LOG.d("H: " + heuristic.f(node));
 			}
 
 			return node;
