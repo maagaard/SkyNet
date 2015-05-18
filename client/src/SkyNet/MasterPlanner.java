@@ -117,27 +117,29 @@ public class MasterPlanner implements Planner {
             currentState = shortest.getLast();
             lastSolvedGoalState = currentState;
 
-            currentState.level.solveGoalWithBox(goal, currentState.chosenBox); // goal.solveGoal(currentState.chosenBox);
+//            System.err.println("Goal: " + .name + ", box: " + currentState.chosenBox.name);
+//            currentState.level.solveGoalWithBox(, currentState.chosenBox); // goal.solveGoal(currentState.chosenBox);
+            currentState.level.solveGoalWithBox(currentState.chosenGoal, currentState.chosenBox); // goal.solveGoal(currentState.chosenBox);
             currentState.chosenBox.x = goal.x;
             currentState.chosenBox.y = goal.y;
 
             agent.x = currentState.agentCol;
             agent.y = currentState.agentRow;
 
+
             //TODO: Goal solved. Execute
-            try {
-                LevelWriter.ExecutePlan(new Plan(currentState.extractPlan()), serverMessages);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                LevelWriter.ExecutePlan(new Plan(currentState.extractPlan()), serverMessages);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
 
             //TODO: Update "WORLD" - update the state of the level, and add all new necessary knowledge
             //TODO: WHOLE LEVEL NEEDS TO BE UPDATED !!!!!!
 
             updateLevel();
-
 //            updateConflictingBoxes();
-
         }
 
         return new Plan(currentState.extractPlan());
@@ -145,7 +147,7 @@ public class MasterPlanner implements Planner {
 
 
     private LinkedList<Node> solveGoalWithBox(Strategy strategy, Agent agent, Goal goal, Box box) {
-        System.err.println("___________________________________");
+        System.err.println("______________________________");
         System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name + " at " + box.x + "," + box.y);
 
         LinkedList<Node> partialSolution = extractPlan(strategy, level, agent, goal, box);
