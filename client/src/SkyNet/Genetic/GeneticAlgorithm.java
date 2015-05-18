@@ -11,8 +11,11 @@ public class GeneticAlgorithm {
     private static Random rnd = new Random();
 
     public static PopulationMember GenerateSolution(int startX, int startY, List<Gene> genes) {
-        return GenerateSolution(startX, startY,
-          100, genes, 0.24, 0.5, 0.9, 25);
+        if(genes.size() > 1)
+            return GenerateSolution(startX, startY,
+                    100, genes, 0.24, 0.5, 0.9, 25);
+        else
+            return new PopulationMember(startX, startY, genes);
     }
 
     public static PopulationMember GenerateSolution(int startX, int startY,
@@ -57,8 +60,8 @@ public class GeneticAlgorithm {
             correctCount = 0;
 
         return evolve(minCorrectCount, fstParentPopulationRange,
-          sndParentPopulationRange, mutationChance,
-          correctCount, newMembers.toArray(new PopulationMember[newMembers.size()]));
+                sndParentPopulationRange, mutationChance,
+                correctCount, newMembers.toArray(new PopulationMember[newMembers.size()]));
     }
 
     private static List<PopulationMember> crossover(PopulationMember fstParent, PopulationMember sndParent) {
@@ -80,7 +83,7 @@ public class GeneticAlgorithm {
             if (index1 == index2)
                 if (index1 > 0) index1--;
                 else index1++;
-            swap(xs, index1, index2);
+                swap(xs, index1, index2);
             return new PopulationMember(xs, victim);
         } else return victim;
     }

@@ -50,7 +50,7 @@ public class LevelReader {
 
         ArrayList<Goal> goals = new ArrayList<Goal>();
 
-        while (!line.equals("")) {
+        while (line != null && !line.equals("")) {
             int length = line.length();
             if (length > longestLine) longestLine = length;
 

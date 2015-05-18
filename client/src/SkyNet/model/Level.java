@@ -25,17 +25,17 @@ public class Level {
         this.boxes = new ArrayList<>(boxes);
     }
 
-    public Level(Level lvl, List<Agent> agents, List<Box> boxes){
+    public Level(Level lvl, List<Box> boxes, List<Goal> goals){
         this.walls = lvl.walls;
-        this. goals = lvl.goals;
+        this. goals = new ArrayList<>(goals);
         this.width = lvl.width;
         this.height = lvl.height;
-        this.agents = new ArrayList<>(agents);
+        this.agents = lvl.agents;
         this.boxes = new ArrayList<>(boxes);
     }
 
     public boolean cellIsFree(int row, int col) {
-        return !(this.walls[row][col] ||
-            this.boxes.stream().anyMatch(box -> box.x == row && box.y == col));
+        return !this.walls[row][col] &&
+            !this.boxes.stream().anyMatch(box -> box.x == col && box.y == row);
     }
 }

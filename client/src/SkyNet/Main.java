@@ -1,11 +1,14 @@
 package SkyNet;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.List;
 
 //import SkyNet.PartialStrategy.*;
 //import SkyNet.PartialPlanHeuristic.*;
+import SkyNet.HTN.Search;
 import SkyNet.HTN.Utils;
 import SkyNet.model.Cell;
 import SkyNet.model.Level;
@@ -18,9 +21,33 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         System.err.println("SearchClient initializing.");
+        //LIVE
         BufferedReader serverMessages = new BufferedReader(new InputStreamReader(System.in));
+        //DEBUG
+//        BufferedReader serverMessages = new BufferedReader(new FileReader("levels/SAsimple1.lvl"));
         Level level = LevelReader.ReadLevel(serverMessages);
 
+        Search search = new Search();
+        List<Command> commands = search.completeLevel(level);
+
+        //DEBUG
+//        for (Command c : commands) {
+//            String act = c.toActionString();
+//            System.out.println(act);
+//        }
+
+        //LIVE
+        for (Command c : commands) {
+            String act = c.toActionString();
+            System.out.println(act);
+            String response = serverMessages.readLine();
+            if (response.contains("false")) {
+                System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
+                break;
+            }
+        }
+
+        /*
         Cell start = new Cell(level.agents.get(0).x, level.agents.get(0).y);
         Cell goal = new Cell(17, 5);
 
@@ -31,17 +58,7 @@ public class Main {
 
         System.err.println("--- Make boxes into wall!! ---");
         utils.printMap(start, goal, utils.boxesToWalls(level, level.boxes));
-
-
-        for (Command c : utils.findAgentMovePath(start, goal, level)) {
-            String act = c.toActionString();
-            System.out.println(act);
-            String response = serverMessages.readLine();
-            if (response.contains("false")) {
-                System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
-                break;
-            }
-        }
+        */
 
         /*
         // Use stderr to print to console

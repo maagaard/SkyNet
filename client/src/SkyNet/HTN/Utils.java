@@ -38,9 +38,11 @@ public class Utils implements HTNUtils {
     }
 
     @Override
-    public List<Command> findAgentMovePath(Cell start, Cell goal, Level level) {
-        Cell path = findPath(start, goal, level);
-        return getCommands(path);
+    public List<Cell> findAgentMovePAth(Cell start, Cell goal, Level level) {
+        Cell path = findPath(start, goal, new Level(level, new LinkedList<Box>()));
+        if(path != null && path.parent != null)
+            return getOrderedCells(path.parent);
+        else return new LinkedList<>();
     }
 
     private Cell findPath(Cell start, Cell goal, Level level){
@@ -73,10 +75,8 @@ public class Utils implements HTNUtils {
     }
 
     private class LevelHeuristic implements Comparator<Node>{
-        private Level goal;
 
-        public LevelHeuristic(Level goal) {
-            this.goal = goal;
+        public LevelHeuristic() {
         }
 
         private int h(Level lvl, Agent a) {
@@ -112,7 +112,10 @@ public class Utils implements HTNUtils {
                 return dists.stream().reduce((acc, d) -> acc + d).get() +
                         agentToBoxesDists.stream().min(Integer::min).get();
             } else {
-                return dists.stream().reduce((acc, x) -> acc + x).get();
+                if (dists.size() > 0)
+                    return dists.stream().reduce((acc, x) -> acc + x).get();
+                else
+                    return 0;
             }
         }
 
@@ -127,13 +130,12 @@ public class Utils implements HTNUtils {
     }
 
     @Override
-    public Node accomplishLevel(Agent agent, Level initial, Level end) {
-        Node start = new Node(initial, agent);
-        LevelHeuristic h = new LevelHeuristic(end);
+    public Node accomplishLevel(Agent agent, Level lvl) {
+        Node start = new Node(lvl, agent);
+        LevelHeuristic h = new LevelHeuristic();
         PriorityQueue<Node> frontier = new PriorityQueue<Node>(10, h);
         HashSet<Node> explored = new HashSet<Node>();
 
-        List<Command> commands = new LinkedList<Command>();
         frontier.add(start);
 
         while(true) {
@@ -186,10 +188,10 @@ public class Utils implements HTNUtils {
         return path;
     }
 
-    private List<Command> getCommands(Cell c) {
-        List<Command> commands = getPath(c).stream().map(cell -> new Command(cell.direction)).collect(Collectors.toList());
-        Collections.reverse(commands);
-        return commands;
+    private List<Cell> getOrderedCells(Cell c) {
+        List<Cell> cells = getPath(c);
+        Collections.reverse(cells);
+        return cells;
     }
 
     public void printMap(Cell start, Cell goal, Level level) {
@@ -224,14 +226,14 @@ public class Utils implements HTNUtils {
                 }
             } else if ( c.actType == Command.type.Push ) {
                 // Make sure that there's actually a box to move
-                Optional<Box> anyBox = current.level.boxes.stream().filter(b -> b.x == newAgentCol && b.y == newAgentRow).findAny();
+                Optional<Box> anyBox = boxAt(current.level, newAgentCol, newAgentRow);
                 if (anyBox.isPresent()) {
                     int newBoxRow = newAgentRow + dirToRowChange( c.dir2 );
                     int newBoxCol = newAgentCol + dirToColChange( c.dir2 );
                     // .. and that new cell of box is free
-                    if (current.level.cellIsFree(newBoxCol, newBoxRow) ) {
+                    if (current.level.cellIsFree(newBoxRow, newBoxCol) ) {
                         List<Box> boxes = current.level.boxes.stream()
-                                .filter(b -> b.x == newAgentCol && b.y == newAgentRow).collect(Collectors.toList());
+                                .filter(b -> !(b.x == newAgentCol && b.y == newAgentRow)).collect(Collectors.toList());
                         boxes.add(new Box(anyBox.get().name, newBoxCol, newBoxRow));
 
                         Agent newAgent = new Agent(agent.number, newAgentCol, newAgentRow);
@@ -247,10 +249,10 @@ public class Utils implements HTNUtils {
                     int boxRow = agent.y + dirToRowChange( c.dir2 );
                     int boxCol = agent.x + dirToColChange( c.dir2 );
                     // .. and there's a box in "dir2" of the agent
-                    Optional<Box> anyBox = current.level.boxes.stream().filter(b -> b.x == boxCol && b.y == boxRow).findAny();
+                    Optional<Box> anyBox = boxAt(current.level, boxCol, boxRow);
                     if (anyBox.isPresent()) {
                         List<Box> boxes = current.level.boxes.stream()
-                                .filter(b -> b.x == boxCol && b.y == boxRow).collect(Collectors.toList());
+                                .filter(b -> !(b.x == boxCol && b.y == boxRow)).collect(Collectors.toList());
                         boxes.add(new Box(anyBox.get().name, agent.x, agent.y));
 
                         Agent newAgent = new Agent(agent.number, newAgentCol, newAgentRow);
@@ -293,8 +295,8 @@ public class Utils implements HTNUtils {
         return ( d == Command.dir.E ? 1 : ( d == Command.dir.W ? -1 : 0 ) ); // East is left one column (1), west is right one column (-1)
     }
 
-    private boolean boxAt(Level lvl, int col, int row ) {
+    private Optional<Box> boxAt(Level lvl, int col, int row) {
         //return this.boxes[row][col] > 0;
-        return lvl.boxes.stream().anyMatch(b -> b.x == col && b.y == row);
+        return lvl.boxes.stream().filter(b -> b.x == col && b.y == row).findAny();
     }
 }
