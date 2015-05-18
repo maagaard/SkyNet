@@ -1,5 +1,7 @@
 package SkyNet.model;
 
+import SkyNet.LOG;
+
 import java.util.*;
 
 /**
@@ -40,7 +42,7 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     public void solveGoal(Box box) {
         if (box == null) {
             this.solved = null;
-            System.err.println("Goal destroyed: " + name);
+            LOG.D("Goal destroyed: " + name);
             return;
         }
         this.solved = box;
@@ -96,13 +98,13 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
 
     @Override
     public int compareTo(Goal g) {
-        System.err.println("Comparing this: " + this.name + " to " + g.name);
+        LOG.D("Comparing this: " + this.name + " to " + g.name);
         if (this.conflictingPlans.contains(g) || g.conflictingPlans.contains(this)) {
             //Mutual conflict
-            System.err.println("This conflicts: " + this.conflictPriority+ " and g: "+ g.conflictPriority);
+            LOG.D("This conflicts: " + this.conflictPriority+ " and g: "+ g.conflictPriority);
             return this.conflictPriority - g.conflictPriority;
         } else {
-            System.err.println("This size: " + this.sizePriority + " and g: "+ g.sizePriority);
+            LOG.D("This size: " + this.sizePriority + " and g: "+ g.sizePriority);
             return g.sizePriority - this.sizePriority;
         }
     }

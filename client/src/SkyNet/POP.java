@@ -27,15 +27,15 @@ public class POP {//} implements Planner {
 
             for (Box box : level.boxes) {
                 if (Character.toLowerCase(goal.name) == Character.toLowerCase(box.name)) {
-                    System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
+                    LOG.D("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name);
 
                     LinkedList<Node> solution = extractSubgoalSolution(level, agent, goal, box);
                     solutionList.add(new PartialPlan(agent, goal, box, solution));
 
                     if (solution == null) {
-                        System.err.format("No solution found\n");
+                        LOG.D("No solution found\n");
                     } else if (solution.size() == 0) {
-                        System.err.println("Solution of length 0 is wrong");
+                        LOG.D("Solution of length 0 is wrong");
                     }
                 }
             }
@@ -87,40 +87,40 @@ public class POP {//} implements Planner {
         try {
             LinkedList<Node> partialPlan = PartialSearch(strategy, state);
             if (partialPlan == null) return null;
-            System.err.format("Search starting with strategy %s\n", strategy);
+            LOG.D("Search starting with strategy " + strategy);
             return partialPlan;
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.format("Error");
+            LOG.D("Error");
             return null;
         }
     }
 
     public LinkedList<Node> PartialSearch(Strategy strategy, Node state) throws IOException {
-        System.err.format("Search starting with strategy %s\n", strategy);
+        LOG.D("Search starting with strategy "+ strategy);
 
         strategy.addToFrontier(state);
 
         int iterations = 0;
         while (true) {
-            if (iterations % 1000 == 0) { System.err.println(strategy.searchStatus()); }
+            if (iterations % 1000 == 0) { LOG.D(strategy.searchStatus()); }
             if (Memory.shouldEnd()) {
-                System.err.format("Memory limit almost reached, terminating search %s\n", Memory.stringRep());
+                LOG.D("Memory limit almost reached, terminating search " + Memory.stringRep());
                 return null;
             }
             if (strategy.timeSpent() > 600) { // Minutes timeout
-                System.err.format("Time limit reached, terminating search %s\n", Memory.stringRep());
+                LOG.D("Time limit reached, terminating search " + Memory.stringRep());
                 return null;
             }
             if (strategy.frontierIsEmpty()) {
-                System.err.format("Frontier is empty\n");
+                LOG.D("Frontier is empty\n");
                 return null;
             }
 
             Node leafNode = strategy.getAndRemoveLeaf();
 
             if (leafNode.isGoalState()) {
-                System.err.format("Goal state reached\n");
+                LOG.D("Goal state reached\n");
                 return leafNode.extractPlan();
             }
 

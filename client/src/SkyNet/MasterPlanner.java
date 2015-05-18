@@ -4,7 +4,6 @@ import SkyNet.model.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -62,13 +61,16 @@ public class MasterPlanner implements Planner {
 //        for (Goal g : sortedGoals) {
 //            size += g.optimalSolutionLength;
 //        }
-//        System.err.println(size);
+//        LOG.D(size);
 //        System.exit(0);
 
         /** Goal ordering determined by partial plans */
         partialPlans = partialPlanner.createPartialPlans(level);
         sortedGoals = sortGoals();
-        System.err.println("Goals: " + sortedGoals.size());
+        LOG.D("Goals: " + sortedGoals.size());
+
+        LOG.D("Goals: " + sortedGoals.size());
+
 //            updateConflictingBoxes();
 
 
@@ -90,14 +92,14 @@ public class MasterPlanner implements Planner {
                 solutionList.add(solution);
                 int subSolutionLength = solution.size() - currentState.g();
 
-                System.err.println("Found solution: " + subSolutionLength);
-                System.err.println("Optimal solution: " + goal.optimalSolutionLength);
+                LOG.D("Found solution: " + subSolutionLength);
+                LOG.D("Optimal solution: " + goal.optimalSolutionLength);
 
                 // Check if solution is close to the admissible result - if yes just go with it?
                 if (subSolutionLength <= (goal.optimalSolutionLength + 200)) {
                     break;
                 } else {
-                    System.err.println("Trying next box. " + matchingBoxes.size() + " boxes left");
+                    LOG.D("Trying next box. " + matchingBoxes.size() + " boxes left");
                 }
             }
 
@@ -119,7 +121,7 @@ public class MasterPlanner implements Planner {
             currentState = shortest.getLast();
             lastSolvedGoalState = currentState;
 
-//            System.err.println("Goal: " + .name + ", box: " + currentState.chosenBox.name);
+//            LOG.D("Goal: " + .name + ", box: " + currentState.chosenBox.name);
 //            currentState.level.solveGoalWithBox(, currentState.chosenBox); // goal.solveGoal(currentState.chosenBox);
             currentState.level.solveGoalWithBox(currentState.chosenGoal, currentState.chosenBox); // goal.solveGoal(currentState.chosenBox);
             currentState.chosenBox.x = goal.x;
@@ -149,14 +151,14 @@ public class MasterPlanner implements Planner {
 
 
     private LinkedList<Node> solveGoalWithBox(Strategy strategy, Agent agent, Goal goal, Box box) {
-        System.err.println("______________________________");
-        System.err.println("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name + " at " + box.x + "," + box.y);
+        LOG.D("______________________________");
+        LOG.D("Agent: " + agent.number + ", goal: " + goal.name + ", box: " + box.name + " at " + box.x + "," + box.y);
 
         LinkedList<Node> partialSolution = extractPlan(strategy, level, agent, goal, box);
 
         /** Back track from last successful node and solve goal again */
         if (partialSolution == null || partialSolution.size() == 0) {
-            System.err.println("Back track");
+            LOG.D("Back track");
             //TODO: Something is wrong - back-track
             //TODO: Can we assume, that if frontier is empty, the problem is caused by the last solved goal???
             Node node = currentState.parent;
@@ -168,7 +170,7 @@ public class MasterPlanner implements Planner {
                 return solveGoalWithBox(this.strategy, agent, currentState.chosenGoal, currentState.chosenBox);
             } else {
                 // Backtracked to first goal - skip back-tracking and try another box
-                System.err.println("########### I SHOULDN'T BE IN HERE !!!!!! I THINK ############");
+                LOG.D("########### I SHOULDN'T BE IN HERE !!!!!! I THINK ############");
                 currentState = lastSolvedGoalState;
 //                return solveGoalWithBox(this.strategy, agent, sortedGoals.get(solvedGoalCount), box);
             }
@@ -235,11 +237,10 @@ public class MasterPlanner implements Planner {
         ArrayList<Goal> sortedGoals = sortConflictingGoals(partialPlans);
 
         //Print goal order
-        System.err.format("Goal order: \n");
+        LOG.D("Goal order: ");
         for (Goal g : sortedGoals) {
-            System.err.format("" + g.name + ", ");
+            LOG.D("" + g.name + ", ");
         }
-        System.err.format("\n");
 
         return sortedGoals;
     }
@@ -251,7 +252,7 @@ public class MasterPlanner implements Planner {
 
         int longestPlan = 0;
         for (PartialPlan p : partialPlans) {
-            System.err.println("Plan " + p.goal.name + " length: " + p.size());
+            LOG.D("Plan " + p.goal.name + " length: " + p.size());
             if (p.size() > longestPlan) {
                 longestPlan = p.size();
             }
@@ -271,21 +272,21 @@ public class MasterPlanner implements Planner {
                     if (node.boxes[goal.y][goal.x] != 0) {
                         conflictGoalBox.add(goal);
                         goal.conflictingPlans.add(partialPlan.goal);
-                        System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
+                        LOG.D("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name);
                     }
                     // Goal agent conflict
                     if (goal.x == node.agentCol && goal.y == node.agentRow) {
                         conflictGoalAgent.add(goal);
 //                        goal.conflictingPlans.add(partialPlan.goal);
 
-                        System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
+                        LOG.D("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name);
                     }
                 }
             }
 //            float planSizePriority = (((float) longestPlan / (float) partialPlan.size()) * 10) / (level.goals.size()) * 10;
 //            int goalConflictPriority = (conflictGoalBox.size()) * 100 * level.goals.size();
 //            partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
-//            System.err.println("Plan " + partialPlan.goal.name + " size priority: " + planSizePriority + " conflict size: " + conflictGoalBox.size() + " total priority: " + partialPlan.goal.priority);
+//            LOG.D("Plan " + partialPlan.goal.name + " size priority: " + planSizePriority + " conflict size: " + conflictGoalBox.size() + " total priority: " + partialPlan.goal.priority);
         }
 
         for (Goal goal : level.unsolvedGoals) {
@@ -301,7 +302,7 @@ public class MasterPlanner implements Planner {
 //
 //            goal.priority = goalConflictPriority + (int) planSizePriority;
 
-            System.err.println("Plan " + goal.name + " size priority: " + goal.sizePriority + " conflict size: " + goal.conflictingPlans.size() + " total priority: " + (goal.sizePriority + goal.conflictPriority));
+            LOG.D("Plan " + goal.name + " size priority: " + goal.sizePriority + " conflict size: " + goal.conflictingPlans.size() + " total priority: " + (goal.sizePriority + goal.conflictPriority));
 
             sortedGoals.add(goal);
         }
@@ -364,7 +365,7 @@ public class MasterPlanner implements Planner {
             for (Node node : partialPlan.plan) {
                 for (Box box : boxes) {
                     if (box.x == node.agentCol && box.y == node.agentRow) {
-//                        System.err.println("Box: " + box.name + " interfering with plan for " + partialPlan.box.name);
+//                        LOG.D("Box: " + box.name + " interfering with plan for " + partialPlan.box.name);
                         conflictingBoxes.add(box);
                     }
                 }
@@ -382,7 +383,7 @@ public class MasterPlanner implements Planner {
 //        currentState.actingAgent = agent;
         currentState.chosenGoal = goal;
         currentState.chosenBox = box;
-        System.err.println("Goal: " + goal.x + "," + goal.y + " box: " + box.x + "," + box.y);
+        LOG.D("Goal: " + goal.x + "," + goal.y + " box: " + box.x + "," + box.y);
 //        currentState.agentCol = agent.x;
 //        currentState.agentRow = agent.y;
 
@@ -393,18 +394,18 @@ public class MasterPlanner implements Planner {
         try {
             LinkedList<Node> partialPlan = Search(this.strategy, currentState);
             if (partialPlan == null) return null;
-//            System.err.format("Search starting with strategy %s\n", this.strategy);
+//            LOG.D("Search starting with strategy %s\n", this.strategy);
             return partialPlan;
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.format("Error");
+            LOG.D("Error");
             return null;
         }
     }
 
 
     public LinkedList<Node> Search(Strategy strategy, Node state) throws IOException {
-        System.err.format("Search starting with strategy %s\n", strategy);
+        LOG.D("Search starting with strategy " + strategy);
         Heuristic.AStar h = new Heuristic.AStar(currentState);
         Node lastNode = null;
 
@@ -413,18 +414,18 @@ public class MasterPlanner implements Planner {
         int iterations = 0;
         while (true) {
             if (iterations % 1000 == 0) {
-                System.err.println(strategy.searchStatus());
+                LOG.D(strategy.searchStatus());
             }
             if (Memory.shouldEnd()) {
-                System.err.format("Memory limit almost reached, terminating search %s\n", Memory.stringRep());
+                LOG.D("Memory limit almost reached, terminating search " + Memory.stringRep());
                 return null;
             }
             if (strategy.timeSpent() > 1200) { // 20 Minutes timeout
-                System.err.format("Time limit reached, terminating search %s\n", Memory.stringRep());
+                LOG.D("Time limit reached, terminating search " + Memory.stringRep());
                 return null;
             }
             if (strategy.frontierIsEmpty()) {
-                System.err.format("Frontier is empty\n");
+                LOG.D("Frontier is empty\n");
 
                 //TODO: Back Track
 
@@ -447,7 +448,7 @@ public class MasterPlanner implements Planner {
             for (Node n : leafNode.getExpandedNodes()) {
                 if (!strategy.isExplored(n) && !strategy.inFrontier(n)) {
                     strategy.addToFrontier(n);
-//                    System.err.println("H: " + h.f(n));
+//                    LOG.D("H: " + h.f(n));
                 }
             }
 
