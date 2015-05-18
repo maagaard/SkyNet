@@ -70,4 +70,9 @@ public class Command {
 		return "[" + this.toString() + "]";
 	}
 
+
+	private String createJointAction() {
+		return "";
+	}
+
 }

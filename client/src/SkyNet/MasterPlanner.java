@@ -65,19 +65,21 @@ public class MasterPlanner implements Planner {
 //        System.err.println(size);
 //        System.exit(0);
 
+        /** Goal ordering determined by partial plans */
+        partialPlans = partialPlanner.createPartialPlans(level);
+        sortedGoals = sortGoals();
+        System.err.println("Goals: " + sortedGoals.size());
+//            updateConflictingBoxes();
+
 
         /** Create full plan */
         for (solvedGoalCount = 0; solvedGoalCount < level.goals.size(); solvedGoalCount++) {
 
-            /** Goal ordering determined by partial plans */
-            partialPlans = partialPlanner.createPartialPlans(level);
-            sortedGoals = sortGoals();
-            System.err.println("Goals: " + sortedGoals.size());
-//            updateConflictingBoxes();
 
             if (sortedGoals.size() == 0) {break;}
 
-            Goal goal = sortedGoals.get(0); // get(solvedGoalCount);
+//            Goal goal = sortedGoals.get(0); // get(solvedGoalCount);
+            Goal goal = sortedGoals.remove(0);
 
             ArrayList<Box> matchingBoxes = level.getMatchingBoxesForGoal(goal);
 
@@ -92,7 +94,7 @@ public class MasterPlanner implements Planner {
                 System.err.println("Optimal solution: " + goal.optimalSolutionLength);
 
                 // Check if solution is close to the admissible result - if yes just go with it?
-                if (subSolutionLength <= (goal.optimalSolutionLength + 20)) {
+                if (subSolutionLength <= (goal.optimalSolutionLength + 200)) {
                     break;
                 } else {
                     System.err.println("Trying next box. " + matchingBoxes.size() + " boxes left");

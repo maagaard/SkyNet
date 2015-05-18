@@ -30,6 +30,8 @@ public class Main {
         if (plan.GetPlan().size() == 0) {
             System.err.println("Unable to solve level");
         } else {
+            //TODO: Maybe remove this stuff?
+
             System.err.println("Found solution of length " + plan.GetPlan().size());
 
             LevelWriter.ExecutePlan(plan, serverMessages);

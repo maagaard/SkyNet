@@ -21,10 +21,10 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
     public HashSet<Box> conflictingBoxes = new HashSet<>();
     public HashSet<Goal> conflictingPlans = new HashSet<>();
     public ArrayList<ProposedSolution> suggestedBoxOrder = new ArrayList<>();
-
     public Box suggestedBox;
-    public PriorityQueue<Box> boxQueue;
+
     public int optimalSolutionLength = 0;
+    public PartialPlan partialPlan;
 
     private Box solved = null;
 
@@ -96,12 +96,14 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
 
     @Override
     public int compareTo(Goal g) {
-        System.err.println("Comparing " + this.name + " to " + g.name);
-        if (this.conflictingPlans.contains(g)) {
+        System.err.println("Comparing this: " + this.name + " to " + g.name);
+        if (this.conflictingPlans.contains(g) || g.conflictingPlans.contains(this)) {
             //Mutual conflict
+            System.err.println("This conflicts: " + this.conflictPriority+ " and g: "+ g.conflictPriority);
             return this.conflictPriority - g.conflictPriority;
         } else {
-            return this.sizePriority - g.sizePriority;
+            System.err.println("This size: " + this.sizePriority + " and g: "+ g.sizePriority);
+            return g.sizePriority - this.sizePriority;
         }
     }
 

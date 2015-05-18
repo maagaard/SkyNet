@@ -62,7 +62,7 @@ public class POP {//} implements Planner {
 
             goal.suggestedBox = shortestPlan.box;
             goal.optimalSolutionLength = shortestPlan.size();
-
+            goal.partialPlan = shortestPlan;
 
             //TODO: See if any goals uses the same box for shortest solution - and solve problem?
 

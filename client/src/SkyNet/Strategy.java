@@ -132,7 +132,7 @@ public abstract class Strategy {
 
             Node node;
 
-			boolean doubleFrontier = false;
+			boolean doubleFrontier = true;
 
 			if (doubleFrontier) {
 				if (frontier.size() == 0) {

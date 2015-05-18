@@ -16,5 +16,5 @@ public class Agent {
     public char number;
     public int x;
     public int y;
-
+    public String color;
 }

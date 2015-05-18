@@ -40,6 +40,9 @@ public class Node {
 
     public int agentRow;
     public int agentCol;
+
+    public Map<Integer, Integer> agentMap = new HashMap<>();
+
     public char agentNumber;
     public int destroyingGoal = 0;
     public int stupidMoveHeuristics = 0;
