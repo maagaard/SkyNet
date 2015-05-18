@@ -147,16 +147,27 @@ public abstract class Heuristic implements Comparator<Node> {
                 int agentBoxDist = Math.abs(n.chosenBox.y - n.agentRow) + Math.abs(n.chosenBox.x - n.agentCol);
                 int boxGoalDist = Math.abs(n.chosenGoal.y - n.chosenBox.y) + Math.abs(n.chosenGoal.x - n.chosenBox.x);
 
-                return boxGoalDist + agentBoxDist + 7;
+                return boxGoalDist + agentBoxDist + 9;
 
             } else {
                 //When pushing and pulling
+
                 if (n.movingBoxId != n.chosenBox.id) {
+
+                    boolean isBoxInConflict = n.chosenGoal.conflictingBoxes.contains(n.level.getBox(n.movingBoxId));
+
                     int agentBoxDist = Math.abs(n.chosenBox.y - n.agentRow) + Math.abs(n.chosenBox.x - n.agentCol);
                     int boxGoalDist = Math.abs(n.chosenGoal.y - n.chosenBox.y) + Math.abs(n.chosenGoal.x - n.chosenBox.x);
-//                    int extra = 3;
-//                    if (n.destroyingGoal > 0) { extra += 50; }
-                    return boxGoalDist + agentBoxDist + 5 + n.destroyingGoal;
+
+                    if (isBoxInConflict) {
+                        //Park box elsewhere
+//                        if (n.level.isParkingCell(n.movingBoxX, n.movingBoxY)) {
+//                        }
+
+                        return boxGoalDist + agentBoxDist + 5 + n.destroyingGoal;
+                    } else {
+                        return boxGoalDist + agentBoxDist + 31 + n.destroyingGoal;
+                    }
                 } else {
 
                     if (n.action.actType == Command.type.Push) {
@@ -168,27 +179,14 @@ public abstract class Heuristic implements Comparator<Node> {
                     return boxGoalDist + agentBoxDist;
                 }
 
-                //TODO: Discourage moving irrelevant boxes
 
                 //TODO: Courage moving of correct box towards goal
 
                 //TODO: Correlate with setting of chosen box in Node
-//                return (Math.abs(n.chosenGoal.y - n.chosenBox.y) + (Math.abs(n.chosenGoal.x - n.chosenBox.x)));
+
             }
 
-//            if (n.chosenGoal.conflictingBoxes.size() == 0 && n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
-//                randomBoxMoveDisadvantage = 100;
-//            } else if (n.movingBoxId != 0 && n.movingBoxId != n.chosenBox.id) {
-//
-//                for (Box box : n.chosenGoal.conflictingBoxes) {
-//                    if (n.movingBoxId == box.id) {
-//                        randomBoxMoveDisadvantage = 0;
-//                        break;
-//                    }
-//                    randomBoxMoveDisadvantage = 100;
-//                }
-//            }
-//            return agentBoxDist + boxGoalDist + agentGoalDist + solvedGoalDistance(n) + randomBoxMoveDisadvantage;
+
         } else {
             return partialH(n);
         }

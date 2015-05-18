@@ -69,16 +69,16 @@ public class MasterPlanner implements Planner {
         sortedGoals = sortGoals();
         LOG.D("Goals: " + sortedGoals.size());
 
-        LOG.D("Goals: " + sortedGoals.size());
-
-//            updateConflictingBoxes();
+        updateConflictingBoxes();
 
 
         /** Create full plan */
         for (solvedGoalCount = 0; solvedGoalCount < level.goals.size(); solvedGoalCount++) {
 
 
-            if (sortedGoals.size() == 0) {break;}
+            if (sortedGoals.size() == 0) {
+                break;
+            }
 
 //            Goal goal = sortedGoals.get(0); // get(solvedGoalCount);
             Goal goal = sortedGoals.remove(0);
@@ -127,6 +127,8 @@ public class MasterPlanner implements Planner {
             currentState.chosenBox.x = goal.x;
             currentState.chosenBox.y = goal.y;
 
+//            currentState.resetNodeCount();
+
             agent.x = currentState.agentCol;
             agent.y = currentState.agentRow;
 
@@ -166,7 +168,7 @@ public class MasterPlanner implements Planner {
 
             if (solvedGoalCount >= 1) {
                 currentState = node;
-                solvedGoalCount = sortedGoals.indexOf(currentState.chosenGoal)-1;
+                solvedGoalCount = sortedGoals.indexOf(currentState.chosenGoal) - 1;
                 return solveGoalWithBox(this.strategy, agent, currentState.chosenGoal, currentState.chosenBox);
             } else {
                 // Backtracked to first goal - skip back-tracking and try another box
@@ -266,23 +268,27 @@ public class MasterPlanner implements Planner {
             Set<Goal> conflictGoalBox = new HashSet<>();
             Set<Goal> conflictGoalAgent = new HashSet<>();
 
-            for (Node node : partialPlan.plan) {
-                for (Goal goal : goals) {
-                    //Goal box movement conflict
-                    if (node.boxes[goal.y][goal.x] != 0) {
-                        conflictGoalBox.add(goal);
-                        goal.conflictingPlans.add(partialPlan.goal);
-                        LOG.D("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name);
-                    }
-                    // Goal agent conflict
-                    if (goal.x == node.agentCol && goal.y == node.agentRow) {
-                        conflictGoalAgent.add(goal);
-//                        goal.conflictingPlans.add(partialPlan.goal);
+            shit(partialPlans);
 
-                        LOG.D("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name);
-                    }
-                }
-            }
+//            for (Node node : partialPlan.plan) {
+//                for (Goal goal : goals) {
+//                    //Goal box movement conflict
+//                    if (node.boxes[goal.y][goal.x] != 0) {
+//                        conflictGoalBox.add(goal);
+//                        goal.conflictingPlans.add(partialPlan.goal);
+//                        LOG.D("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name);
+//                    }
+//                    // Goal agent conflict
+//                    if (goal.x == node.agentCol && goal.y == node.agentRow) {
+//                        conflictGoalAgent.add(goal);
+////                        goal.conflictingPlans.add(partialPlan.goal);
+//
+//                        LOG.D("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name);
+//                    }
+//                }
+//            }
+
+
 //            float planSizePriority = (((float) longestPlan / (float) partialPlan.size()) * 10) / (level.goals.size()) * 10;
 //            int goalConflictPriority = (conflictGoalBox.size()) * 100 * level.goals.size();
 //            partialPlan.goal.priority = goalConflictPriority + (int) planSizePriority;
@@ -291,7 +297,7 @@ public class MasterPlanner implements Planner {
 
         for (Goal goal : level.unsolvedGoals) {
 
-            goal.sizePriority = (int)(((float) longestPlan / (float) goal.optimalSolutionLength) * 10) / (level.goals.size()) * 10;
+            goal.sizePriority = (int) (((float) longestPlan / (float) goal.optimalSolutionLength) * 10) / (level.goals.size()) * 10;
             goal.conflictPriority = (goal.conflictingPlans.size()) * 100 * level.goals.size();
 
 //            int goalConflictPriority = 0;
@@ -323,33 +329,31 @@ public class MasterPlanner implements Planner {
 //                int x = node.agentCol;
 //                int y = node.agentRow;
 
-
                 for (Goal goal : goals) {
                     int x = goal.x;
                     int y = goal.y;
 
                     if (node.boxes[y][x] != 0) {
-                        // Horizontal issue
-                        if (node.walls[y-1][x] && node.walls[y+1][x] && (node.action.dir1 == Command.dir.E || node.action.dir1 == Command.dir.W)) {
-
+                        if (conflictAvoidable(node, x, y)) {
+                            goal.conflictingPlans.add(partialPlan.goal);
                         }
-                        else if (node.walls[y][x+1] && node.walls[y][x+1] && (node.action.dir1 == Command.dir.S || node.action.dir1 == Command.dir.N)) {
-
-                        }
-
-
-
                     }
-
                 }
-
             }
-
-
         }
-
     }
 
+
+    private boolean conflictAvoidable(Node n, int x, int y) {
+        // Horizontal issue
+        if (n.walls[y - 1][x] || n.walls[y + 1][x] && (n.action.dir1 == Command.dir.E || n.action.dir1 == Command.dir.W)) {
+            return true;
+        } else if (n.walls[y][x + 1] || n.walls[y][x + 1] && (n.action.dir1 == Command.dir.S || n.action.dir1 == Command.dir.N)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     private void updateConflictingBoxes() {
         for (PartialPlan partialPlan : partialPlans) {
@@ -370,6 +374,7 @@ public class MasterPlanner implements Planner {
                     }
                 }
             }
+            LOG.D("Plan: " + partialPlan.box.name + " has " + conflictingBoxes.size() + " conflicting boxes");
             partialPlan.goal.conflictingBoxes = new HashSet<>(conflictingBoxes);
         }
     }
@@ -406,7 +411,7 @@ public class MasterPlanner implements Planner {
 
     public LinkedList<Node> Search(Strategy strategy, Node state) throws IOException {
         LOG.D("Search starting with strategy " + strategy);
-        Heuristic.AStar h = new Heuristic.AStar(currentState);
+//        Heuristic.AStar h = new Heuristic.AStar(currentState);
         Node lastNode = null;
 
         strategy.addToFrontier(state);

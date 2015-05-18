@@ -1,10 +1,22 @@
 package SkyNet.model;
 
+import SkyNet.Node;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import static SkyNet.model.PathFragment.*;
 
 public class Level {
 
+    public class Position {
+        public final int x, y;
+        public Position(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
 
     public boolean walls[][];
     public ArrayList<Goal> goals;
@@ -17,6 +29,9 @@ public class Level {
 
     public HashMap<Integer, Goal> solvedGoals = new HashMap<>();
     public ArrayList<Goal> unsolvedGoals = new ArrayList<>();
+
+    public Map<Position, Boolean> freeCellMap = new HashMap<>();
+
 //    public HashMap<Integer, Goal> unsolvedGoals = new HashMap<>();
 
     public int width;
@@ -25,6 +40,20 @@ public class Level {
     public Level() {
     }
 
+    //Used for mapping "unused" cells
+    public void createFreeCellMap() {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                freeCellMap.put(new Position(i, j), Boolean.TRUE);
+            }
+        }
+    }
+
+    public void updateFreeCellMap(PartialPlan plan) {
+        for (Node n : plan.plan) {
+
+        }
+    }
 
     //Used for mapping box ids to boxes
     public void createBoxMap() {
@@ -127,4 +156,9 @@ public class Level {
         return solvedGoals.get(boxId);
     }
 
+
+    public boolean isParkingCell(int movingBoxX, int movingBoxY) {
+        Position p = new Position(movingBoxX, movingBoxY);
+        return freeCellMap.get(p);
+    }
 }

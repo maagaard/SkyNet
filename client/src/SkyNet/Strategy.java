@@ -132,7 +132,7 @@ public abstract class Strategy {
 
             Node node;
 
-			boolean doubleFrontier = true;
+			boolean doubleFrontier = false;
 
 			if (doubleFrontier) {
 				if (frontier.size() == 0) {
@@ -145,6 +145,10 @@ public abstract class Strategy {
 				}
 			} else {
 				node = frontier.poll();
+			}
+
+			if (heuristic != null && !node.isInitialState()) {
+//				LOG.D("H: " + heuristic.f(node));
 			}
 
 			return node;

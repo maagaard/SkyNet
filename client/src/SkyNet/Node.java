@@ -76,6 +76,10 @@ public class Node {
         }
     }
 
+    public void resetNodeCount() {
+        g = 0;
+    }
+
     public int g() {
         return g;
     }

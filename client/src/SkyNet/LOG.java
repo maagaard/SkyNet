@@ -7,8 +7,8 @@ package SkyNet;
  */
 public class LOG {
 
-    public static boolean debug = true;
-    public static boolean verbose = true;
+    private static boolean debug = true;
+    private static boolean verbose = true;
 
 
 //    static {
