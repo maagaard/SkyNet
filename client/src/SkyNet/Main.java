@@ -3,11 +3,13 @@ package SkyNet;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 //import SkyNet.PartialStrategy.*;
 //import SkyNet.PartialPlanHeuristic.*;
+import SkyNet.HTN.DistanceMap;
 import SkyNet.HTN.Search;
 import SkyNet.HTN.Utils;
 import SkyNet.model.Cell;
@@ -30,6 +32,13 @@ public class Main {
         Search search = new Search();
         List<Command> commands = search.completeLevel(level);
 
+        //DEBUG distancemap
+        Utils util = new Utils();
+        DistanceMap distanceMap = new DistanceMap(util);
+        Cell start = new Cell(1,1);
+        HashMap<String, Integer> distances = distanceMap.calculateDistanceMap(start, level);
+        distanceMap.printDistanceMap(distances, level);
+
         //DEBUG
 //        for (Command c : commands) {
 //            String act = c.toActionString();
@@ -37,28 +46,31 @@ public class Main {
 //        }
 
         //LIVE
+        /*
         for (Command c : commands) {
             String act = c.toActionString();
             System.out.println(act);
+            System.err.println(act);
             String response = serverMessages.readLine();
             if (response.contains("false")) {
                 System.err.format("Server responsed with %s to the inapplicable action: %s\n", response, act);
                 break;
             }
         }
+        */
 
-        /*
-        Cell start = new Cell(level.agents.get(0).x, level.agents.get(0).y);
-        Cell goal = new Cell(17, 5);
+
+        Cell start2 = new Cell(level.agents.get(0).x, level.agents.get(0).y);
+        Cell goal = new Cell(1, 2);
 
         Utils utils = new Utils();
 
         System.err.println("--- Move agent from S to G ---");
-        utils.printMap(start, goal, level);
+        utils.printMap(start2, goal, level);
 
         System.err.println("--- Make boxes into wall!! ---");
-        utils.printMap(start, goal, utils.boxesToWalls(level, level.boxes));
-        */
+        utils.printMap(start2, goal, utils.boxesToWalls(level, level.boxes));
+
 
         /*
         // Use stderr to print to console

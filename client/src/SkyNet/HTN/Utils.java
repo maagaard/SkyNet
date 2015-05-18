@@ -207,7 +207,8 @@ public class Utils implements HTNUtils {
                       System.err.print(" ");
                   }
 
-              } System.err.print(System.getProperty("line.separator")); }
+              } System.err.print(System.getProperty("line.separator"));
+          }
     }
 
     private List<Node> findNeighbours(Node current) {
