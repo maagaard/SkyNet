@@ -96,6 +96,7 @@ public class Goal implements Comparable<Goal> {//Comparator<Goal> {
 
     @Override
     public int compareTo(Goal g) {
+        System.err.println("Comparing " + this.name + " to " + g.name);
         if (this.conflictingPlans.contains(g)) {
             //Mutual conflict
             return this.conflictPriority - g.conflictPriority;

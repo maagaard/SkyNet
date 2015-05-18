@@ -266,8 +266,8 @@ public class MasterPlanner implements Planner {
                     //Goal box movement conflict
                     if (node.boxes[goal.y][goal.x] != 0) {
                         conflictGoalBox.add(goal);
-                        System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
                         goal.conflictingPlans.add(partialPlan.goal);
+                        System.err.format("Goal: " + goal.name + " conflicting with plan for " + partialPlan.goal.name + "\n");
                     }
                     // Goal agent conflict
                     if (goal.x == node.agentCol && goal.y == node.agentRow) {
