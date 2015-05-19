@@ -13,7 +13,7 @@ public class GeneticAlgorithm {
     public static PopulationMember GenerateSolution(int startX, int startY, List<Gene> genes) {
         if(genes.size() > 1)
             return GenerateSolution(startX, startY,
-                    100, genes, 0.24, 0.5, 0.9, 25);
+                    100, genes, 0.24, 0.5, 0.7, 50);
         else
             return new PopulationMember(startX, startY, genes);
     }

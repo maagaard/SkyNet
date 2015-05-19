@@ -11,9 +11,11 @@ import java.util.HashMap;
 public class DistanceMap {
 
     private HTNUtils utils;
+    private MovePathGenerator movePathGenerator;
 
     public DistanceMap(HTNUtils utils) {
         this.utils = utils;
+        this.movePathGenerator = MovePathGenerator.getInstance();
     }
 
     /**
@@ -35,7 +37,7 @@ public class DistanceMap {
             for(int col = 0; col < width; col++) {
                 if(!level.walls[row][col]) {
                     Cell cell = new Cell(col, row);
-                    int distance = utils.findAgentMovePAth(start, cell, level).size();
+                    int distance = this.movePathGenerator.findAgentMovePAth(start, cell, level).size();
                     map.put("" + cell.x + cell.y, distance);
                 }
             }

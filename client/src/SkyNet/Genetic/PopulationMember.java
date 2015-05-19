@@ -30,7 +30,8 @@ public class PopulationMember implements Comparable{
         else {
             Gene head = popMemberGenes.get(0);
             List<Gene> tail = popMemberGenes.stream().skip(1).collect(Collectors.toList());
-            int score = acc + head.distanceTo(tail.get(0));
+            int distTo = head.distanceTo(tail.get(0));
+            int score = acc + distTo;
             if(tail.size() >= 2)
                 return score(score, tail);
             else
@@ -41,10 +42,6 @@ public class PopulationMember implements Comparable{
     @Override
     public int compareTo(Object o) {
         return this.score - ((PopulationMember)o).score;
-    }
-
-    private int dist(int x1, int y1, int x2, int y2){
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 }
 

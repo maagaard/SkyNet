@@ -17,8 +17,6 @@ public class Box {
         this.y = y;
     }
 
-
-
     @Override
     public int hashCode() {
         final int prime = 37;
@@ -40,8 +38,11 @@ public class Box {
 //            return false;
         if (this.hashCode() == obj.hashCode())
             return true;
-
-
         return false;
     }
+
+    public String toString(){
+        return "Box(" + this.name + ", " + this.x + ", " + this.y + ")";
+    }
+
 }

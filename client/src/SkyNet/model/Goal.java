@@ -21,8 +21,6 @@ public class Goal implements Comparator<Goal> {
         this.y = y;
     }
 
-
-
     @Override
     public int hashCode() {
         final int prime = 37;
@@ -49,8 +47,10 @@ public class Goal implements Comparator<Goal> {
 //            return false;
         if (this.hashCode() == obj.hashCode())
             return true;
-
-
         return false;
+    }
+
+    public String toString(){
+        return "Goal(" + this.name + ", " + this.x + ", " + this.y + ")";
     }
 }

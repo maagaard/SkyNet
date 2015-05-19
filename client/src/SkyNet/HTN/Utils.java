@@ -7,65 +7,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Utils implements HTNUtils {
+
+    public Utils(){
+    }
+
     private int manhatten_dist(int x1, int y1, int x2, int y2){
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-    }
-
-    private class SignleGoalHeuristic implements Comparator<Cell>{
-        private Cell goal;
-        private Cell init;
-
-        public SignleGoalHeuristic(Cell init, Cell goal) {
-            this.init = init;
-            this.goal = goal;
-        }
-
-        private int h(Cell current) {
-            float dx = goal.x - current.x;
-            float dy = goal.y - current.y;
-
-            return (int)(Math.sqrt((dx*dx) + (dy*dy)));
-        }
-
-        public int f(Cell c) {
-            return c.g + h(c);
-        }
-
-        @Override
-        public int compare(Cell o1, Cell o2) {
-            return f(o1) - f(o2);
-        }
-    }
-
-    @Override
-    public List<Cell> findAgentMovePAth(Cell start, Cell goal, Level level) {
-        Cell path = findPath(start, goal, new Level(level, new LinkedList<Box>()));
-        if(path != null && path.parent != null)
-            return getOrderedCells(path.parent);
-        else return new LinkedList<>();
-    }
-
-    private Cell findPath(Cell start, Cell goal, Level level){
-        start.g = 0;
-        start.parent = null;
-        SignleGoalHeuristic h = new SignleGoalHeuristic(start, goal);
-        PriorityQueue<Cell> frontier = new PriorityQueue<Cell>(10, h);
-        HashSet<Cell> explored = new HashSet<Cell>();
-        frontier.add(start);
-
-        while(true) {
-            if (frontier.isEmpty())
-                return null;
-
-            Cell current = frontier.poll();
-            if(current.x == goal.x && current.y == goal.y)
-                return current;
-
-            explored.add(current);
-            for(Cell c : findNeighbours(current, level))
-                if(!explored.contains(c) && !frontier.contains(c))
-                    frontier.add(c);
-        }
     }
 
     private boolean goalAchieved(List<Box> boxes, Goal g){
@@ -76,7 +23,10 @@ public class Utils implements HTNUtils {
 
     private class LevelHeuristic implements Comparator<Node>{
 
+        private MovePathGenerator movePathGenerator;
+
         public LevelHeuristic() {
+            this.movePathGenerator = MovePathGenerator.getInstance();
         }
 
         private int h(Level lvl, Agent a) {
@@ -95,7 +45,19 @@ public class Utils implements HTNUtils {
                 Box closestBoxToAgent = boxes.get(0);
 
                 for(Box box : boxes){
-                    int distToGoal = manhatten_dist(box.x, box.y, g.x, g.y);
+                    //int distToGoal = manhatten_dist(box.x, box.y, g.x, g.y);
+                    List<Box> obstacles = lvl.boxes.stream()
+                            .filter(b -> b.x == box.x && b.y == box.y)
+                            .collect(Collectors.toList());
+                    List<Cell> agentMovePAth =
+                            this.movePathGenerator.findAgentMovePAth(
+                                    new Cell(box.x, box.y),
+                                    new Cell(g.x, g.y),
+                                    obstacles);
+                    int distToGoal = agentMovePAth.size();
+                    if(agentMovePAth.size() == 1 && agentMovePAth.get(0).x == -1)
+                        distToGoal = agentMovePAth.size();
+
                     boxesDists.add(distToGoal);
 
                     if(boxesDists.get(closestBoxToGoal) > distToGoal){
@@ -179,21 +141,6 @@ public class Utils implements HTNUtils {
         return rtnLevel;
     }
 
-    private List<Cell> getPath(Cell c) {
-        LinkedList<Cell> path = new LinkedList<Cell>();
-        while(c.parent != null) {
-            path.add(c);
-            c = c.parent;
-        }
-        return path;
-    }
-
-    private List<Cell> getOrderedCells(Cell c) {
-        List<Cell> cells = getPath(c);
-        Collections.reverse(cells);
-        return cells;
-    }
-
     public void printMap(Cell start, Cell goal, Level level) {
           for(int h = 0; h < level.height; h++) {
               for(int w = 0; w < level.width; w++) {
@@ -268,31 +215,12 @@ public class Utils implements HTNUtils {
         return neighbours;
     }
 
-    private List<Cell> findNeighbours(Cell current, Level level) {
-        LinkedList<Cell> neighbours = new LinkedList<>();
-        for( Command c : Command.every) {
 
-            int x = current.x + dirToColChange(c.dir1);
-            int y = current.y + dirToRowChange(c.dir1);
-
-            if(c.actType == Command.type.Move) {
-                if(level.cellIsFree(y, x)) {
-                    Cell cell = new Cell(x,y);
-                    cell.parent = current;
-                    cell.direction = c.dir1;
-                    cell.g = current.g + 1;
-                    neighbours.add(cell);
-                }
-            }
-        }
-        return neighbours;
-    }
-
-    private int dirToRowChange( Command.dir d ) {
+    public int dirToRowChange( Command.dir d ) {
         return ( d == Command.dir.S ? 1 : ( d == Command.dir.N ? -1 : 0 ) ); // South is down one row (1), north is up one row (-1)
     }
 
-    private int dirToColChange( Command.dir d ) {
+    public int dirToColChange( Command.dir d ) {
         return ( d == Command.dir.E ? 1 : ( d == Command.dir.W ? -1 : 0 ) ); // East is left one column (1), west is right one column (-1)
     }
 

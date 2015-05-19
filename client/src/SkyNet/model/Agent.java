@@ -17,4 +17,8 @@ public class Agent {
     public int x;
     public int y;
 
+    @Override
+    public String toString(){
+        return "Agent(" + this.number + ", " + this.x + ", " + this.y + ")";
+    }
 }
